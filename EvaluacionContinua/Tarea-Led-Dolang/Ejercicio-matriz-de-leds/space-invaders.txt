@@ -32,5 +32,43 @@ main_loop:
     out PORTD, r17
     rcall deley
 
+    ldi r16, 0x04
+    ldi r17, 0x00
+    out PORTB, r16
+    out PORTD, r17
+    rcall deley
 
+    ldi r16, 0x05
+    ldi r17, 0x00
+    out PORTB, r16
+    out PORTD, r17
+    rcall deley
+
+    ldi r16, 0x06
+    ldi r17, 0x3c
+    out PORTB, r16
+    out PORTD, r17
+    rcall deley
+
+    ldi r16, 0x07
+    ldi r17, 0x99
+    out PORTB, r16
+    out PORTD, r17
+    rcall deley
+
+    rjmp main_loop
+
+deley:
+    ldi r20, 70
+    ldi r18, 255
+    ldi r19, 255
+L1:    
+    dec r19
+    brne L1
+    dec r18
+    brne L1
+    dec r20
+    brne L1
+
+    ret
 
