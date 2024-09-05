@@ -1,45 +1,82 @@
 ;Ejercicio de visualizacion de un corazon
-.include "m328pdef.inc"
-.org 0x00
+.include "m328pdef.inc" ; Incluir el archivo de definición del microcontrolador ATmega328P
+.org 0x00               ; Indica la dirección de memoria de inicio     
 
-;Inicializacion
+;Configuracion del puerto D como salida con lo que se encuentra en el registro r20
 ldi r20, 0xff
 out DDRD, r20
 
 main_loop:
-          ldi r16, 0x00
-          ldi r17, 0x99
-          out PORTB, r16
-          out PORTD, r17
-          rcall deley
+          ;Primera linea de la matriz
+          ldi r16, 0x00          ;Carga 0x00 en registro 16
+          ldi r17, 0x99          ;Carga 0x99 en registro 17
+          out PORTB, r16         ;Configura el puerto B con los datos del registro 16
+          out PORTD, r17         ;Configura el puerto D con los datos del registro 17
+          rcall deley            ;Llama a deley
 
-          ldi r16, 0x01
-          ldi r17, 0x00
-          out PORTB, r16
-          out PORTD, r17
-          rcall deley
+          ;Segunda linea de la matriz
+          ldi r16, 0x01          ;Carga 0x01 en registro 16
+          ldi r17, 0x00          ;Carga 0x00 en registro 17
+          out PORTB, r16         ;Configura el puerto B con los datos del registro 16
+          out PORTD, r17         ;Configura el puerto D con los datos del registro 17
+          rcall deley            ;Llama a deley
 
-          ldi r16, 0x02
-          ldi r17, 0x00
-          out PORTB, r16
-          out PORTD, r17
-          rcall deley
+          ;Tercera linea de la matriz
+          ldi r16, 0x02          ;Carga 0x00 en registro 16
+          ldi r17, 0x00          ;Carga 0x99 en registro 17
+          out PORTB, r16         ;Configura el puerto B con los datos del registro 16
+          out PORTD, r17         ;Configura el puerto D con los datos del registro 17
+          rcall deley            ;Llama a deley       
 
-          ldi r16, 0x03
-          ldi r17, 0x00
-          out PORTB, r16
-          out PORTD, r17
-          rcall deley
+          ;Cuarta linea de la matriz
+          ldi r16, 0x03          ;Carga 0x00 en registro 16
+          ldi r17, 0x00          ;Carga 0x99 en registro 17
+          out PORTB, r16         ;Configura el puerto B con los datos del registro 16
+          out PORTD, r17         ;Configura el puerto D con los datos del registro 17
+          rcall deley            ;Llama a deley      
 
-          ldi r16, 0x04
-          ldi r17, 0x00
-          out PORTB, r16
-          out PORTD, r17
-          rcall deley
+          ;Quinta linea de la matriz
+          ldi r16, 0x04          ;Carga 0x00 en registro 16
+          ldi r17, 0x00          ;Carga 0x99 en registro 17
+          out PORTB, r16         ;Configura el puerto B con los datos del registro 16
+          out PORTD, r17         ;Configura el puerto D con los datos del registro 17
+          rcall deley            ;Llama a deley       
 
-          ldi r16, 0x05
-          ldi r17, 0x81
-          out PORTB, r16
-          out PORTD, r17
-          rcall deley
-          
+          ;Sexta linea de la matriz
+          ldi r16, 0x05          ;Carga 0x00 en registro 16
+          ldi r17, 0x81          ;Carga 0x99 en registro 17
+          out PORTB, r16         ;Configura el puerto B con los datos del registro 16
+          out PORTD, r17         ;Configura el puerto D con los datos del registro 17
+          rcall deley            ;Llama a deley       
+
+          ;Septima linea de la matriz
+          ldi r16,0x06          ;Carga 0x00 en registro 16
+          ldi r17,0xc3          ;Carga 0x99 en registro 17
+          out PORTB,r16         ;Configura el puerto B con los datos del registro 16
+          out PORTD,r17         ;Configura el puerto D con los datos del registro 17
+          rcall deley           ;Llama a deley        
+
+          ;Octava linea de la matriz
+          ldi r16,0x07          ;Carga 0x00 en registro 16
+          ldi r17,0xe7          ;Carga 0x99 en registro 17
+          out PORTB,r16         ;Configura el puerto B con los datos del registro 16
+          out PORTD,r17         ;Configura el puerto D con los datos del registro 17
+          rcall deley           ;Llama a deley        
+
+          rjmp main_loop        ;Saltar a main_loop   
+
+;Genera un retardo  
+deley:
+;carga de registros
+    ldi r20, 70
+    ldi r18, 255
+    ldi r19, 255
+L1:
+    dec r19 ;Decrementa el registro r19
+    brne L1 ;Si r19 no es 0 vuelve a repetir lo anterior
+    dec r18 ;Decrementa el registro r18      
+    brne L1 ;Si r18 no es 0 vuelve a repetir lo anterior
+    dec r20 ;Decrementa el registro r20
+    brne L1 ;Si r20 no es 0 vuelve a repetir lo anterior 
+    ret   ; Retornar de la subrutina de retardo
+
