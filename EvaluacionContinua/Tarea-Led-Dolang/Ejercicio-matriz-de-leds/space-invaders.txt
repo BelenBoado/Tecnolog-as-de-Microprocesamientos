@@ -14,4 +14,23 @@ main_loop:
     out PORTD, r17
     rcall deley
 
-;me falta programar las otras lineas y los comentarios
+    ldi r16, 0x01
+    ldi r17, 0xdb
+    out PORTB, r16
+    out PORTD, r17
+    rcall deley
+
+    ldi r16, 0x02
+    ldi r17, 0x81
+    out PORTB, r16
+    out PORTD, r17
+    rcall deley
+
+    ldi r16, 0x03
+    ldi r17, 0x81
+    out PORTB, r16
+    out PORTD, r17
+    rcall deley
+
+
+
