@@ -1,0 +1,72 @@
+.include "m328pdef.inc"
+.org 0x00
+
+; Inicialización
+ldi r20 ,0xff
+out DDRD,r20
+out DDRB,r20
+
+main_loop:
+    ldi r16,0x00
+    ldi r17,0xff
+    out PORTB,r16
+    out PORTD,r17
+    rcall deley
+
+    ldi r16,0x01
+    ldi r17,0xdb
+    out PORTB,r16
+    out PORTD,r17
+    rcall deley
+
+    ldi r16,0x02
+    ldi r17,0xdb
+    out PORTB,r16
+    out PORTD,r17
+    rcall deley
+
+    ldi r16,0x03
+    ldi r17,0xff
+    out PORTB,r16
+    out PORTD,r17
+    rcall deley
+
+    ldi r16,0x04
+    ldi r17,0xff
+    out PORTB,r16
+    out PORTD,r17
+    rcall deley
+
+    ldi r16,0x05
+    ldi r17,0xbd
+    out PORTB,r16
+    out PORTD,r17
+    rcall deley
+
+    ldi r16,0x06
+    ldi r17,0xc3
+    out PORTB,r16
+    out PORTD,r17
+    rcall deley
+
+    ldi r16,0x07
+    ldi r17,0xff
+    out PORTB,r16
+    out PORTD,r17
+    rcall deley
+
+    rjmp main_loop
+
+
+deley:
+    ldi r20, 70
+    ldi r18, 255
+    ldi r19, 255
+L1:
+    dec r19
+    brne L1
+    dec r18
+    brne L1
+    dec r20
+    brne L1
+    ret
