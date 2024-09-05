@@ -1,0 +1,49 @@
+.include "m328pdef.inc"
+
+.cseg
+
+.org    0x00
+
+ldi  r17,  0xFF
+out DDRD, r17
+
+main:
+     out PORTD, r17
+     cbi portd, 0
+     rcall Delay
+     sbi PORTD, 0
+     cbi portd, 1
+     rcall Delay
+     sbi PORTD, 1
+     cbi portd, 2
+     rcall Delay
+     sbi PORTD, 2
+     cbi portd, 3
+     rcall Delay
+     sbi PORTD, 3
+     cbi portd, 4
+     rcall Delay
+     sbi PORTD, 4
+     cbi portd, 5
+     rcall Delay
+     sbi PORTD, 5
+     cbi portd, 6
+     rcall Delay
+     sbi PORTD, 6
+     cbi portd, 7
+     rcall Delay
+     sbi PORTD, 7
+     rcall Delay
+
+     rjmp main
+
+Delay: ldi r23,  70
+loop3: ldi r22,  254
+loop2: ldi r21,  254
+loop1: dec r21
+       brne loop1
+       dec r22
+       brne loop2
+       dec r23
+       brne loop3
+       ret
