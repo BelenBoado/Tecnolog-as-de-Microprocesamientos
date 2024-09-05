@@ -1,3 +1,58 @@
 ;Encendido desde extremos hacia el centro
-.include "m328pdef.inc"
+.include "m328pdef.inc"  ; Incluimos las definiciones del microcontrolador Atmega328p
+.cseg
+.org 0x00
 
+ldi r17, 0xff
+out DDRD, r17
+
+main:
+  out PORTD, r17
+  
+  cbi PORTD, 0
+  cbi PORTD, 7
+  call delay
+
+  cbi PORTD, 1
+  cbi PORTD, 6
+  call delay
+
+  cbi PORTD, 2
+  cbi PORTD, 5
+  call delay
+
+  cbi PORTD, 3
+  cbi PORTD, 4
+  call delay
+
+  sbi PORTD, 3
+  sbi PORTD, 4
+  call delay
+
+  sbi PORTD, 2
+  sbi PORTD, 5
+  call delay
+
+  sbi PORTD, 1
+  sbi PORTD, 6
+  call delay
+
+  sbi PORTD, 0
+  sbi PORTD, 7
+  call delay
+
+  rjmp main
+
+
+delay:
+      ldi r23, 70
+loop3:  ldi r22, 254
+loop2:  ldi r21, 254
+loop1:  dec r21
+        brne loop1
+        dec r22
+        brne loop2
+        dec r23
+        brne loop3
+
+        ret
