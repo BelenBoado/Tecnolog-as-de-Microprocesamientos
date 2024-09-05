@@ -1,68 +1,70 @@
-.include "m328pdef.inc"
-.org  0x00
+.include "m328pdef.inc" ; Incluir definiciones específicas del microcontrolador ATmega328P 
+.org  0x00  ; Especificar el origen del código en la dirección 0x00
 
-ldi  r20, 0xFF
-out  DDRD, r20
-out  DDRB, r20
+ldi  r20, 0xFF ; Cargar el valor 0xFF en el registro r20
+out  DDRD, r20 ; Configurar los pines D0-D7 como salidas
+out  DDRB, r20 ; Configurar los pines B0-B7 como salidas
+
+; El puerto B se encargara de escoger qué línea de la matriz se manipulará, mientras que los pines del puerto B se encargaran de escoger qué luces la linea se encenderán.
 
 main:
      ldi r16, 0x00
      ldi r17, 0xe7
      out PORTB, r16
-     out PORTB, r17
+     out PORTD, r17
      rcall delay
 
      ldi r16, 0x01
      ldi r17, 0xc3
      out PORTB, r16
-     out PORTB, r17
+     out PORTD, r17
      rcall delay
 
      ldi r16, 0x02
      ldi r17, 0x81
      out PORTB, r16
-     out PORTB, r17
+     out PORTD, r17
      rcall delay
 
      ldi r16, 0x03
      ldi r17, 0x00
      out PORTB, r16
-     out PORTB, r17
+     out PORTD, r17
      rcall delay
 
      ldi r16, 0x04
      ldi r17, 0x00
      out PORTB, r16
-     out PORTB, r17
+     out PORTD, r17
      rcall delay
 
      ldi r16, 0x05
      ldi r17, 0x81
      out PORTB, r16
-     out PORTB, r17
+     out PORTD, r17
      rcall delay
 
      ldi r16, 0x06
      ldi r17, 0xc3
      out PORTB, r16
-     out PORTB, r17
+     out PORTD, r17
      rcall delay
 
      ldi r16, 0x07
      ldi r17, 0xe7
      out PORTB, r16
-     out PORTB, r17
+     out PORTD, r17
      rcall delay
 
-     rjmp main
+     rjmp main ; Saltar al inicio del bucle principal
 
-delay: ldi r23, 70
-loop3: ldi r22, 254
-loop2: ldi r21, 254
-loop1: dec r21
-       brne loop1
-       dec r22
-       brne loop2
-       dec r23
-       brne loop3
-       ret
+delay: ldi r23, 70 ; Cargar el valor inicial en r23
+loop3: ldi r22, 254 ; Cargar el valor inicial en r22
+loop2: ldi r21, 254 ; Cargar el valor inicial en r21
+loop1: dec r21 ; Decrementar r21
+       brne loop1 ; Si r21 != 0, saltar al siguiente bucle
+       dec r22 ; Decrementar r22
+       brne loop2 ; Si r22 != 0, saltar al siguiente bucle
+       dec r23 ; Decrementar r23
+       brne loop3 ; Si r23 != 0, saltar al siguiente bucle
+       ret ; Regresar de la subrutina
