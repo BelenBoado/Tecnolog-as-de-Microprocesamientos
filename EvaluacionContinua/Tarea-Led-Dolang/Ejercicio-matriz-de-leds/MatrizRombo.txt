@@ -72,9 +72,9 @@ main:
 
      rjmp main ; Saltar al inicio del bucle principal
 
-delay: ldi r23, 70 ; Cargar el valor inicial en r23
-loop3: ldi r22, 254 ; Cargar el valor inicial en r22
-loop2: ldi r21, 254 ; Cargar el valor inicial en r21
+delay: ldi r23, 20 ; Cargar el valor inicial en r23
+loop3: ldi r22, 20 ; Cargar el valor inicial en r22
+loop2: ldi r21, 20 ; Cargar el valor inicial en r21
 loop1: dec r21 ; Decrementar r21
        brne loop1 ; Si r21 != 0, saltar al siguiente bucle
        dec r22 ; Decrementar r22
