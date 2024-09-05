@@ -1,34 +1,35 @@
-.include "m328pdef.inc"
-.org 0x00
+.include "m328pdef.inc" ;Incluir el archivo de definición del microcontrolador ATmega328P
+.org 0x00  ; Indica la dirección de memoria de inicio
 
-; Inicialización
-ldi r16, 0xfe
-ldi r20 ,0xff
-out DDRD,r20
+;Configuracion de puertos y carga de registros
+ldi r16, 0xfe ;Carga en el registro r16 el numero en hexadecimal fe
+ldi r20 ,0xff ;Carga en el registro r20 el numero en hexadecimal ff
+out DDRD,r20  ;Configuramos el puerto D como salida, atravez del registro 20
 
 main_loop:
-    out PORTD, r16
-    rcall delay
+    out PORTD, r16    ;Configuración del puerto D con el registro 16
+    rcall delay       ;Llama a delay y genera un ratardo
 
-    lsl r16
-    cpi r16, 0x00
-    brne main_loop
+    lsl r16          ;Desplazamiento de bit a la izquierda
+    cpi r16, 0x00    ;Compara r16 con 0x00
+    brne main_loop   ;Salta a main_loop de no cumplirse lo anterior
 
-    out PORTD, r16
-    rjmp main_loop
+    out PORTD, r16   ;Configura el puerto con lo ultimo que se guardo en el registro
+    rjmp main_loop   ;Vuelve al main_loop
 
-
+; Genera un retardo 
 delay:
+;Carga los registros con los numero 70 y 254 
     ldi r18, 70
     ldi r19, 254
     ldi r21, 254
 L1:
-    dec r21
-    brne L1
-    dec r19
-    brne L1
-    dec r18
-    brne L1
-    ret
+    dec r21    ;Decrementa el registro 21
+    brne L1    ;Salta a L1 de no ser 0 el registro
+    dec r19    ;Decrementa 1 del registro 19
+    brne L1    ;Salta a L1 de no ser 0 el registro
+    dec r18    ;Decrementa en 1 del registro 18
+    brne L1    ;Salta a L1 de no ser 0 el registro
+    ret        ;Retornar de la subrutina de retardo
 
       
