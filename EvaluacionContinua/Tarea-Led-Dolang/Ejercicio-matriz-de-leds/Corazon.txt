@@ -7,6 +7,10 @@ ldi r20, 0xff
 out DDRD, r20
 
 main_loop:
+;Previa Explicación
+;Cada linea de la matriz contiene el mismo codigo , pero diferentes valores para los registros y puertos
+;El registro r16 junto al Puerto B se encarga de manejar el multiplexor y asi indicar que linea prender
+;El registro r17 junto al Puerto D se encarga de que led del dibujo encender
           ;Primera linea de la matriz
           ldi r16, 0x00          ;Carga 0x00 en registro 16
           ldi r17, 0x99          ;Carga 0x99 en registro 17
@@ -68,15 +72,12 @@ main_loop:
 ;Genera un retardo  
 deley:
 ;carga de registros
-    ldi r20, 70
-    ldi r18, 255
-    ldi r19, 255
+    ldi r18, 50
+    ldi r19, 50
 L1:
     dec r19 ;Decrementa el registro r19
     brne L1 ;Si r19 no es 0 vuelve a repetir lo anterior
     dec r18 ;Decrementa el registro r18      
     brne L1 ;Si r18 no es 0 vuelve a repetir lo anterior
-    dec r20 ;Decrementa el registro r20
-    brne L1 ;Si r20 no es 0 vuelve a repetir lo anterior 
     ret   ; Retornar de la subrutina de retardo
 
