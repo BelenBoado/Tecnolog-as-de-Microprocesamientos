@@ -7,6 +7,21 @@ out DDRB, r20 ; Configurar los pines B0-B7 como salidas
 
 ; El puerto B se encargara de escoger qué línea de la matriz se manipulará, mientras que los pines del puerto B se encargaran de escoger qué luces la linea se encenderán.
 
+; Al ser la lógica de los leds inversa, la figura quedaría de la siguiente manera:
+; 11111111
+; 11011011
+; 11011011
+; 11111111
+; 11111111
+; 11000011
+; 10111101
+; 11111111
+
+; Debido a la forma en la que decidimos abordar el ejercicio, a la hora de realizar el programa nos encontramos que el bit más significatico en la salida de los puertos era el menos significativo en la entrada de los leds de la matriz, sin embargo, en el caso de esta figura, al ser todas las lineas iguales de izquierda a derecha y viceversa, esto no influye en el código.
+; Cada linea la invertimos y convertimos a hexadecimal, siendo esta nuestra salida en el puerto D.
+; Por ejemplo, la segunda línea de la figura quedaría 11011011, que al pasarla a hexadecimal resulta en db.
+
+
 main_loop:
     ldi r16,0x00
     ldi r17,0xff
@@ -59,9 +74,9 @@ main_loop:
     rjmp main_loop ; Saltar al inicio del bucle principal
 
 
-delay: ldi r23, 70 ; Cargar el valor inicial en r23
-loop3: ldi r22, 254 ; Cargar el valor inicial en r22
-loop2: ldi r21, 254 ; Cargar el valor inicial en r21
+delay: ldi r23, 20 ; Cargar el valor inicial en r23
+loop3: ldi r22, 20 ; Cargar el valor inicial en r22
+loop2: ldi r21, 20 ; Cargar el valor inicial en r21
 loop1: dec r21 ; Decrementar r21
        brne loop1 ; Si r21 != 0, saltar al siguiente bucle
        dec r22 ; Decrementar r22
