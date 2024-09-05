@@ -7,8 +7,10 @@
 ldi  r17,  0xFF ; Cargar el valor 0xFF en el registro r17
 out DDRD, r17 ; Configurar los pines D0-D7 como salidas
 
+; Debido a que los LEDS conectados al puerto D funcionan con lógica inversa, al setear los pines del puerto en LOW, los leds se encenderán, y al setearlos en HIGH, ocurrirá lo contrario
+
 main:
-     out PORTD, r17
+     out PORTD, r17  
      cbi portd, 0
      rcall Delay
      sbi PORTD, 0
