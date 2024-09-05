@@ -10,42 +10,42 @@ out DDRD, r17 ; Configurar los pines D0-D7 como salidas
 ; Debido a que los LEDS conectados al puerto D funcionan con lógica inversa, al setear los pines del puerto en LOW, los leds se encenderán, y al setearlos en HIGH, ocurrirá lo contrario
 
 main:
-     out PORTD, r17  
-     cbi portd, 0
-     rcall Delay
-     sbi PORTD, 0
-     cbi portd, 1
-     rcall Delay
-     sbi PORTD, 1
-     cbi portd, 2
-     rcall Delay
-     sbi PORTD, 2
-     cbi portd, 3
-     rcall Delay
-     sbi PORTD, 3
-     cbi portd, 4
-     rcall Delay
-     sbi PORTD, 4
-     cbi portd, 5
-     rcall Delay
-     sbi PORTD, 5
-     cbi portd, 6
-     rcall Delay
-     sbi PORTD, 6
-     cbi portd, 7
-     rcall Delay
-     sbi PORTD, 7
-     rcall Delay
+     out PORTD, r17  ; Mandar 1 lógico a todos los pines del puerto B
+     cbi portd, 0 ; Setear PIND0 en low
+     rcall Delay ; llama la subrutina de retardo
+     sbi PORTD, 0 ; Setear PIND0 en high
+     cbi portd, 1 ; Setear PIND1 en low
+     rcall Delay ; llama la subrutina de retardo
+     sbi PORTD, 1 ; Setear PIND1 en high
+     cbi portd, 2 ; Setear PIND2 en low
+     rcall Delay ; llama la subrutina de retardo
+     sbi PORTD, 2 ; Setear PIND2 en high
+     cbi portd, 3 ; Setear PIND3 en low
+     rcall Delay ; llama la subrutina de retardo
+     sbi PORTD, 3 ; Setear PIND3 en high
+     cbi portd, 4 ; Setear PIND4 en low
+     rcall Delay ; llama la subrutina de retardo
+     sbi PORTD, 4 ; Setear PIND4 en high
+     cbi portd, 5 ; Setear PIND5 en low
+     rcall Delay ; llama la subrutina de retardo
+     sbi PORTD, 5 ; Setear PIND5 en high
+     cbi portd, 6 ; Setear PIND6 en low
+     rcall Delay ; llama la subrutina de retardo
+     sbi PORTD, 6 ; Setear PIND6 en high
+     cbi portd, 7 ; Setear PIND7 en low
+     rcall Delay ; llama la subrutina de retardo
+     sbi PORTD, 7 ; Setear PIND7 en high
+     rcall Delay ; llama la subrutina de retardo
 
      rjmp main
 
-Delay: ldi r23,  70
-loop3: ldi r22,  254
-loop2: ldi r21,  254
-loop1: dec r21
-       brne loop1
-       dec r22
-       brne loop2
-       dec r23
-       brne loop3
-       ret
+Delay: ldi r23,  70 ; Cargar el valor inicial en r23
+loop3: ldi r22,  254 ; Cargar el valor inicial en r22
+loop2: ldi r21,  254 ; Cargar el valor inicial en r21
+loop1: dec r21 ; Decrementar r21
+       brne loop1 ; Si r21 != 0, saltar al siguiente bucle
+       dec r22 ; Decrementar r22
+       brne loop2 ; Si r22 != 0, saltar al siguiente bucle
+       dec r23 ; Decrementar r23
+       brne loop3 ; Si r23 != 0, saltar al siguiente bucle
+       ret ; Regresar de la subrutina
