@@ -1,18 +1,17 @@
 ; Alien de "Space Invaders"
-.include "m328pdef.inc"
-.org 0x00
+.include "m328pdef.inc"     ; Inclusion de las definiciones especificas para el microcontrolador Atmega328p
+.org 0x00                   ; Direccion de inicio del programa
 
 ;inicializacion de los registros a utilizar
-ldi r20, 0xff
-out DDRD, r20
-out DDRD, r20
+ldi r20, 0xff          ; Se cargan todos los pines del registro r20
+out DDRD, r20          ; Se configura el puerto D como salidas
 
 main_loop:
-    ldi r16, 0x00
-    ldi r17, 0xbd
-    out PORTB, r16
-    out PORTD, r17
-    rcall deley
+    ldi r16, 0x00        ; Carga 0x00 en todos los pines de r16
+    ldi r17, 0xbd        ; Carga 0xbd en todos los pines de r17
+    out PORTB, r16       ; Envia el valor de r16 a la salida del puerto B, en este caso para seleccionar la primer fila de la matriz
+    out PORTD, r17       ; Envia el valor de r17 a la salida del puerto D, en este caso para seleccionar los leds que se van a prender
+    rcall deley          ; Llama al retardo
 
     ldi r16, 0x01
     ldi r17, 0xdb
@@ -56,19 +55,21 @@ main_loop:
     out PORTD, r17
     rcall deley
 
-    rjmp main_loop
+    rjmp main_loop       ;Salta al inicio del bucle main_loop para repetir la imagen
 
+
+;subrutina de retardo
 deley:
-    ldi r20, 70
-    ldi r18, 255
-    ldi r19, 255
+    ldi r20, 70          ; Carga 70 en r20
+    ldi r18, 255         ; Carga 255 en r18
+    ldi r19, 255         ; Carga 255 en r19
 L1:    
-    dec r19
-    brne L1
-    dec r18
-    brne L1
-    dec r20
-    brne L1
+    dec r19              ; Decrementa r19
+    brne L1              ; Si r19 no es 0, vuelve a L1, empezando de vuelta el bucle
+    dec r18              ; Decrementa r18
+    brne L1              ; Si r19 no es 0, vuelve a L1, empezando de vuelta el bucle
+    dec r20              ; Decrementa r20
+    brne L1              ; Si r19 no es 0, vuelve a L1, empezando de vuelta el bucle
 
-    ret
-
+    ret                  ; Retornar al programa principal después del retardo
+              
