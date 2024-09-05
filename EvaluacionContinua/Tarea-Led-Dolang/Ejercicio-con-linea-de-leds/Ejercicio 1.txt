@@ -1,11 +1,11 @@
-.include "m328pdef.inc"
+.include "m328pdef.inc" ; Incluir definiciones específicas del microcontrolador ATmega328P
 
-.cseg
+.cseg ; Indicar que lo siguiente es parte del segmento de código
 
-.org    0x00
+.org    0x00 ; Especificar el origen del código en la dirección 0x00
 
-ldi  r17,  0xFF
-out DDRD, r17
+ldi  r17,  0xFF ; Cargar el valor 0xFF en el registro r17
+out DDRD, r17 ; Configurar los pines D0-D7 como salidas
 
 main:
      out PORTD, r17
