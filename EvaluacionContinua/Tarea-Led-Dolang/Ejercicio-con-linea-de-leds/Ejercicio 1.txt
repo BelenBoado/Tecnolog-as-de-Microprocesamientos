@@ -37,7 +37,7 @@ main:
      sbi PORTD, 7 ; Setear PIND7 en high
      rcall Delay ; llama la subrutina de retardo
 
-     rjmp main
+     rjmp main ; Saltar al inicio del bucle principal
 
 Delay: ldi r23,  70 ; Cargar el valor inicial en r23
 loop3: ldi r22,  254 ; Cargar el valor inicial en r22
