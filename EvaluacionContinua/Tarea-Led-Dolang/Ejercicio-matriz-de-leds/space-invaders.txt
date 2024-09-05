@@ -1,1 +1,17 @@
+; Alien de "Space Invaders"
+.include "m328pdef.inc"
+.org 0x00
 
+;inicializacion de los registros a utilizar
+ldi r20, 0xff
+out DDRD, r20
+out DDRD, r20
+
+main_loop:
+    ldi r16, 0x00
+    ldi r17, 0xbd
+    out PORTB, r16
+    out PORTD, r17
+    rcall deley
+
+;me falta programar las otras lineas y los comentarios
