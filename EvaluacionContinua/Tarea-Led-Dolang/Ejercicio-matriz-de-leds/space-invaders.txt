@@ -13,9 +13,9 @@ main_loop:
     out PORTD, r17       ; Envia el valor de r17 a la salida del puerto D, en este caso para seleccionar los leds que se van a prender
     rcall deley          ; Llama al retardo
 
-    ldi r16, 0x01
-    ldi r17, 0xdb
-    out PORTB, r16
+    ldi r16, 0x01        ; En las siguientes se repite el proceso, reescribiendo los valores de los registros para
+    ldi r17, 0xdb        ; cambiar las columnas que deberan encenderse y los leds segun la fila,
+    out PORTB, r16       ; asi formando la figura de Space nvader deseada
     out PORTD, r17
     rcall deley
 
@@ -60,15 +60,12 @@ main_loop:
 
 ;subrutina de retardo
 deley:
-    ldi r20, 70          ; Carga 70 en r20
-    ldi r18, 255         ; Carga 255 en r18
-    ldi r19, 255         ; Carga 255 en r19
+    ldi r18, 50         ; Carga 50 en r18
+    ldi r19, 50         ; Carga 50 en r19
 L1:    
     dec r19              ; Decrementa r19
     brne L1              ; Si r19 no es 0, vuelve a L1, empezando de vuelta el bucle
     dec r18              ; Decrementa r18
-    brne L1              ; Si r19 no es 0, vuelve a L1, empezando de vuelta el bucle
-    dec r20              ; Decrementa r20
     brne L1              ; Si r19 no es 0, vuelve a L1, empezando de vuelta el bucle
 
     ret                  ; Retornar al programa principal después del retardo
