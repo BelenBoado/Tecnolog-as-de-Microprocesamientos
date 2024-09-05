@@ -1,0 +1,2 @@
+;Encendido desde extremos hacia el centro
+.include "m328pdef.inc"
