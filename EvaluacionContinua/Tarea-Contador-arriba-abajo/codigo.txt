@@ -1,1 +1,202 @@
+.include "m328pdef.inc" ; Define device ATmega328P
 
+
+.def temp = r16
+.def button_state = r17
+.def led_state = r20
+.def counter = r24
+
+.org 0x0000
+    rjmp Reset
+
+Reset:
+    ; Initialize stack pointer
+    ldi temp, high(RAMEND)
+    out SPH, temp
+    ldi temp, low(RAMEND)
+    out SPL, temp
+
+    ; Configura los puertoe B y C como salida
+    ldi temp, 0xFF
+    out DDRB, temp
+    out DDRC, temp
+
+    ; Configura el Puerto D como entrada
+    ldi temp, 0xf0
+    out DDRD, temp
+    SBI PORTD, 2
+    SBI PORTD, 3
+
+    ; Clear initial LED state
+    ldi led_state, 0
+    out PORTB, led_state
+    ldi counter, 0
+
+
+    ;configuramos las interrupciones
+    LDI R18, 0X03
+    OUT EIMSK, R18 ;habilita las interrupciones INT0 e INT1
+    LDI R19, 0x0F
+    STS EICRA, R19 ; configura flancos de subida
+
+MainLoop:
+     ldi r21, 0x01 ; aca configuramos el punto que se prende y apaga siempre
+     out PORTC, r21
+     rcall Mseg
+
+     ldi r21, 0x00
+     out PORTC, r21
+     rcall Mseg
+
+    ; Lee el estado del botón
+    in button_state, PIND
+    andi button_state, (1 << PD2)  ; chequea que hay en el pind2
+    ;rcall Mseg
+
+
+
+    ; Cheque si el botón fue presionado
+    cpi button_state, 0
+    brne Button1Pressed
+    ;rcall Mseg
+
+    in button_state, PIND
+    andi button_state, (1 << PD3)  ;chequea que hay en el pind3
+    cpi button_state, 0
+    brne Button2Pressed
+
+
+    cpi counter, 0
+    breq numerocero
+
+    cpi counter, 1
+    breq numerouno
+
+    cpi counter, 2
+    breq numerodos
+
+    cpi counter, 3
+    breq numerotres
+
+    cpi counter, 4
+    breq numerocuatro
+
+    cpi counter, 5
+    breq numerocinco
+
+    cpi counter, 6
+    breq numeroseis
+
+    cpi counter, 7
+    breq numerosiete
+
+    cpi counter, 8
+    breq numeroocho
+
+    cpi counter, 9
+    breq resetcounter
+
+
+
+    ; espera que se liberen los botones
+    rjmp MainLoop
+
+Button1Pressed:
+    inc counter
+    rjmp MainLoop
+
+Button2Pressed:
+    dec counter
+    rjmp MainLoop
+
+resetcounter:
+    ldi counter, 9
+    rjmp MainLoop
+
+numerocero:
+      LDI R25, 0b00111111                                                                   ldi r26, 0x00                           ; cero
+      out PORTB, r25
+      rcall Mseg
+      rjmp MainLoop
+
+numerouno:
+      LDI R25, 0b00000110
+      ldi r26, 0x00   ; numero 1
+      out PORTB, r25
+      out PORTD, r26
+      rcall Mseg
+      rjmp MainLoop  
+
+numerodos:
+          ldi r25, 0b00011011
+          ldi r26, 0b01000000            ; numero 2
+          out PORTB, r25
+          out PORTD, r26
+          rcall Mseg
+          rjmp MainLoop
+
+numerotres:
+      ldi r25, 0b00001111
+      ldi r26, 0b01000000           ; numero 3
+      out PORTB, r25
+      out PORTD, r26
+      rcall Mseg
+      rjmp MainLoop
+
+numerocuatro:
+      ldi r25, 0b00100110
+      ldi r26, 0b01000000           ; numero 4
+      out PORTB, r25
+      out PORTD, r26
+      rcall Mseg
+      rjmp MainLoop
+
+numerocinco:
+      ldi r25, 0b00101101
+      ldi r26, 0b01000000          ; numero 5
+      out PORTB, r25
+      out PORTD, r26
+      rcall Mseg
+      rjmp MainLoop
+
+numeroseis:
+      ldi r25, 0b00111100
+      ldi r26, 0b01000000           ; numero 6
+      out PORTB, r25
+      out PORTD, r26
+      rcall Mseg
+      rjmp MainLoop
+
+numerosiete:
+      ldi r25, 0b00000111
+      ldi r26, 0x00          ; numero 7
+      out PORTB, r25
+      out PORTD, r26
+      rcall Mseg
+      rjmp MainLoop
+
+numeroocho:
+      ldi r25, 0b00111111
+      ldi r26, 0b01000000           ; numero 8
+      out PORTB, r25
+      out PORTD, r26
+      rcall Mseg
+      rjmp MainLoop
+
+
+
+
+Mseg:
+      ldi r27, 21
+      ldi r22, 79
+      ldi r23, 189
+L1:
+    dec r23
+    brne L1
+    dec r22
+    brne L1
+    dec r27
+    brne L1
+    nop
+
+    RET
