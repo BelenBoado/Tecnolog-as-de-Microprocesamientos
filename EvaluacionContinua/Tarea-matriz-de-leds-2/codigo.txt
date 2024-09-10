@@ -335,10 +335,331 @@ letraU:                          ; Comenzamos a codificar los registros que form
     out PORTD, fig2
     rcall delay
 
-    ldi fig2,0b01000000
+    ldi fig2, 0b01000000
+    ldi row, 0x02
+    ldi figure, 0b00111110
+    out PORTB, row
+    out PORTC, figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b01000000
+    ldi row, 0x03
+    ldi figure, 0b00111110
+    out PORTB, row
+    out PORTC, figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b01000000
+    ldi row, 0x04
+    ldi figure, 0b00111110
+    out PORTB, row
+    out PORTC, figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b01000000
+    ldi row, 0x05
+    ldi figure, 0b00111110
+    out PORTB, row
+    out PORTC, figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b01000000
+    ldi row, 0x06
+    ldi figure, 0b00111110
+    out PORTB, row
+    out PORTC, figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b10000000
+    ldi row, 0x07
+    ldi figure, 0b00000001
+    out PORTB, row
+    out PORTC, figure
+    out PORTD, fig2
+    rcall delay
+
+    rjmp MainLoop
+
+letraR:
+    ldi fig2, 0b11000000
+    ldi row,0x00
+    ldi figure,0b00100001
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b11000000
+    ldi row,0x01
+    ldi figure,0b00011101
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b11000000
     ldi row,0x02
-ldi figure,0b00111110
-out PORTB,row
-out PORTC, figure
-out PORTD, fig2
-rcall delay
+    ldi figure,0b00011101
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b11000000
+    ldi row,0x03
+    ldi figure,0b00011101
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+                        
+    ldi fig2, 0b11000000
+    ldi row,0x04
+    ldi figure,0b00100001
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b11000000
+    ldi row,0x05
+    ldi figure,0b00110101
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b11000000
+    ldi row,0x06
+    ldi figure,0b00101101
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b11000000
+    ldi row,0x07
+    ldi figure,0b00011101
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    rjmp MainLoop
+
+letraY:
+    ldi fig2, 0b01000000
+    ldi row,0x00
+    ldi figure,0b00111110
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b11000000
+    ldi row,0x01
+    ldi figure,0b00111101
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b11000000
+    ldi row,0x02
+    ldi figure,0b00011011
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b11000000
+    ldi row,0x03
+    ldi figure,0b00100111
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b11000000
+    ldi row,0x04
+    ldi figure,0b00110111
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b11000000
+    ldi row,0x05
+    ldi figure,0b00111011
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b11000000
+    ldi row,0x06
+    ldi figure,0b00111101
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b11000000
+    ldi row,0x07
+    ldi figure,0b00111110
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    rjmp MainLoop
+
+letraO:
+    ldi fig2, 0b10000000
+    ldi row,0x00
+    ldi figure,0b00000001
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b01000000
+    ldi row,0x01
+    ldi figure,0b00111110
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b01000000
+    ldi row,0x02
+    ldi figure,0b00111110
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b01000000
+    ldi row,0x03
+    ldi figure,0b00111110
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b01000000
+    ldi row,0x04
+    ldi figure,0b00111110
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b01000000
+    ldi row,0x05
+    ldi figure,0b00111110
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b01000000
+    ldi row,0x06
+    ldi figure,0b00111110
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b10000000
+    ldi row,0x07
+    ldi figure,0b00000001
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    rjmp MainLoop
+
+letraM:
+    ldi fig2, 0b01000000
+    ldi row,0x00
+    ldi figure,0b00111110
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b00000000
+    ldi row,0x01
+    ldi figure,0b00111100
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b01000000
+    ldi row,0x02
+    ldi figure,0b00011010
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b01000000
+    ldi row,0x03
+    ldi figure,0b00100110
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b0100 0000
+    ldi row,0x04
+    ldi figure,0b0011 1110
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b0100 0000
+    ldi row,0x05
+    ldi figure,0b0011 1110
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b0100 0000
+    ldi row,0x06
+    ldi figure,0b0011 1110
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b0100 0000
+    ldi row,0x07
+    ldi figure,0b0011 1110
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    rjmp MainLoop
+
+delay: ldi r23, 1 ; Cargar el valor inicial en r23
+loop3: ldi r22, 1 ; Cargar el valor inicial en r22
+loop2: ldi r21, 1 ; Cargar el valor inicial en r21
+loop1: dec r21 ; Decrementar r21
+       brne loop1 ; Si r21 != 0, saltar al siguiente bucle
+       dec r22 ; Decrementar r22
+       brne loop2 ; Si r22 != 0, saltar al siguiente bucle
+       dec r23 ; Decrementar r23
+       brne loop3 ; Si r23 != 0, saltar al siguiente bucle
+       ret ; Regresar de la subrutina
