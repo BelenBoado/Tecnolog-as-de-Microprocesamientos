@@ -114,7 +114,8 @@ resetcounter:
     rjmp MainLoop
 
 numerocero:
-      LDI R25, 0b00111111                                                                   ldi r26, 0x00                           ; cero
+      LDI R25, 0b00111111                                                         
+      ldi r26, 0x00                           ; cero
       out PORTB, r25
       rcall Mseg
       rjmp MainLoop
