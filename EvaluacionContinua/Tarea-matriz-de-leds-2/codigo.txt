@@ -334,3 +334,11 @@ letraU:                          ; Comenzamos a codificar los registros que form
     out PORTC, figure
     out PORTD, fig2
     rcall delay
+
+    ldi fig2,0b01000000
+    ldi row,0x02
+ldi figure,0b00111110
+out PORTB,row
+out PORTC, figure
+out PORTD, fig2
+rcall delay
