@@ -5,7 +5,7 @@
 .def row = r26
 .def figure = r27
 .def estado_led = r20
-.def contador = r24
+.def counter = r24
 .def fig2 = r25
 
 .org 0x0000
@@ -32,7 +32,7 @@ Reset:
     ; Inicializamos el estado de los led en 0 y el contador en 0
     ldi estado_led, 0x00
     out PORTD, estado_led
-    ldi contador, 0
+    ldi counter, 0
 
         ;configuramos las interrupciones
     LDI R18, 0X03
@@ -109,7 +109,7 @@ letraN:                        ; Comenzamos a codificar los registros que formar
 
     rjmp MainLoop                  ;Saltamos al MainLoop para que siga avanzando el programa
 
-letraA:                            ; Comenzamos a codificar los registros que formaran las filas y columnas de la letra N  
+letraA:                            ; Comenzamos a codificar los registros que formaran las filas y columnas de la letra A  
     ldi fig2, 0b11000000
     ldi row,0x00
     ldi figure,0b00000011
@@ -177,7 +177,7 @@ letraA:                            ; Comenzamos a codificar los registros que fo
 
     rjmp MainLoop                    ; Saltamos al MainLoop para que continue avanzando el programa
 
-letraG:                              ; Comenzamos a codificar los registros que formaran las filas y columnas de la letra N  
+letraG:                              ; Comenzamos a codificar los registros que formaran las filas y columnas de la letra G 
     ldi fig2, 0b10000000
     ldi row,0x00
     ldi figure,0b00000000
@@ -279,8 +279,8 @@ MainLoop:                    ;Loop principal del programa
     cpi button_state, 0    ; Compara el boton con 0 
     brne Button2pressed    ; Si no es 0, salta a la funcion Button2Pressed
 
-    cpi counter, 0
-    breq letraU
+    cpi counter, 0         ;Compara el estado del contador y llama a la letra respectiva para ese lugar
+    breq letraU            ; Salta a la letra correspondiente
     cpi counter, 1
     breq atajoR
     cpi counter, 2
@@ -301,24 +301,24 @@ MainLoop:                    ;Loop principal del programa
     breq atajoM
     cpi counter, 10
     breq atajoA
-    brne resetcounter
+    brne resetcounter               ; Cuando alcanza la ultima letra, se resetea el contador, volviendo a 0
 
-    ; Wait for button release
-    rjmp MainLoop
+    ; Espera a que el botton sea liberado
+    rjmp MainLoop                    ; Repite el MainLoop
 
-Button1Pressed:
-    inc counter
-    rjmp MainLoop
+Button1Pressed:                     ; Si el boton 1 es presionado
+    inc counter                     ; incrementa el contador
+    rjmp MainLoop                   ; y vuelva al loop principal
 
-Button2Pressed:
-    dec counter
-    rjmp MainLoop
+Button2Pressed:                    ; Si el boton 2 es presionado
+    dec counter                    ; decrementa el contador
+    rjmp MainLoop                  ; y regresa al loop principal
 
-resetcounter:
-    ldi counter, 0
-    rjmp MainLoop
+resetcounter:                       ; Cuando se acaban las letras se resetea el contador
+    ldi counter, 0                  ; Se carga el 0 en el contador     
+    rjmp MainLoop                   ; y regresa al MainLoop
 
-letraU:                          ; Comenzamos a codificar los registros que formaran las filas y columnas de la letra N  
+letraU:                          ; Comenzamos a codificar los registros que formaran las filas y columnas de la letra U 
     ldi fig2, 0b01000000
     ldi row, 0x00
     ldi figure, 0b00111110
