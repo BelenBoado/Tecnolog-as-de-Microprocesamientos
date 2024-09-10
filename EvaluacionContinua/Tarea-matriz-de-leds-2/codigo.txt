@@ -1,1 +1,336 @@
+.include "m328pdef.inc" ; Incluimos las definiciones del microcontrolador con el que vamos a trabajar
 
+.def temp = r16                  ; Definimos algumas variables globales para no mezclar registros
+.def estado_boton = r17          ; mientras programamos
+.def row = r26
+.def figure = r27
+.def estado_led = r20
+.def contador = r24
+.def fig2 = r25
+
+.org 0x0000
+    rjmp Reset
+
+Reset:
+    ; Inicializamos el stack pointer
+    ldi temp, high(RAMEND)
+    out SPH, temp
+    ldi temp, low(RAMEND)
+    out SPL, temp
+
+    ; Configuramos puerto B y puerto C como salidas
+    ldi temp, 0xFF
+    out DDRB, temp
+    out DDRC, temp
+
+    ; Configuramos Puerto D como entrada y salida, ya que las interrupciones funcionaran en ese puerto
+    ldi temp, 0xf0
+    out DDRD, temp
+    sbi PORTD, 2
+    sbi PORTD, 3
+
+    ; Inicializamos el estado de los led en 0 y el contador en 0
+    ldi estado_led, 0x00
+    out PORTD, estado_led
+    ldi contador, 0
+
+        ;configuramos las interrupciones
+    LDI R18, 0X03
+    OUT EIMSK, R18 ;habilita las interrupciones INT0 e INT1
+    LDI R19, 0x0F
+    STS EICRA, R19 ; configura flancos de subida
+
+    rjmp MainLoop            ; Saltamos al loop principal
+
+letraN:                        ; Comenzamos a codificar los registros que formaran las filas y columnas de la letra N            
+    ldi fig2, 0b01000000
+    ldi row,0x00
+    ldi figure,0b00111110
+    out PORTB,row
+    out PORTC, figure
+    out PORTD,fig2
+    rcall delay
+
+    ldi fig2, 0b01000000
+    ldi row,0x01
+    ldi figure,0b00111100
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b01000000
+    ldi row,0x02
+    ldi figure,0b00111010
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b01000000
+    ldi row,0x03
+    ldi figure,0b00110110
+    out PORTB,row
+    out PORTC,figure
+    out PORTD,fig2
+    rcall delay
+
+    ldi fig2, 0b01000000
+    ldi row,0x04
+    ldi figure,0b00101110
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b01000000
+    ldi row,0x05
+    ldi figure,0b00011110
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b00000000
+    ldi row,0x06
+    ldi figure,0b00111110
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b01000000
+    ldi row,0x07
+    ldi figure,0b00111110
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    rjmp MainLoop                  ;Saltamos al MainLoop para que siga avanzando el programa
+
+letraA:                            ; Comenzamos a codificar los registros que formaran las filas y columnas de la letra N  
+    ldi fig2, 0b11000000
+    ldi row,0x00
+    ldi figure,0b00000011
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b10000000
+    ldi row,0x01
+    ldi figure,0b00111101
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b10000000
+    ldi row,0x02
+    ldi figure,0b00111101
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b10000000
+    ldi row,0x03
+    ldi figure,0b00111101
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b10000000
+    ldi row,0x04
+    ldi figure,0b00000001
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b10000000
+    ldi row,0x05
+    ldi figure,0b00111101
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+
+    ldi fig2, 0b10000000
+    ldi row,0x06
+    ldi figure,0b00111101
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b10000000
+    ldi row,0x07
+    ldi figure,0b00111101
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    rjmp MainLoop                    ; Saltamos al MainLoop para que continue avanzando el programa
+
+letraG:                              ; Comenzamos a codificar los registros que formaran las filas y columnas de la letra N  
+    ldi fig2, 0b10000000
+    ldi row,0x00
+    ldi figure,0b00000000
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b11000000
+    ldi row,0x01
+    ldi figure,0b00111110
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b11000000
+    ldi row,0x02
+    ldi figure,0b00111110
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b11000000
+    ldi row,0x03
+    ldi figure,0b00111110
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b10000000
+    ldi row,0x04
+    ldi figure,0b00000010
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b10000000
+    ldi row,0x05
+    ldi figure,0b00111010
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b10000000
+    ldi row,0x06
+    ldi figure,0b00111101
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b10000000
+    ldi row,0x07
+    ldi figure,0b00000000
+    out PORTB,row
+    out PORTC,figure
+    out PORTD, fig2
+    rcall delay
+
+    rjmp MainLoop              ;Saltamos al MainLoop para que el programa pueda seguir avanzando
+
+; Creamos atajos para las letras que se encuentran a mas distancia del MainLoop ya que sino el programa no podra leer las letras.
+; Cada atajo contara de un salto relativo qe redireccionara al programa a la letra correspondiente.
+atajoA:                      ; Atajo a la letra A  
+    rjmp letraA
+atajoY:                      ; Atajo a la letra Y
+    rjmp letraY
+atajoN:                      ; Atajo a la letra N
+    rjmp letraN
+atajoO:                      ; Atajo a la letra O
+    rjmp letraO
+atajoM:                      ; Atajo a la letra M        
+    rjmp letraM  
+atajoR:                      ; Atajo a la letra R
+    rjmp letraR
+atajoG:                      ; Atajo a la letra G  
+       rjmp letraG
+
+MainLoop:                    ;Loop principal del programa
+    ; Ingresa el estado del boton ubicado en el Pin D 2 que sera el encargado de Incrementar el contador para que avancen las letras.
+    in button_state, PIND
+    andi button_state, (1 << PD2)  ; Chequea el PIN D 2
+
+    ; Chequea si el boton fue presionado
+    cpi button_state, 0          ;Compara el boton con 0
+    brne Button1Pressed          ; Si no es 0, salta a la funcion Button1Pressed
+
+
+    ; Ingresa el estado del boton ubicado en el Pin D 3 que sera el encargado de Decrementar el contador para que retroocedan las letras.
+    in button_state, PIND
+    andi button_state, (1 << PD3)  ; Chequea el PIN D 3
+
+    ; Chequea si el boton fue presionado
+    cpi button_state, 0    ; Compara el boton con 0 
+    brne Button2pressed    ; Si no es 0, salta a la funcion Button2Pressed
+
+    cpi counter, 0
+    breq letraU
+    cpi counter, 1
+    breq atajoR
+    cpi counter, 2
+    breq letraU
+    cpi counter, 3
+    breq atajoG
+    cpi counter, 4
+    breq letraU
+    cpi counter, 5
+    breq atajoA
+    cpi counter, 6
+    breq atajoY
+    cpi counter, 7
+    breq atajoN
+    cpi counter, 8
+    breq atajoO
+    cpi counter, 9
+    breq atajoM
+    cpi counter, 10
+    breq atajoA
+    brne resetcounter
+
+    ; Wait for button release
+    rjmp MainLoop
+
+Button1Pressed:
+    inc counter
+    rjmp MainLoop
+
+Button2Pressed:
+    dec counter
+    rjmp MainLoop
+
+resetcounter:
+    ldi counter, 0
+    rjmp MainLoop
+
+letraU:                          ; Comenzamos a codificar los registros que formaran las filas y columnas de la letra N  
+    ldi fig2, 0b01000000
+    ldi row, 0x00
+    ldi figure, 0b00111110
+    out PORTB, row
+    out PORTC, figure
+    out PORTD, fig2
+    rcall delay
+
+    ldi fig2, 0b01000000
+    ldi row, 0x01
+    ldi figure, 0b00111110
+    out PORTB, row
+    out PORTC, figure
+    out PORTD, fig2
+    rcall delay
