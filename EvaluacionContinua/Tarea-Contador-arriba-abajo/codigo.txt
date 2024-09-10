@@ -1,4 +1,4 @@
-.include "m328pdef.inc" ; Define device ATmega328P
+.include "m328pdef.inc" ; Incluye definiciones específicas del microcontrolador ATmega328P
 
 
 .def temp = r16
@@ -10,7 +10,7 @@
     rjmp Reset
 
 Reset:
-    ; Initialize stack pointer
+    ; Inicia el puntero de la pila 
     ldi temp, high(RAMEND)
     out SPH, temp
     ldi temp, low(RAMEND)
@@ -27,7 +27,7 @@ Reset:
     SBI PORTD, 2
     SBI PORTD, 3
 
-    ; Clear initial LED state
+    ; Inicia todos los LEDs del puerto B y el contador en 0
     ldi led_state, 0
     out PORTB, led_state
     ldi counter, 0
