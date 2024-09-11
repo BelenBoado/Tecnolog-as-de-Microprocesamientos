@@ -1,21 +1,20 @@
-.include "m328pdef.inc"  
-.org 0x0000
-rjmp Reset
+.include "m328pdef.inc"  ; Incluimos las definiciones del microcontrolador con el que vamos a trabajar
+
+         
+.org 0x0000			 ;Inicializamos la direcciones de memoria donde iniciara el programa
+rjmp Reset			 ; y las interrupciones
 .ORG 0x0002
 RJMP Button1Pressed
 .ORG 0x0004
 RJMP Button2Pressed
 
-.def temp = r16
-.def button_state = r17
+.def temp = r16			; Definimos algumas variables globales para no mezclar registros
+.def button_state = r17		; mientras programamos
 .def row = r26
 .def figure = r27
 .def led_state = r20
 .def counter = r24
 .def fig2 = r25
-
-
-
 
 Reset:
     ldi temp, high(RAMEND)
