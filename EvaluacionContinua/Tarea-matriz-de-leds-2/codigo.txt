@@ -1,6 +1,4 @@
-
-
-.include "m328pdef.inc" 
+.include "m328pdef.inc"  
 .org 0x0000
 rjmp Reset
 .ORG 0x0002
@@ -49,7 +47,7 @@ Reset:
 
     rjmp MainLoop
 
-letraN:
+letraN:  					; Comenzamos a codificar los registros que formaran las filas y columnas de la letra N 
     ldi fig2, 0b01000000
     ldi row,0x00
     ldi figure,0b00111110
@@ -116,7 +114,7 @@ letraN:
 
     ret
 
-letraA:
+letraA:						; Comenzamos a codificar los registros que formaran las filas y columnas de la letra A 
     ldi fig2, 0b11000000
     ldi row,0x00
     ldi figure,0b00000011
@@ -184,7 +182,7 @@ letraA:
 
     ret
 
-letraG:
+letraG:					; Comenzamos a codificar los registros que formaran las filas y columnas de la letra G 
     ldi fig2, 0b10000000
     ldi row,0x00
     ldi figure,0b00000000
@@ -321,7 +319,7 @@ resetcounter:
     ldi counter, 0
     rjmp MainLoop
 
-letraU:
+letraU:					; Comenzamos a codificar los registros que formaran las filas y columnas de la letra U
     ldi fig2, 0b01000000
     ldi row, 0x00
     ldi figure, 0b00111110
@@ -388,7 +386,7 @@ letraU:
 
     ret
 
-letraR:
+letraR:						; Comenzamos a codificar los registros que formaran las filas y columnas de la letra R
     ldi fig2, 0b11000000
     ldi row,0x00
     ldi figure,0b00100001
@@ -455,7 +453,7 @@ letraR:
 
     ret
 
-letraY:
+letraY:						; Comenzamos a codificar los registros que formaran las filas y columnas de la letra Y 
     ldi fig2, 0b01000000
     ldi row,0x00
     ldi figure,0b00111110
@@ -522,7 +520,7 @@ letraY:
 
     ret
 
-letraO:
+letraO:						; Comenzamos a codificar los registros que formaran las filas y columnas de la letra O 
     ldi fig2, 0b10000000
     ldi row,0x00
     ldi figure,0b00000001
@@ -589,7 +587,7 @@ letraO:
 
     ret
 
-letraM:
+letraM:						; Comenzamos a codificar los registros que formaran las filas y columnas de la letra M 
     ldi fig2, 0b01000000
     ldi row,0x00
     ldi figure,0b00111110
