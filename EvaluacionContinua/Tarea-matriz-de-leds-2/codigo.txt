@@ -1,48 +1,55 @@
-.include "m328pdef.inc" ; Incluimos las definiciones del microcontrolador con el que vamos a trabajar
 
-.def temp = r16                  ; Definimos algumas variables globales para no mezclar registros
-.def estado_boton = r17          ; mientras programamos
+
+.include "m328pdef.inc" 
+.org 0x0000
+rjmp Reset
+.ORG 0x0002
+RJMP Button1Pressed
+.ORG 0x0004
+RJMP Button2Pressed
+
+.def temp = r16
+.def button_state = r17
 .def row = r26
 .def figure = r27
-.def estado_led = r20
+.def led_state = r20
 .def counter = r24
 .def fig2 = r25
 
-.org 0x0000
-    rjmp Reset
+
+
 
 Reset:
-    ; Inicializamos el stack pointer
     ldi temp, high(RAMEND)
     out SPH, temp
     ldi temp, low(RAMEND)
     out SPL, temp
 
-    ; Configuramos puerto B y puerto C como salidas
+   
     ldi temp, 0xFF
     out DDRB, temp
     out DDRC, temp
 
-    ; Configuramos Puerto D como entrada y salida, ya que las interrupciones funcionaran en ese puerto
+  
     ldi temp, 0xf0
     out DDRD, temp
     sbi PORTD, 2
     sbi PORTD, 3
 
-    ; Inicializamos el estado de los led en 0 y el contador en 0
-    ldi estado_led, 0x00
-    out PORTD, estado_led
+
+    ldi led_state, 0x00
+    out PORTB, led_state
     ldi counter, 0
 
-        ;configuramos las interrupciones
+     ;configuramos las interrupciones
     LDI R18, 0X03
     OUT EIMSK, R18 ;habilita las interrupciones INT0 e INT1
     LDI R19, 0x0F
     STS EICRA, R19 ; configura flancos de subida
 
-    rjmp MainLoop            ; Saltamos al loop principal
+    rjmp MainLoop
 
-letraN:                        ; Comenzamos a codificar los registros que formaran las filas y columnas de la letra N            
+letraN:
     ldi fig2, 0b01000000
     ldi row,0x00
     ldi figure,0b00111110
@@ -107,9 +114,9 @@ letraN:                        ; Comenzamos a codificar los registros que formar
     out PORTD, fig2
     rcall delay
 
-    rjmp MainLoop                  ;Saltamos al MainLoop para que siga avanzando el programa
+    ret
 
-letraA:                            ; Comenzamos a codificar los registros que formaran las filas y columnas de la letra A  
+letraA:
     ldi fig2, 0b11000000
     ldi row,0x00
     ldi figure,0b00000011
@@ -175,9 +182,9 @@ letraA:                            ; Comenzamos a codificar los registros que fo
     out PORTD, fig2
     rcall delay
 
-    rjmp MainLoop                    ; Saltamos al MainLoop para que continue avanzando el programa
+    ret
 
-letraG:                              ; Comenzamos a codificar los registros que formaran las filas y columnas de la letra G 
+letraG:
     ldi fig2, 0b10000000
     ldi row,0x00
     ldi figure,0b00000000
@@ -242,45 +249,40 @@ letraG:                              ; Comenzamos a codificar los registros que 
     out PORTD, fig2
     rcall delay
 
-    rjmp MainLoop              ;Saltamos al MainLoop para que el programa pueda seguir avanzando
+    ret
 
-; Creamos atajos para las letras que se encuentran a mas distancia del MainLoop ya que sino el programa no podra leer las letras.
-; Cada atajo contara de un salto relativo qe redireccionara al programa a la letra correspondiente.
-atajoA:                      ; Atajo a la letra A  
+atajoA:
     rjmp letraA
-atajoY:                      ; Atajo a la letra Y
+atajoY:
     rjmp letraY
-atajoN:                      ; Atajo a la letra N
+atajoN:
     rjmp letraN
-atajoO:                      ; Atajo a la letra O
+atajoO:
     rjmp letraO
-atajoM:                      ; Atajo a la letra M        
-    rjmp letraM  
-atajoR:                      ; Atajo a la letra R
+atajoM:
+    rjmp letraM
+atajoR:
     rjmp letraR
-atajoG:                      ; Atajo a la letra G  
-       rjmp letraG
+atajoG:
+    rjmp letraG
 
-MainLoop:                    ;Loop principal del programa
-    ; Ingresa el estado del boton ubicado en el Pin D 2 que sera el encargado de Incrementar el contador para que avancen las letras.
+MainLoop:
+   
     in button_state, PIND
-    andi button_state, (1 << PD2)  ; Chequea el PIN D 2
-
-    ; Chequea si el boton fue presionado
-    cpi button_state, 0          ;Compara el boton con 0
-    brne Button1Pressed          ; Si no es 0, salta a la funcion Button1Pressed
+    andi button_state, (1 << PD2)  ; Check only PD2
 
 
-    ; Ingresa el estado del boton ubicado en el Pin D 3 que sera el encargado de Decrementar el contador para que retroocedan las letras.
+    cpi button_state, 0
+    brne Button1Pressed
+
     in button_state, PIND
-    andi button_state, (1 << PD3)  ; Chequea el PIN D 3
+    andi button_state, (1 << PD3)
 
-    ; Chequea si el boton fue presionado
-    cpi button_state, 0    ; Compara el boton con 0 
-    brne Button2pressed    ; Si no es 0, salta a la funcion Button2Pressed
+    cpi button_state, 0
+    brne Button2pressed
 
-    cpi counter, 0         ;Compara el estado del contador y llama a la letra respectiva para ese lugar
-    breq letraU            ; Salta a la letra correspondiente
+    cpi counter, 0
+    breq letraU
     cpi counter, 1
     breq atajoR
     cpi counter, 2
@@ -301,24 +303,25 @@ MainLoop:                    ;Loop principal del programa
     breq atajoM
     cpi counter, 10
     breq atajoA
-    brne resetcounter               ; Cuando alcanza la ultima letra, se resetea el contador, volviendo a 0
+	cpi counter, 11
+    breq resetcounter
 
-    ; Espera a que el botton sea liberado
-    rjmp MainLoop                    ; Repite el MainLoop
+  
+    rjmp MainLoop
 
-Button1Pressed:                     ; Si el boton 1 es presionado
-    inc counter                     ; incrementa el contador
-    rjmp MainLoop                   ; y vuelva al loop principal
+Button1Pressed:
+    inc counter
+    reti
 
-Button2Pressed:                    ; Si el boton 2 es presionado
-    dec counter                    ; decrementa el contador
-    rjmp MainLoop                  ; y regresa al loop principal
+Button2Pressed:
+    dec counter
+    reti
 
-resetcounter:                       ; Cuando se acaban las letras se resetea el contador
-    ldi counter, 0                  ; Se carga el 0 en el contador     
-    rjmp MainLoop                   ; y regresa al MainLoop
+resetcounter:
+    ldi counter, 0
+    rjmp MainLoop
 
-letraU:                          ; Comenzamos a codificar los registros que formaran las filas y columnas de la letra U 
+letraU:
     ldi fig2, 0b01000000
     ldi row, 0x00
     ldi figure, 0b00111110
@@ -383,7 +386,7 @@ letraU:                          ; Comenzamos a codificar los registros que form
     out PORTD, fig2
     rcall delay
 
-    rjmp MainLoop
+    ret
 
 letraR:
     ldi fig2, 0b11000000
@@ -417,7 +420,7 @@ letraR:
     out PORTC,figure
     out PORTD, fig2
     rcall delay
-                        
+
     ldi fig2, 0b11000000
     ldi row,0x04
     ldi figure,0b00100001
@@ -450,7 +453,7 @@ letraR:
     out PORTD, fig2
     rcall delay
 
-    rjmp MainLoop
+    ret
 
 letraY:
     ldi fig2, 0b01000000
@@ -517,7 +520,7 @@ letraY:
     out PORTD, fig2
     rcall delay
 
-    rjmp MainLoop
+    ret
 
 letraO:
     ldi fig2, 0b10000000
@@ -584,7 +587,7 @@ letraO:
     out PORTD, fig2
     rcall delay
 
-    rjmp MainLoop
+    ret
 
 letraM:
     ldi fig2, 0b01000000
@@ -619,43 +622,43 @@ letraM:
     out PORTD, fig2
     rcall delay
 
-    ldi fig2, 0b0100 0000
+    ldi fig2, 0b01000000
     ldi row,0x04
-    ldi figure,0b0011 1110
+    ldi figure,0b00111110
     out PORTB,row
     out PORTC,figure
     out PORTD, fig2
     rcall delay
 
-    ldi fig2, 0b0100 0000
+    ldi fig2, 0b01000000
     ldi row,0x05
-    ldi figure,0b0011 1110
+    ldi figure,0b00111110
     out PORTB,row
     out PORTC,figure
     out PORTD, fig2
     rcall delay
 
-    ldi fig2, 0b0100 0000
+    ldi fig2, 0b01000000
     ldi row,0x06
-    ldi figure,0b0011 1110
+    ldi figure,0b00111110
     out PORTB,row
     out PORTC,figure
     out PORTD, fig2
     rcall delay
 
-    ldi fig2, 0b0100 0000
+    ldi fig2, 0b01000000
     ldi row,0x07
-    ldi figure,0b0011 1110
+    ldi figure,0b00111110
     out PORTB,row
     out PORTC,figure
     out PORTD, fig2
     rcall delay
 
-    rjmp MainLoop
+    ret
 
-delay: ldi r23, 1 ; Cargar el valor inicial en r23
-loop3: ldi r22, 1 ; Cargar el valor inicial en r22
-loop2: ldi r21, 1 ; Cargar el valor inicial en r21
+delay: ldi r23, 50 ; Cargar el valor inicial en r23
+loop3: ldi r22, 20 ; Cargar el valor inicial en r22
+loop2: ldi r21, 10 ; Cargar el valor inicial en r21
 loop1: dec r21 ; Decrementar r21
        brne loop1 ; Si r21 != 0, saltar al siguiente bucle
        dec r22 ; Decrementar r22
@@ -663,3 +666,4 @@ loop1: dec r21 ; Decrementar r21
        dec r23 ; Decrementar r23
        brne loop3 ; Si r23 != 0, saltar al siguiente bucle
        ret ; Regresar de la subrutina
+
