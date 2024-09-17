@@ -189,8 +189,8 @@ numeroocho:
 
 Mseg:
       ldi r27, 21
-      ldi r22, 79
-      ldi r23, 189
+      ldi r22, 67
+      ldi r23, 66
 L1:
     dec r23
     brne L1
