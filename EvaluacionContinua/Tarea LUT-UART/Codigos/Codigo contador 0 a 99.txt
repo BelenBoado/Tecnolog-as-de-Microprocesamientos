@@ -24,6 +24,7 @@ RESET:
     ldi r16, 0xFF
     out DDRD, r16
     out DDRB, r16
+    out PORTC, r16
     rjmp MainLoop
 
 addten:
@@ -39,10 +40,10 @@ MainLoop:
 
 CheckButtons:
     in r18, PINC
-    cpi r18, 0x41
+    cpi r18, 0x7E
     breq StopCounting
     in r18, PINC
-    cpi r18, 0x42
+    cpi r18, 0x7D
     breq StartCounting
     rjmp ShowNumber
 
@@ -81,7 +82,7 @@ ShowNumberLoop:
     
 Delay:
     ldi r20, 0xFF
-    ldi r24, 0xFF
+    ldi r24, 0x3F
     rcall DelayLoop
     ret
 DelayLoop:
