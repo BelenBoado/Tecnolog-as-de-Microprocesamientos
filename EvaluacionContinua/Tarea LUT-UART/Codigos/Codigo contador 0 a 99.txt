@@ -1,1 +1,100 @@
+.include "m328pdef.inc"
 
+.cseg
+
+.org 0x0000
+
+rjmp RESET
+
+LUT_7SEG:
+    .db 0b0000111111 ; 0
+    .db 0b0010000110 ; 1
+    .db 0b0001011011 ; 2
+    .db 0b0001001111 ; 3
+    .db 0b0001100110 ; 4
+    .db 0b0001101101 ; 5
+    .db 0b0001111101 ; 6
+    .db 0b0000000111 ; 7
+    .db 0b0001111111 ; 8
+    .db 0b0001101111 ; 9
+
+RESET:
+    ldi r16, 0x00
+    out DDRC, r16
+    ldi r16, 0xFF
+    out DDRD, r16
+    out DDRB, r16
+    rjmp MainLoop
+
+addten:
+    inc r19
+    inc r19
+    ldi r17, 1
+    rjmp ShowNumber
+
+MainLoop:
+    ldi r17, 1
+    ldi r19, 1
+    ldi r22, 0
+
+CheckButtons:
+    in r18, PINC
+    cpi r18, 0x41
+    breq StopCounting
+    in r18, PINC
+    cpi r18, 0x42
+    breq StartCounting
+    rjmp ShowNumber
+
+StopCounting:
+    ldi r22, 1
+    rjmp ShowNumber
+StartCounting:
+    ldi r22, 0
+    rjmp ShowNumber
+    
+ShowNumber:
+    ldi r23, 0x01
+ShowNumberLoop:
+    ldi ZL, low(LUT_7SEG)
+    ldi ZH, high(LUT_7SEG)
+    out PORTB, r1
+    add ZL, r17
+    ldi r21, 1
+    lpm r18, Z
+    out PORTD, r18
+    out PORTB, r21
+    rcall delay
+    ldi ZL, low(LUT_7SEG)
+    ldi ZH, high(LUT_7SEG)
+    out PORTB, r1
+    add ZL, r19
+    ldi r21, 2
+    lpm r18, Z
+    out PORTD, r18
+    out PORTB, r21
+    rcall Delay
+    dec r23
+    cpi r22, 1
+    brne increment
+    rjmp CheckButtons
+    
+Delay:
+    ldi r20, 0xFF
+    ldi r24, 0xFF
+    rcall DelayLoop
+    ret
+DelayLoop:
+    dec r20
+    brne DelayLoop
+    dec r24
+    brne DelayLoop
+    ret
+increment:
+    inc r17
+    inc r17
+    cpi r17, 20
+    brlo CheckButtons
+    cpi r19, 19
+    brlo addten
+    rjmp MainLoop
