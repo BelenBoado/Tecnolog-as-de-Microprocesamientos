@@ -1,14 +1,14 @@
 include "m328pdef.inc" ; Incluimos las definiciones del microcontrolador ATmega328P
 
-.org 0x0000
+.org 0x0000		; Inicializamos la direccion del memoria para inicie el programa
 rjmp start
 
 configurar:
-	ldi r20, 0xFF         ;
-	out DDRD, r20
+	ldi r20, 0xFF         ; Coniguramos los puertos
+	out DDRD, r20	      ; como salidas
 	clr r20
-	out PORTD, r20        ; 
-	call LUT  ;
+	out PORTD, r20        ; y entradas
+	call SEÑAL              ; Cargamos los datos de la señal
 	ret
 
 esperar_inicio:
@@ -52,3 +52,121 @@ get_7seg_code:
 	add r28, r0
 	ld r20, Y
 	ret
+
+SEÑAL:
+
+	ldi r28, 0x00
+	ldi r29, 0x01
+
+	ldi r20, 0xff       ; Valor 255
+	ST Y+, r20
+	ldi r20, 0xfe       ; Valor 254
+	ST Y+, r20
+	ldi r20, 0xfd       ; Valor 253
+	ST Y+, r20
+	ldi r20, 0xfc       ; Valor 252
+	ST Y+, r20
+	ldi r20, 0xfb       ; Valor 251
+	ST Y+, r20
+	ldi r20, 0xfa       ; Valor 250
+	ST Y+, r20
+	ldi r20, 0xf9       ; Valor 249
+	ST Y+, r20
+	ldi r20, 0xf8       ; Valor 248
+	ST Y+, r20
+	ldi r20, 0xf7       ; Valor 247
+	ST Y+, r20
+	ldi r20, 0xf6       ; Valor 246
+	ST Y+, r20
+	ldi r20, 0xf5       ; Valor 245
+	ST Y+, r20
+	ldi r20, 0xf4       ; Valor 244
+	ST Y+, r20
+	ldi r20, 0xf3       ; Valor 243
+	ST Y+, r20
+	ldi r20, 0xf2       ; Valor 242
+	ST Y+, r20
+	ldi r20, 0xf1       ; Valor 241
+	ST Y+, r20
+	ldi r20, 0xf0       ; Valor 240
+	ST Y+, r20
+	ldi r20, 0xef       ; Valor 239
+	ST Y+, r20
+	ldi r20, 0xee       ; Valor 238
+	ST Y+, r20
+	ldi r20, 0xed       ; Valor 237
+	ST Y+, r20
+	ldi r20, 0xec       ; Valor 236
+	ST Y+, r20
+	ldi r20, 0xeb       ; Valor 235
+	ST Y+, r20
+	ldi r20, 0xea       ; Valor 234
+	ST Y+, r20
+	ldi r20, 0xe9       ; Valor 233
+	ST Y+, r20
+	ldi r20, 0xe8       ; Valor 232
+	ST Y+, r20
+	ldi r20, 0xe7       ; Valor 231
+	ST Y+, r20
+	ldi r20, 0xe6       ; Valor 230
+	ST Y+, r20
+	ldi r20, 0xe5       ; Valor 229
+	ST Y+, r20
+	ldi r20, 0xe4       ; Valor 228
+	ST Y+, r20
+	ldi r20, 0xe3       ; Valor 227
+	ST Y+, r20
+	ldi r20, 0xe2       ; Valor 226
+	ST Y+, r20
+	ldi r20, 0xe1       ; Valor 225
+	ST Y+, r20
+	ldi r20, 0xe0       ; Valor 224
+	ST Y+, r20
+	ldi r20, 0xdf       ; Valor 223
+	ST Y+, r20
+	ldi r20, 0xde       ; Valor 222
+	ST Y+, r20
+	ldi r20, 0xdd       ; Valor 221
+	ST Y+, r20
+	ldi r20, 0xdc       ; Valor 220
+	ST Y+, r20
+	ldi r20, 0xdb       ; Valor 219
+	ST Y+, r20
+	ldi r20, 0xda       ; Valor 218
+	ST Y+, r20
+	ldi r20, 0xd9       ; Valor 217
+	ST Y+, r20
+	ldi r20, 0xd8       ; Valor 216
+	ST Y+, r20
+	ldi r20, 0xd7       ; Valor 215
+	ST Y+, r20
+	ldi r20, 0xd6       ; Valor 214
+	ST Y+, r20
+	ldi r20, 0xd5       ; Valor 213
+	ST Y+, r20
+	ldi r20, 0xd4       ; Valor 212
+	ST Y+, r20
+	ldi r20, 0xd3       ; Valor 211
+	ST Y+, r20
+	ldi r20, 0xd2       ; Valor 210
+	ST Y+, r20
+	ldi r20, 0xd1       ; Valor 209
+	ST Y+, r20
+	ldi r20, 0xd0       ; Valor 208
+	ST Y+, r20
+	ldi r20, 0xcf       ; Valor 207
+	ST Y+, r20
+	ldi r20, 0xce       ; Valor 206
+	ST Y+, r20
+	ldi r20, 0xcd       ; Valor 205
+	ST Y+, r20
+	ldi r20, 0xcc       ; Valor 204
+	ST Y+, r20
+	ldi r20, 0xcb       ; Valor 203
+	ST Y+, r20
+	ldi r20, 0xca       ; Valor 202
+	ST Y+, r20
+	ldi r20, 0xc9       ; Valor 201
+	ST Y+, r20
+	ldi r20, 0xc8       ; Valor 200
+	ST Y+, r20
