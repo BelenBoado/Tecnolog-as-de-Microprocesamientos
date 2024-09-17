@@ -1,1 +1,54 @@
+include "m328pdef.inc" ; Incluimos las definiciones del microcontrolador ATmega328P
 
+.org 0x0000
+rjmp start
+
+configurar:
+	ldi r20, 0xFF         ;
+	out DDRD, r20
+	clr r20
+	out PORTD, r20        ; 
+	call LUT  ;
+	ret
+
+esperar_inicio:
+	nop
+	ret
+
+start:
+	ldi r16, HIGH(RAMEND)
+	out SPH, r16
+	ldi r16, LOW(RAMEND)
+	out SPL, r16
+	call configurar
+	call esperar_inicio
+	rjmp main_loop        ; 
+main_loop:
+	ldi ZH, high(LUT)     ; 
+	ldi ZL, low(LUT)      ;
+
+output_loop:
+	ld r16, Z+            ;
+	out PORTD, r16        ;
+	call delay            ;
+	rjmp output_loop      ;
+
+get_u:
+	mov r20, r16
+	andi r20, 0x0F
+	mov r1, r20
+	ret
+
+set_7seg_u:
+	mov r0, r1
+	call get_7seg_code
+	mov r17, r20
+	out PORTD, r17
+	ret
+
+get_7seg_code:
+	ldi r28, 0x00
+	ldi r29, 0x01
+	add r28, r0
+	ld r20, Y
+	ret
