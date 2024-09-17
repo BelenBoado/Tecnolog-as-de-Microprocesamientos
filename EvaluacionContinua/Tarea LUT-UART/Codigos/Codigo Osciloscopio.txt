@@ -170,3 +170,404 @@ SEÑAL:
 	ST Y+, r20
 	ldi r20, 0xc8       ; Valor 200
 	ST Y+, r20
+	------------------------
+	ldi r20, 0xc7       ; Valor 199
+ST Y+, r20
+ldi r20, 0xc6       ; Valor 198
+ST Y+, r20
+ldi r20, 0xc5       ; Valor 197
+ST Y+, r20
+ldi r20, 0xc4       ; Valor 196
+ST Y+, r20
+ldi r20, 0xc3       ; Valor 195
+ST Y+, r20
+ldi r20, 0xc2       ; Valor 194
+ST Y+, r20
+ldi r20, 0xc1       ; Valor 193
+ST Y+, r20
+ldi r20, 0xc0       ; Valor 192
+ST Y+, r20
+ldi r20, 0xbf       ; Valor 191
+ST Y+, r20
+ldi r20, 0xbe       ; Valor 190
+ST Y+, r20
+ldi r20, 0xbd       ; Valor 189
+ST Y+, r20
+ldi r20, 0xbc       ; Valor 188
+ST Y+, r20
+ldi r20, 0xbb       ; Valor 187
+ST Y+, r20
+ldi r20, 0xba       ; Valor 186
+ST Y+, r20
+ldi r20, 0xb9       ; Valor 185
+ST Y+, r20
+ldi r20, 0xb8       ; Valor 184
+ST Y+, r20
+ldi r20, 0xb7       ; Valor 183
+ST Y+, r20
+ldi r20, 0xb6       ; Valor 182
+ST Y+, r20
+ldi r20, 0xb5       ; Valor 181
+ST Y+, r20
+ldi r20, 0xb4       ; Valor 180
+ST Y+, r20
+ldi r20, 0xb3       ; Valor 179
+ST Y+, r20
+ldi r20, 0xb2       ; Valor 178
+ST Y+, r20
+ldi r20, 0xb1       ; Valor 177
+ST Y+, r20
+ldi r20, 0xb0       ; Valor 176
+ST Y+, r20
+ldi r20, 0xaf       ; Valor 175
+ST Y+, r20
+ldi r20, 0xae       ; Valor 174
+ST Y+, r20
+ldi r20, 0xad       ; Valor 173
+ST Y+, r20
+ldi r20, 0xac       ; Valor 172
+ST Y+, r20
+ldi r20, 0xab       ; Valor 171
+ST Y+, r20
+ldi r20, 0xaa       ; Valor 170
+ST Y+, r20
+ldi r20, 0xa9       ; Valor 169
+ST Y+, r20
+ldi r20, 0xa8       ; Valor 168
+ST Y+, r20
+ldi r20, 0xa7       ; Valor 167
+ST Y+, r20
+ldi r20, 0xa6       ; Valor 166
+ST Y+, r20
+ldi r20, 0xa5       ; Valor 165
+ST Y+, r20
+ldi r20, 0xa4       ; Valor 164
+ST Y+, r20
+ldi r20, 0xa3       ; Valor 163
+ST Y+, r20
+ldi r20, 0xa2       ; Valor 162
+ST Y+, r20
+ldi r20, 0xa1       ; Valor 161
+ST Y+, r20
+ldi r20, 0xa0       ; Valor 160
+ST Y+, r20
+ldi r20, 0x9f       ; Valor 159
+ST Y+, r20
+ldi r20, 0x9e       ; Valor 158
+ST Y+, r20
+ldi r20, 0x9d       ; Valor 157
+ST Y+, r20
+ldi r20, 0x9c       ; Valor 156
+ST Y+, r20
+ldi r20, 0x9b       ; Valor 155
+ST Y+, r20
+ldi r20, 0x9a       ; Valor 154
+ST Y+, r20
+ldi r20, 0x99       ; Valor 153
+ST Y+, r20
+ldi r20, 0x98       ; Valor 152
+ST Y+, r20
+ldi r20, 0x97       ; Valor 151
+ST Y+, r20
+ldi r20, 0x96       ; Valor 150
+ST Y+, r20
+ldi r20, 0x95       ; Valor 149
+ST Y+, r20
+ldi r20, 0x94       ; Valor 148
+ST Y+, r20
+ldi r20, 0x93       ; Valor 147
+ST Y+, r20
+ldi r20, 0x92       ; Valor 146
+ST Y+, r20
+ldi r20, 0x91       ; Valor 145
+ST Y+, r20
+ldi r20, 0x90       ; Valor 144
+ST Y+, r20
+ldi r20, 0x8f       ; Valor 143
+ST Y+, r20
+ldi r20, 0x8e       ; Valor 142
+ST Y+, r20
+ldi r20, 0x8d       ; Valor 141
+ST Y+, r20
+ldi r20, 0x8c       ; Valor 140
+ST Y+, r20
+ldi r20, 0x8b       ; Valor 139
+ST Y+, r20
+ldi r20, 0x8a       ; Valor 138
+ST Y+, r20
+ldi r20, 0x89       ; Valor 137
+ST Y+, r20
+ldi r20, 0x88       ; Valor 136
+ST Y+, r20
+ldi r20, 0x87       ; Valor 135
+ST Y+, r20
+ldi r20, 0x86       ; Valor 134
+ST Y+, r20
+ldi r20, 0x85       ; Valor 133
+ST Y+, r20
+ldi r20, 0x84       ; Valor 132
+ST Y+, r20
+ldi r20, 0x83       ; Valor 131
+ST Y+, r20
+ldi r20, 0x82       ; Valor 130
+ST Y+, r20
+ldi r20, 0x81       ; Valor 129
+ST Y+, r20
+ldi r20, 0x80       ; Valor 128
+ST Y+, r20
+ldi r20, 0x7f       ; Valor 127
+ST Y+, r20
+ldi r20, 0x7e       ; Valor 126
+ST Y+, r20
+ldi r20, 0x7d       ; Valor 125
+ST Y+, r20
+ldi r20, 0x7c       ; Valor 124
+ST Y+, r20
+ldi r20, 0x7b       ; Valor 123
+ST Y+, r20
+ldi r20, 0x7a       ; Valor 122
+ST Y+, r20
+ldi r20, 0x79       ; Valor 121
+ST Y+, r20
+ldi r20, 0x78       ; Valor 120
+ST Y+, r20
+ldi r20, 0x77       ; Valor 119
+ST Y+, r20
+ldi r20, 0x76       ; Valor 118
+ST Y+, r20
+ldi r20, 0x75       ; Valor 117
+ST Y+, r20
+ldi r20, 0x74       ; Valor 116
+ST Y+, r20
+ldi r20, 0x73       ; Valor 115
+ST Y+, r20
+ldi r20, 0x72       ; Valor 114
+ST Y+, r20
+ldi r20, 0x71       ; Valor 113
+ST Y+, r20
+ldi r20, 0x70       ; Valor 112
+ST Y+, r20
+ldi r20, 0x6f       ; Valor 111
+ST Y+, r20
+ldi r20, 0x6e       ; Valor 110
+ST Y+, r20
+ldi r20, 0x6d       ; Valor 109
+ST Y+, r20
+ldi r20, 0x6c       ; Valor 108
+ST Y+, r20
+ldi r20, 0x6b       ; Valor 107
+ST Y+, r20
+ldi r20, 0x6a       ; Valor 106
+ST Y+, r20
+ldi r20, 0x69       ; Valor 105
+ST Y+, r20
+ldi r20, 0x68       ; Valor 104
+ST Y+, r20
+ldi r20, 0x67       ; Valor 103
+ST Y+, r20
+ldi r20, 0x66       ; Valor 102
+ST Y+, r20
+ldi r20, 0x65       ; Valor 101
+ST Y+, r20
+ldi r20, 0x64       ; Valor 100
+ST Y+, r20
+ldi r20, 0x63       ; Valor 99
+ST Y+, r20
+ldi r20, 0x62       ; Valor 98
+ST Y+, r20
+ldi r20, 0x61       ; Valor 97
+ST Y+, r20
+ldi r20, 0x60       ; Valor 96
+ST Y+, r20
+ldi r20, 0x5f       ; Valor 95
+ST Y+, r20
+ldi r20, 0x5e       ; Valor 94
+ST Y+, r20
+ldi r20, 0x5d       ; Valor 93
+ST Y+, r20
+ldi r20, 0x5c       ; Valor 92
+ST Y+, r20
+ldi r20, 0x5b       ; Valor 91
+ST Y+, r20
+ldi r20, 0x5a       ; Valor 90
+ST Y+, r20
+ldi r20, 0x59       ; Valor 89
+ST Y+, r20
+ldi r20, 0x58       ; Valor 88
+ST Y+, r20
+ldi r20, 0x57       ; Valor 87
+ST Y+, r20
+ldi r20, 0x56       ; Valor 86
+ST Y+, r20
+ldi r20, 0x55       ; Valor 85
+ST Y+, r20
+ldi r20, 0x54       ; Valor 84
+ST Y+, r20
+ldi r20, 0x53       ; Valor 83
+ST Y+, r20
+ldi r20, 0x52       ; Valor 82
+ST Y+, r20
+ldi r20, 0x51       ; Valor 81
+ST Y+, r20
+ldi r20, 0x50       ; Valor 80
+ST Y+, r20
+ldi r20, 0x4f       ; Valor 79
+ST Y+, r20
+ldi r20, 0x4e       ; Valor 78
+ST Y+, r20
+ldi r20, 0x4d       ; Valor 77
+ST Y+, r20
+ldi r20, 0x4c       ; Valor 76
+ST Y+, r20
+ldi r20, 0x4b       ; Valor 75
+ST Y+, r20
+ldi r20, 0x4a       ; Valor 74
+ST Y+, r20
+ldi r20, 0x49       ; Valor 73
+ST Y+, r20
+ldi r20, 0x48       ; Valor 72
+ST Y+, r20
+ldi r20, 0x47       ; Valor 71
+ST Y+, r20
+ldi r20, 0x46       ; Valor 70
+ST Y+, r20
+ldi r20, 0x45       ; Valor 69
+ST Y+, r20
+ldi r20, 0x44       ; Valor 68
+ST Y+, r20
+ldi r20, 0x43       ; Valor 67
+ST Y+, r20
+ldi r20, 0x42       ; Valor 66
+ST Y+, r20
+ldi r20, 0x41       ; Valor 65
+ST Y+, r20
+ldi r20, 0x40       ; Valor 62
+ST Y+, r20
+ldi r20, 0x3f       ; Valor 61
+ST Y+, r20
+ldi r20, 0x3e       ; Valor 60
+ST Y+, r20
+ldi r20, 0x3d       ; Valor 59
+ST Y+, r20
+ldi r20, 0x3c       ; Valor 58
+ST Y+, r20
+ldi r20, 0x3b       ; Valor 57
+ST Y+, r20
+ldi r20, 0x3a       ; Valor 56
+ST Y+, r20
+ldi r20, 0x39       ; Valor 55
+ST Y+, r20
+ldi r20, 0x38       ; Valor 54
+ST Y+, r20
+ldi r20, 0x37       ; Valor 53
+ST Y+, r20
+ldi r20, 0x36       ; Valor 52
+ST Y+, r20
+ldi r20, 0x35       ; Valor 51
+ST Y+, r20
+ldi r20, 0x34       ; Valor 50
+ST Y+, r20
+ldi r20, 0x33       ; Valor 49
+ST Y+, r20
+ldi r20, 0x32       ; Valor 48
+ST Y+, r20
+ldi r20, 0x31       ; Valor 47
+ST Y+, r20
+ldi r20, 0x30       ; Valor 46
+ST Y+, r20
+ldi r20, 0x2f       ; Valor 45
+ST Y+, r20
+ldi r20, 0x2e       ; Valor 44
+ST Y+, r20
+ldi r20, 0x2d       ; Valor 43
+ST Y+, r20
+ldi r20, 0x2c       ; Valor 42
+ST Y+, r20
+ldi r20, 0x2b       ; Valor 41
+ST Y+, r20
+ldi r20, 0x2a       ; Valor 40
+ST Y+, r20
+ldi r20, 0x29       ; Valor 39
+ST Y+, r20
+ldi r20, 0x28       ; Valor 38
+ST Y+, r20
+ldi r20, 0x27       ; Valor 37
+ST Y+, r20
+ldi r20, 0x26       ; Valor 36
+ST Y+, r20
+ldi r20, 0x25       ; Valor 35
+ST Y+, r20
+ldi r20, 0x24       ; Valor 34
+ST Y+, r20
+ldi r20, 0x23       ; Valor 33
+ST Y+, r20
+ldi r20, 0x22       ; Valor 32
+ST Y+, r20
+ldi r20, 0x21       ; Valor 31
+ST Y+, r20
+ldi r20, 0x20       ; Valor 30
+ST Y+, r20
+ldi r20, 0x1f       ; Valor 29
+ST Y+, r20
+ldi r20, 0x1e       ; Valor 28
+ST Y+, r20
+ldi r20, 0x1d       ; Valor 27
+ST Y+, r20
+ldi r20, 0x1c       ; Valor 26
+ST Y+, r20
+ldi r20, 0x1b       ; Valor 25
+ST Y+, r20
+ldi r20, 0x1a       ; Valor 24
+ST Y+, r20
+ldi r20, 0x19       ; Valor 23
+ST Y+, r20
+ldi r20, 0x18       ; Valor 22
+ST Y+, r20
+ldi r20, 0x17       ; Valor 21
+ST Y+, r20
+ldi r20, 0x16       ; Valor 20
+ST Y+, r20
+ldi r20, 0x15       ; Valor 19
+ST Y+, r20
+ldi r20, 0x14       ; Valor 18
+ST Y+, r20
+ldi r20, 0x13       ; Valor 17
+ST Y+, r20
+ldi r20, 0x12       ; Valor 16
+ST Y+, r20
+ldi r20, 0x11       ; Valor 15
+ST Y+, r20
+ldi r20, 0x10       ; Valor 14
+ST Y+, r20
+ldi r20, 0x0f       ; Valor 13
+ST Y+, r20
+ldi r20, 0x0e       ; Valor 12
+ST Y+, r20
+ldi r20, 0x0d       ; Valor 11
+ST Y+, r20
+ldi r20, 0x0c       ; Valor 10
+ST Y+, r20
+ldi r20, 0x0b       ; Valor 9
+ST Y+, r20
+ldi r20, 0x0a       ; Valor 8
+ST Y+, r20
+ldi r20, 0x09       ; Valor 7
+ST Y+, r20
+ldi r20, 0x08       ; Valor 6
+ST Y+, r20
+ldi r20, 0x07       ; Valor 5
+ST Y+, r20
+ldi r20, 0x06       ; Valor 4
+ST Y+, r20
+ldi r20, 0x05       ; Valor 3
+ST Y+, r20
+ldi r20, 0x04       ; Valor 2
+ST Y+, r20
+ldi r20, 0x03       ; Valor 1
+ST Y+, r20
+ldi r20, 0x02       ; Valor 0
+ST Y+, r20
+ldi r20, 0x01       ; Valor 
+ST Y+, r20
+ldi r20, 0x00       ; Valor 
+ST Y+, r20
