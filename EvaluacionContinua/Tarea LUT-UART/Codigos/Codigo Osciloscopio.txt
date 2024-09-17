@@ -22,7 +22,15 @@ start:
 	out SPL, r16
 	call configurar
 	call esperar_inicio
+	ldi r18,(1<<PB0)
+  	out DDRB, r18
+
+  	ldi r18, (1<<CS02) | (1<<CS00)
+  	out TCCR0B, r18
+	ldi r16, 0
+	out TCNT0, r16
 	rjmp main_loop        ; 
+	
 main_loop:
 	ldi ZH, high(LUT)     ; 
 	ldi ZL, low(LUT)      ;
