@@ -571,3 +571,19 @@ SEÑAL:
 	ST Y+, r20
 	ldi r20, 0x00       ; Valor 
 	ST Y+, r20
+
+
+delay:
+      ldi r27, 21
+      ldi r22, 67
+      ldi r23, 66
+L1:
+    dec r23
+    brne L1
+    dec r22
+    brne L1
+    dec r27
+    brne L1
+    nop
+
+    RET 
