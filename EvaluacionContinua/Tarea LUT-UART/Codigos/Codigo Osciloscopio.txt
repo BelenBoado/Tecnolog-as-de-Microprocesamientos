@@ -8,7 +8,7 @@ configurar:
 	out DDRD, r20	      ; como salidas
 	clr r20
 	out PORTD, r20        ; y entradas
-	call SEÑAL              ; Cargamos los datos de la señal
+	call SENAL              ; Cargamos los datos de la señal
 	ret
 
 esperar_inicio:
@@ -32,8 +32,8 @@ start:
 	rjmp main_loop        ; 
 	
 main_loop:
-	ldi ZH, high(LUT)     ; 
-	ldi ZL, low(LUT)      ;
+	ldi ZH, high(SENAL)     ; 
+	ldi ZL, low(SENAL)      ;
 
 output_loop:
 	ld r16, Z+            ;
@@ -61,7 +61,7 @@ get_7seg_code:
 	ld r20, Y
 	ret
 
-SEÑAL:
+SENAL:
 
 	ldi r28, 0x00
 	ldi r29, 0x01
