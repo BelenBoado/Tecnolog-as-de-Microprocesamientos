@@ -109,28 +109,11 @@ CargaLigera:
 
 CargaMedia:
    sbi PORTD, PD6
-   rcall Delay
    rjmp ProcedimientoDeLavado
 
 CargaPesada:
    sbi PORTD, PD7
-   rcall Delay
    rjmp ProcedimientoDeLavado
-
-Delay:
-    ldi  r17, 1
-    ldi  r18, 10
-    ldi  r19, 43
-    ldi  r20, 82
-L0: dec  r20
-    brne L0
-    dec  r19
-    brne L0
-    dec  r18
-    brne L0
-    dec  r17
-    brne L0
-    ret
 
 Delay2S:
     ldi  r17, 163
