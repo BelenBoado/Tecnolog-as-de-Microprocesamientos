@@ -1,0 +1,161 @@
+.include "m328pdef.inc"
+
+.cseg
+
+.org 0x0000
+
+ldi r16, 0x00
+out DDRC, r16
+ldi r16, 0xFF
+out DDRB, r16
+out DDRD, r16
+out PORTC, r16
+
+main:
+   cbi PORTB, PB0
+   cbi PORTB, PB1
+   cbi PORTD, PD4
+   cbi PORTD, PD5
+   cbi PORTD, PD6
+   cbi PORTD, PD7
+   ldi r21, 0x05
+   rjmp ListoParaLavar
+   rjmp main
+
+ListoParaLavar:
+   sbi PORTD, PD0
+   sbis PINC, PC0
+   rjmp CargaLigera
+   sbis PINC, PC1
+   rjmp CargaMedia
+   sbis PINC, PC2
+   rjmp CargaPesada
+   rjmp ListoParaLavar
+
+ProcedimientoDeLavado:
+   cbi PORTD, PD0
+   sbi PORTD, PD1
+   sbi PORTB, PB0
+   rcall Delay2s
+   cbi PORTB, PB0
+   rcall Delay1s
+   dec r21
+   brne ProcedimientoDeLavado
+   rjmp ProcedimientoDeCentrifugado
+
+ProcedimientoDeCentrifugado:
+   cbi PORTD, PD1
+   sbi PORTD, PD2
+   sbi PORTB, PB0
+   rcall Delay15s
+   cbi PORTB, PB0
+   rjmp ProcedimientoDeSecado
+
+ProcedimientoDeSecado:
+   cbi PORTD, PD2
+   sbi PORTD, PD3
+   sbi PORTB, PB0
+   rcall Delay5s
+   cbi PORTB, PB0
+   rcall Delay3s
+   sbi PORTB, PB1
+   rcall Delay5s
+   cbi PORTB, PB1
+   rjmp FinDelProceso
+
+FinDelProceso:
+   cbi PORTD, PD3
+   sbi PORTD, PD4
+   rjmp main
+
+CargaLigera:
+   sbi PORTD, PD5
+   rjmp ProcedimientoDeLavado
+
+CargaMedia:
+   sbi PORTD, PD6
+   rcall Delay
+   rjmp ProcedimientoDeLavado
+
+CargaPesada:
+   sbi PORTD, PD7
+   rcall Delay
+   rjmp ProcedimientoDeLavado
+
+Delay:
+    ldi  r17, 1
+    ldi  r18, 10
+    ldi  r19, 43
+    ldi  r20, 82
+L0: dec  r20
+    brne L0
+    dec  r19
+    brne L0
+    dec  r18
+    brne L0
+    dec  r17
+    brne L0
+    ret
+
+Delay2S:
+    ldi  r17, 163
+    ldi  r18, 87
+    ldi  r19, 3
+L1: dec  r19
+    brne L1
+    dec  r18
+    brne L1
+    dec  r17
+    brne L1
+    ret
+
+Delay1S:
+    ldi  r17, 82
+    ldi  r18, 43
+    ldi  r19, 0
+L2: dec  r19
+    brne L2
+    dec  r18
+    brne L2
+    dec  r17
+    brne L2
+    ret
+Delay5S:
+    ldi  r17, 2
+    ldi  r18, 150
+    ldi  r19, 216
+    ldi  r20, 9
+L3: dec  r20
+    brne L3
+    dec  r19
+    brne L3
+    dec  r18
+    brne L3
+    dec  r17
+    brne L3
+    ret
+Delay15S:
+    ldi  r17, 5
+    ldi  r18, 194
+    ldi  r19, 134
+    ldi  r20, 33
+L4: dec  r20
+    brne L4
+    dec  r19
+    brne L4
+    dec  r18
+    brne L4
+    dec  r17
+    brne L4
+    ret
+Delay3S:
+    ldi  r17, 244
+    ldi  r18, 130
+    ldi  r19, 6
+L5: dec  r19
+    brne L5
+    dec  r18
+    brne L5
+    dec  r17
+    brne L5
+    ret
