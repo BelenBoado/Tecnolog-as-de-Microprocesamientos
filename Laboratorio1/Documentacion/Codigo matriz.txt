@@ -19,9 +19,8 @@ inicio:
 
 menu:
      call preguntar
-     call A
-     call B
-     call delay
+     call getc
+     call delay  
 
 wait:
      call getc
@@ -58,21 +57,90 @@ getc:
 A:
   ldi r16, 'A'
   cpi r16, 'A'
-  breq atajoA
+  breq atajo1              ;w
+  call delay               ;
+  breq atajo2              ;e
+  call delay               ;
+  breq atajo3              ;l
+  call delay               ;
+  breq atajo4              ;c
+  call delay               ;
+  breq atajo5              ;o
+  call delay               ;
+  breq atajo6              ;m
   call delay
+  breq atajo2              ;e
+  call delay
+  breq atajo7              ;espacio
+  call delay
+  breq atajo8              ;h
+  call delay
+  breq atajo5              ;o
+  call delay               ;
+  breq atajo6              ;m
+  call delay
+  breq atajo2              ;e
+  call delay
+  breq atajo9              ;!
+  call delay
+  ret
 
 B:
   ldi r16, 'B'
   cpi r16, 'B'
+  breq atajoA
+  call delay
   breq atajoB
   call delay
+  breq atajoC
+  call delay
+  breq atajoD
+  call delay
+  breq atajoE
+  call delay
+  ret   
+
+atajo1:
+       rjmp w
+
+atajo2:
+       rjmp e
+
+atajo3:
+       rjmp L
+
+atajo4:
+       rjmp C
+
+atajo5:
+       rjmp O
+
+atajo6:
+       rjmp M
+atajo7:
+       rjmp espacio
+
+atajo8:
+       rjmp H
+atajo9:
+       rjmp exclaamcion
+
 
 atajoA:
-       call rombo
+       rjmp rombo
 
 atajoB:
-       call carita_feliz
+       rjmp carita_feliz
 
+atajoC:
+       rjmp corazon
+
+atajoD:
+       rjmp carita_triste
+
+atajoe:
+       rjmp alien
+                  
 preguntar:
          ldi r16, 'I'
          rcall putc
@@ -137,19 +205,28 @@ preguntar:
          ldi r16, '-'
          rcall putc
 
-         ldi r16, 'R'
+         ldi r16, 'P'
          rcall putc
 
-         ldi r16, 'o'
+         ldi r16, 'a'
          rcall putc
 
-         ldi r16, 'm'
+         ldi r16, 'l'
+         rcall putc
+
+         ldi r16, 'a'
          rcall putc
 
          ldi r16, 'b'
          rcall putc
 
-         ldi r16, 'o'
+         ldi r16, 'r'
+         rcall putc
+
+         ldi r16, 'a'
+         rcall putc
+
+         ldi r16, 's'
          rcall putc
 
          ldi r16, '/'
@@ -161,10 +238,16 @@ preguntar:
          ldi r16, '-'
          rcall putc
 
-         ldi r16, 'C'
+         ldi r16, 'F'
          rcall putc
 
-         ldi r16, 'a'
+         ldi r16, 'i'
+         rcall putc
+
+         ldi r16, 'g'
+         rcall putc
+
+         ldi r16, 'u'
          rcall putc
 
          ldi r16, 'r'
@@ -173,138 +256,997 @@ preguntar:
          ldi r16, 'a'
          rcall putc
 
-         ldi r16, ' '
+         ldi r16, 's'
          rcall putc
 
-         ldi r16, 'f'
-         rcall putc
 
-         ldi r16, 'e'
-         rcall putc
+atajo1:
+       rjmp w
 
-         ldi r16, 'l'
-         rcall putc
+atajo2:
+       rjmp e
 
-         ldi r16, 'i'
-         rcall putc
+atajo3:
+       rjmp L
 
-         ldi r16, 'z'
-         rcall putc
+atajo4:
+       rjmp C
+
+atajo5:
+       rjmp O
+
+atajo6:
+       rjmp M
+atajo7:
+       rjmp espacio
+
+atajo8:
+       rjmp H
+atajo9:
+       rjmp exclaamcion
+
+
+atajoA:
+       rjmp rombo
+
+atajoB:
+       rjmp carita_feliz
+
+atajoC:
+       rjmp corazon
+
+atajoD:
+       rjmp carita_triste
+
+atajoe:
+       rjmp alien
+
+
 
 rombo:
-     ldi r16, 0x00
-     ldi r17, 0xe7
-     out PORTB, r16
-     out PORTD, r17
+     ldi r26, 0x00
+     ldi r27, 0xe0
+	 ldi r28, 0x07
+     out PORTB, r26
+     out PORTD, r27
+	 out PORTC, r28
      rcall delay
 
-     ldi r16, 0x01
-     ldi r17, 0xc3
-     out PORTB, r16
-     out PORTD, r17
+     ldi r26, 0x01
+     ldi r27, 0xc0
+	 ldi r28, 0x03
+     out PORTB, r26
+     out PORTD, r27
+	 out PORTC, r28
      rcall delay
 
-     ldi r16, 0x02
-     ldi r17, 0x81
-     out PORTB, r16
-     out PORTD, r17
+     ldi r26, 0x02
+     ldi r27, 0x80
+	 ldi r28, 0x01
+     out PORTB, r26
+     out PORTD, r27
+	 out PORTC, r28
      rcall delay
 
-     ldi r16, 0x03
-     ldi r17, 0x00
-     out PORTB, r16
-     out PORTD, r17
+     ldi r26, 0x03
+     ldi r27, 0x00
+	 ldi r28, 0x00
+     out PORTB, r26
+     out PORTD, r27
+	 out PORTC, r28
      rcall delay
 
-     ldi r16, 0x04
-     ldi r17, 0x00
-     out PORTB, r16
-     out PORTD, r17
+     ldi r26, 0x04
+     ldi r27, 0x00
+	 ldi r28, 0x00
+     out PORTB, r26
+     out PORTD, r27
+	 out PORTC, r28
      rcall delay
 
-     ldi r16, 0x05
-     ldi r17, 0x81
-     out PORTB, r16
-     out PORTD, r17
+     ldi r26, 0x05
+     ldi r27, 0x80
+	 ldi r28, 0x01
+     out PORTB, r26
+     out PORTD, r27
+	 out PORTC, r28
      rcall delay
 
-     ldi r16, 0x06
-     ldi r17, 0xc3
-     out PORTB, r16
-     out PORTD, r17
+     ldi r26, 0x06
+     ldi r27, 0xc0
+	 ldi r28, 0x03
+     out PORTB, r26
+     out PORTD, r27
+	 out PORTC, r28
      rcall delay
 
-     ldi r16, 0x07
-     ldi r17, 0xe7
-     out PORTB, r16
-     out PORTD, r17
-     rcall delay
-
-     rjmp inicio ; Saltar al inicio del bucle principal
+     ldi r26, 0x07
+     ldi r27, 0xe0
+	 ldi r28, 0x07
+     out PORTB, r26
+     out PORTD, r27
+	 out PORTC, r28
+     rcall delay			; termina rombo
+     ret
 
 carita_feliz:
-;Previa Explicación
-;Cada linea de la matriz contiene el mismo codigo , pero diferentes valores para los registros y puertos
-;El registro r16 junto al Puerto B se encarga de manejar el multiplexor y asi indicar que linea prender
-;El registro r17 junto al Puerto D se encarga de que led del dibujo encender
-    ;Primera linea de la matriz
-    ldi r16,0x00        ;Carga 0x00 en registro 16
-    ldi r17,0xff        ;Carga 0x99 en registro 17
-    out PORTB,r16       ;Configura el puerto B con los datos del registro 16
-    out PORTD,r17       ;Configura el puerto D con los datos del registro 17
-    rcall delay         ;Llama a deley
+	ldi r26,0x00        ; comienza carita feliz
+    ldi r27,0xf0
+	ldi	r28,0x0f
+    out PORTB,r26
+    out PORTD,r27
+	out PORTC, r28
+    rcall delay
 
-    ;Segunda linea de la matriz
-    ldi r16,0x01        ;Carga 0x00 en registro 16
-    ldi r17,0xdb        ;Carga 0x99 en registro 17
-    out PORTB,r16       ;Configura el puerto B con los datos del registro 16
-    out PORTD,r17       ;Configura el puerto D con los datos del registro 17
-    rcall delay          ;Llama a deley
 
-    ;Tercera linea de la matriz
-    ldi r16,0x02        ;Carga 0x00 en registro 16
-    ldi r17,0xdb        ;Carga 0x99 en registro 17
-    out PORTB,r16       ;Configura el puerto B con los datos del registro 16
-    out PORTD,r17       ;Configura el puerto D con los datos del registro 17
-    rcall delay          ;Llama a deley
+    ldi r26,0x01
+    ldi r27,0xd0
+	ldi r28,0x0b
+    out PORTB,r26
+    out PORTD,r27
+	out PORTC, r28
+    rcall delay
 
-    ;Cuarta linea de la matriz
-    ldi r16,0x03        ;Carga 0x00 en registro 16
-    ldi r17,0xff        ;Carga 0x99 en registro 17
-    out PORTB,r16       ;Configura el puerto B con los datos del registro 16
-    out PORTD,r17       ;Configura el puerto D con los datos del registro 17
-    rcall delay          ;Llama a deley
 
-    ;Quinta linea de la matriz
-    ldi r16,0x04        ;Carga 0x00 en registro 16
-    ldi r17,0xff        ;Carga 0x99 en registro 17
-    out PORTB,r16       ;Configura el puerto B con los datos del registro 16
-    out PORTD,r17       ;Configura el puerto D con los datos del registro 17
-    rcall delay          ;Llama a deley
+    ldi r26,0x02
+    ldi r27,0xd0
+	ldi r28,0x0b
+    out PORTB,r26
+    out PORTD,r27
+	out PORTC, r28
+    rcall delay
 
-    ;Sexta linea de la matriz
-    ldi r16,0x05        ;Carga 0x00 en registro 16
-    ldi r17,0xbd        ;Carga 0x99 en registro 17
-    out PORTB,r16       ;Configura el puerto B con los datos del registro 16
-    out PORTD,r17       ;Configura el puerto D con los datos del registro 17
-    rcall delay          ;Llama a deley
 
-    ;Septima linea de la matriz
-    ldi r16,0x06        ;Carga 0x00 en registro 16
-    ldi r17,0xc3        ;Carga 0x99 en registro 17
-    out PORTB,r16       ;Configura el puerto B con los datos del registro 16
-    out PORTD,r17       ;Configura el puerto D con los datos del registro 17
-    rcall delay          ;Llama a deley
+    ldi r26,0x03
+    ldi r27,0xf0
+	ldi r28,0x0f
+    out PORTB,r26
+    out PORTD,r27
+	out PORTC, r28
+    rcall delay
 
-    ;Octava linea de la matriz
-    ldi r16,0x07        ;Carga 0x00 en registro 16
-    ldi r17,0xff        ;Carga 0x99 en registro 17
-    out PORTB,r16       ;Configura el puerto B con los datos del registro 16
-    out PORTD,r17       ;Configura el puerto D con los datos del registro 17
-    rcall delay          ;Llama a deley
 
-    rjmp inicio     ;Saltar a main_loop
+    ldi r26,0x04
+    ldi r27,0xf0
+	ldi r28, 0x0f
+    out PORTB,r26
+    out PORTD,r27
+	out PORTC, r28
+    rcall delay
 
+
+    ldi r26,0x05
+    ldi r27,0xb0
+	ldi r28, 0x0d
+    out PORTB,r26
+    out PORTD,r27
+	out PORTC, r28
+    rcall delay
+
+
+    ldi r26,0x06
+    ldi r27,0xc0
+	ldi r28,0x03
+    out PORTB,r26
+    out PORTD,r27
+	out PORTC, r28
+    rcall delay
+
+
+    ldi r26,0x07
+    ldi r27,0xf0
+	ldi r28, 0x0f
+    out PORTB,r26
+    out PORTD,r27
+	out PORTC, r28
+    rcall delay  	 		; terima carita feliz
+    ret
+
+
+corazon:
+          ldi r26, 0x00          ; comienza corazon
+          ldi r27, 0x90
+		  ldi r28, 0x09
+          out PORTB, r26
+          out PORTD, r27
+		  out PORTC, r28
+          rcall delay
+
+
+          ldi r26, 0x01
+          ldi r27, 0x00
+          ldi r28, 0x00
+		  out PORTB, r26
+          out PORTD, r27
+		  out PORTC, r28
+          rcall delay
+
+
+          ldi r26, 0x02
+          ldi r27, 0x00
+          ldi r28, 0x00
+		  out PORTB, r26
+          out PORTD, r27
+          out PORTC, r28
+		  rcall delay
+
+
+          ldi r26, 0x03
+          ldi r27, 0x00
+          ldi r28, 0x00
+		  out PORTB, r26
+          out PORTD, r27
+          out PORTC, r28
+		  rcall delay
+
+
+          ldi r26, 0x04
+          ldi r27, 0x00
+          ldi r28, 0x00
+		  out PORTB, r26
+          out PORTD, r27
+          out PORTC, r28
+		  rcall delay
+
+          ldi r26, 0x05
+          ldi r27, 0x80
+          ldi r28, 0x01
+		  out PORTB, r26
+          out PORTD, r27
+          out PORTC, r28
+		  rcall delay
+
+
+          ldi r26,0x06
+          ldi r27,0xc0
+          ldi r28, 0x03
+		  out PORTB,r26
+          out PORTD,r27
+          out PORTC, r28
+		  rcall delay
+
+
+          ldi r26,0x07
+          ldi r27,0xe0
+          ldi r28, 0x07
+		  out PORTB,r26
+          out PORTD,r27
+          out PORTC, r28
+		  rcall delay				; termina corazon
+       ret
+
+carita_triste:
+    ldi r26,0x00			; comienza carita triste
+    ldi r27,0xf0
+	ldi r28, 0x0f
+    out PORTB,r26
+    out PORTD,r27
+    out PORTC, r28
+	rcall delay
+
+    ldi r26,0x01
+    ldi r27,0xd0
+	ldi r28, 0x0b
+    out PORTB,r26
+    out PORTD,r27
+	out PORTC, r28
+    rcall delay
+
+    ldi r26,0x02
+    ldi r27,0xd0
+	ldi r28, 0x0b
+    out PORTB,r26
+    out PORTD,r27
+	out PORTC, r28
+    rcall delay
+
+    ldi r26,0x03
+    ldi r27,0xf0
+    ldi r28, 0x0f
+	out PORTB,r26
+    out PORTD,r27
+	out PORTC, r28
+    rcall delay
+
+    ldi r26,0x04
+    ldi r27,0xf0
+	ldi r28, 0x0f
+    out PORTB,r26
+    out PORTD,r27
+    out PORTC, r28
+	rcall delay
+
+    ldi r26,0x05
+    ldi r27,0xc0
+	ldi r28, 0x03
+    out PORTB,r26
+    out PORTD,r27
+	out PORTC, r28
+    rcall delay
+
+    ldi r26,0x06
+    ldi r27,0xb0
+    ldi r28, 0x0d
+	out PORTB,r26
+    out PORTD,r27
+    out PORTC, r28
+	rcall delay
+
+    ldi r26,0x07
+    ldi r27,0xf0
+	ldi r28, 0x0f
+    out PORTB,r26
+    out PORTD,r27
+	out PORTC, r28
+    rcall delay			; termina carita triste
+     ret
+
+
+alien:
+    ldi r26, 0x00        ; comienza alien
+    ldi r27, 0xb0
+    ldi r28, 0x0d
+	out PORTB, r26
+    out PORTD, r27
+    out PORTC, r28
+	rcall delay
+
+    ldi r26, 0x01
+    ldi r27, 0xd0
+    ldi r28, 0x0b
+	out PORTB, r26
+    out PORTD, r27
+    out PORTC, r28
+	rcall delay
+
+    ldi r26, 0x02
+    ldi r27, 0x80
+    ldi r28, 0x01
+	out PORTB, r26
+    out PORTD, r27
+	out PORTC, r28
+    rcall delay
+
+    ldi r26, 0x03
+    ldi r27, 0x80
+	ldi r28, 0x01
+    out PORTB, r26
+    out PORTD, r27
+	out PORTC, r28
+    rcall delay
+
+    ldi r26, 0x04
+    ldi r27, 0x00
+	ldi r28, 0x00
+    out PORTB, r26
+    out PORTD, r27
+	out PORTC, r28
+    rcall delay
+
+    ldi r26, 0x05
+    ldi r27, 0x00
+	ldi r28, 0x00
+    out PORTB, r26
+    out PORTD, r27
+	out PORTC, r28
+    rcall delay
+
+    ldi r26, 0x06
+    ldi r27, 0x30
+	ldi r28, 0x0c
+    out PORTB, r26
+    out PORTD, r27
+	out PORTC, r28
+    rcall delay
+
+    ldi r26, 0x07
+    ldi r27, 0x90
+	ldi r28, 0x09
+    out PORTB, r26
+    out PORTD, r27
+	out PORTC, r28
+    rcall delay				; termina alien
+
+    ret
+
+w:
+	ldi r26, 0x00
+	ldi r27, 0x00
+	ldi r28, 0x00
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x01
+	ldi r27, 0b01000000
+	ldi r28, 0b00000010
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x02
+	ldi r27, 0b01000000
+	ldi r28, 0b00000010
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x03
+	ldi r27, 0b01000000
+	ldi r28, 0b00000010
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x04
+	ldi r27, 0b01000000
+	ldi r28, 0b00000010
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x05
+	ldi r27, 0b01010000
+	ldi r28, 0b00001010
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x06
+	ldi r27, 0b01100000
+	ldi r28, 0b00000110
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x07
+	ldi r27, 0b01000000
+	ldi r28, 0b00000010
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay				; termina la letra w
+  ret
+
+
+e:
+	ldi r26, 0x00			; empieza la letra e
+	ldi r27, 0x00
+	ldi r28, 0x00
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x01
+	ldi r27, 0b01110000
+	ldi r28, 0b00001110
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x02
+	ldi r27, 0b01000000
+	ldi r28, 0b00000000
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x03
+	ldi r27, 0b01000000
+	ldi r28, 0b00000000
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x04
+	ldi r27, 0b01110000
+	ldi r28, 0b00001000
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x05
+	ldi r27, 0b01000000
+	ldi r28, 0b00000000
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x06
+	ldi r27, 0b01000000
+	ldi r28, 0b00000000
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x07
+	ldi r27, 0b01110000
+	ldi r28, 0b00001110
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay						; termina la letra e
+  ret
+
+
+L:
+	ldi r26, 0x00			; empieza la letra L
+	ldi r27, 0x00
+	ldi r28, 0x00
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x01
+	ldi r27, 0b01000000
+	ldi r28, 0b00000000
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x02
+	ldi r27, 0b01000000
+	ldi r28, 0b00000000
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x03
+	ldi r27, 0b01000000
+	ldi r28, 0b00000000
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x04
+	ldi r27, 0b01000000
+	ldi r28, 0b00000000
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x05
+	ldi r27, 0b01000000
+	ldi r28, 0b00000000
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x06
+	ldi r27, 0b01000000
+	ldi r28, 0b00000000
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x07
+	ldi r27, 0b01110000
+	ldi r28, 0b00001100
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay						; termina la letra L
+  ret
+
+C:
+	ldi r26, 0x00			; empieza la letra C
+	ldi r27, 0x00
+	ldi r28, 0x00
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x01
+	ldi r27, 0b01110000
+	ldi r28, 0b00001110
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x02
+	ldi r27, 0b01000000
+	ldi r28, 0b00000000
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x03
+	ldi r27, 0b01000000
+	ldi r28, 0b00000000
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x04
+	ldi r27, 0b01000000
+	ldi r28, 0b00000000
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x05
+	ldi r27, 0b01000000
+	ldi r28, 0b00000000
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x06
+	ldi r27, 0b01000000
+	ldi r28, 0b00000000
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x07
+	ldi r27, 0b01110000
+	ldi r28, 0b00001110
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay						; termina la letra C
+  ret
+
+O:
+  	ldi r26, 0x00			; empieza la letra O
+	ldi r27, 0x00
+	ldi r28, 0x00
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x01
+	ldi r27, 0b01110000
+	ldi r28, 0b00001110
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x02
+	ldi r27, 0b01000000
+	ldi r28, 0b00000010
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x03
+	ldi r27, 0b01000000
+	ldi r28, 0b00000010
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x04
+	ldi r27, 0b01000000
+	ldi r28, 0b00000010
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x05
+	ldi r27, 0b01000000
+	ldi r28, 0b00000010
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x06
+	ldi r27, 0b01000000
+	ldi r28, 0b00000010
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x07
+	ldi r27, 0b01110000
+	ldi r28, 0b00001110
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay						; termina la letra O
+  ret
+
+M:
+	ldi r26, 0x00			; empieza la letra M
+	ldi r27, 0x00
+	ldi r28, 0x00
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x01
+	ldi r27, 0b01000000
+	ldi r28, 0b00000010
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x02
+	ldi r27, 0b01100000
+	ldi r28, 0b00000110
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x03
+	ldi r27, 0b01010000
+	ldi r28, 0b00001010
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x04
+	ldi r27, 0b01000000
+	ldi r28, 0b00000010
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x05
+	ldi r27, 0b01000000
+	ldi r28, 0b00000010
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x06
+	ldi r27, 0b01000000
+	ldi r28, 0b00000010
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x07
+	ldi r27, 0b01000000
+	ldi r28, 0b00000010
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay						; termina la letra M
+  ret
+
+espacio:
+	ldi r26, 0x00			; empieza el espacio
+	ldi r27, 0x00
+	ldi r28, 0x00
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x01
+	ldi r27,0x00
+	ldi r28, 0x00
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x02
+	ldi r27, 0x00
+	ldi r28, 0x00
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x03
+	ldi r27, 0x00
+	ldi r28, 0x00
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x04
+	ldi r27, 0x00
+	ldi r28, 0x00
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x05
+	ldi r27, 0x00
+	ldi r28, 0x00
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x06
+	ldi r27, 0x00
+	ldi r28, 0x00
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x07
+	ldi r27, 0x00
+	ldi r28, 0x00
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay						; termina espacio
+  ret
+
+H:
+	ldi r26, 0x00			; empieza la letra H
+	ldi r27, 0x00
+	ldi r28, 0x00
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x01
+	ldi r27, 0b01000000
+	ldi r28, 0b00000010
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x02
+	ldi r27, 0b01000000
+	ldi r28, 0b00000010
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x03
+	ldi r27, 0b01110000
+	ldi r28, 0b00001110
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x04
+	ldi r27, 0b01110000
+	ldi r28, 0b00001000
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x05
+	ldi r27, 0b01000000
+	ldi r28, 0b00000010
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x06
+	ldi r27, 0b01000000
+	ldi r28, 0b00000010
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x07
+	ldi r27, 0b01000000
+	ldi r28, 0b00000010
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay						; termina la letra H
+  ret
+
+exclaamcion:
+	ldi r26, 0x00
+	ldi r27, 0x00
+	ldi r28, 0x00
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x01
+	ldi r27, 0b01000000
+	ldi r28, 0b00000000
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x02
+	ldi r27, 0b01000000
+	ldi r28, 0b00000000
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x03
+	ldi r27, 0b01000000
+	ldi r28, 0b00000000
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x04
+	ldi r27, 0b01000000
+	ldi r28, 0b00000000
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x05
+	ldi r27, 0b00000000
+	ldi r28, 0b00000000
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x06
+	ldi r27, 0b01000000
+	ldi r28, 0b00000000
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+
+	ldi r26, 0x07
+	ldi r27, 0b00000000
+	ldi r28, 0b00000000
+	out PORTB, r26
+	out PORTD, r27
+	out PORTC, r28
+	call delay
+	ret
+
+
+  
 
 delay: ldi r23, 20 ; Cargar el valor inicial en r23
 loop3: ldi r22, 20 ; Cargar el valor inicial en r22
