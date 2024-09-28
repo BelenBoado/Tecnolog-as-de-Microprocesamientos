@@ -9,6 +9,7 @@ out DDRC, r16
 ldi r16, 0xFF
 out DDRB, r16
 out DDRD, r16
+out PORTC, r16
 
 main:
    cbi PORTB, PB0
@@ -23,11 +24,11 @@ main:
 
 ListoParaLavar:
    sbi PORTD, PD0
-   sbic PINC, PC0
+   sbis PINC, PC0
    rjmp CargaLigera
-   sbic PINC, PC1
+   sbis PINC, PC1
    rjmp CargaMedia
-   sbic PINC, PC2
+   sbis PINC, PC2
    rjmp CargaPesada
    rjmp ListoParaLavar
 
