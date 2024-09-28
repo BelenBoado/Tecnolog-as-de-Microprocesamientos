@@ -1,14 +1,20 @@
-.include "m328pdef.inc"
+;Cabe destacar que este codigo no compila, ya que al ser muy extenso requiere muchos atajos para cada funcion
+;que deben estar a intervalos muy pequeños, mientras se realizaba, al probarlo con una sola funcion, compilaba correctamente.
+;En el codigo, se evidenciaran una gran cantidad de atajos con saltos entre las funciones, se agregaron unos 42 y no han sido suficientes.
+;
+
+
+.include "m328pdef.inc"       ; Inclusion de las definiciones para el microcontrolador ATmega328P
 
 .org 0x0000
 rjmp inicio
 
-.equ f_cpu = 16000000
+.equ f_cpu = 16000000                       ; Configuracion de los bauidos necesarios para la comuniccion UART
 .equ baud = 9600
 .equ bps = (F_CPU/16/baud) - 1
 
 inicio:
-       ldi r16, high(ramend)
+       ldi r16, high(ramend)          ;Configuracion de los puertos y las pilas
        out SPH, r16
        ldi r16, low(ramend)
        out SPL, r16
@@ -17,10 +23,19 @@ inicio:
        ldi r17, high(bps)
        rcall initUART
 
-menu:
-     call preguntar
+       ldi r18, 0xff
+       out DDRB, r18
+       clr r18
+       ldi r18, 0x0f
+       out DDRC, r18
+       clr r18
+       ldi r18, 0xf0
+       out DDRD, r18
+
+menu:                           ; Un pequeño menu encargado de preguntar al usuario
+     call preguntar             ; y responder con la funcion correspondiente mediante getc
      call getc
-     call delay  
+     call delay
 
 wait:
      call getc
@@ -54,8 +69,10 @@ getc:
      lds r16, UDR0
      ret
 
-A:
-  ldi r16, 'A'
+
+
+A:                         ;Funcion encargada de mostrar un mensaje
+  ldi r16, 'A'             ; al presionar A
   cpi r16, 'A'
   breq atajo1              ;w
   call delay               ;
@@ -85,8 +102,10 @@ A:
   call delay
   ret
 
-B:
-  ldi r16, 'B'
+
+
+B:                               ; Funcion encargada de pasar las imagenes en la matriz
+  ldi r16, 'B'                   ; cuando se presiona B
   cpi r16, 'B'
   breq atajoA
   call delay
@@ -96,53 +115,14 @@ B:
   call delay
   breq atajoD
   call delay
-  breq atajoE
+  breq atajoe
   call delay
-  ret   
-
-atajo1:
-       rjmp w
-
-atajo2:
-       rjmp e
-
-atajo3:
-       rjmp L
-
-atajo4:
-       rjmp C
-
-atajo5:
-       rjmp O
-
-atajo6:
-       rjmp M
-atajo7:
-       rjmp espacio
-
-atajo8:
-       rjmp H
-atajo9:
-       rjmp exclaamcion
+  ret
 
 
-atajoA:
-       rjmp rombo
-
-atajoB:
-       rjmp carita_feliz
-
-atajoC:
-       rjmp corazon
-
-atajoD:
-       rjmp carita_triste
-
-atajoe:
-       rjmp alien
-                  
-preguntar:
-         ldi r16, 'I'
+                                       ;Funcion que almacenara las preguntas a realizar al usuario
+preguntar:                             ; Se veran a traves del puerto serial, ya que la funcion putc
+         ldi r16, 'I'                  ; se encargara de mostrarlas
          rcall putc
 
          ldi r16, 'n'
@@ -196,7 +176,7 @@ preguntar:
          ldi r16, 'n'
          rcall putc
 
-         ldi r16, '/'
+         ldi r16, '\n'
          rcall putc
 
          ldi r16, 'A'
@@ -229,7 +209,7 @@ preguntar:
          ldi r16, 's'
          rcall putc
 
-         ldi r16, '/'
+         ldi r16, '\n'
          rcall putc
 
          ldi r16, 'B'
@@ -260,46 +240,51 @@ preguntar:
          rcall putc
 
 
+
 atajo1:
-       rjmp w
+       rjmp atajo18
 
 atajo2:
-       rjmp e
+       rjmp atajo10
 
 atajo3:
-       rjmp L
+       rjmp atajo11
 
 atajo4:
-       rjmp C
+       rjmp atajo12
 
 atajo5:
-       rjmp O
+       rjmp atajo13
 
 atajo6:
-       rjmp M
+       rjmp atajo14
 atajo7:
-       rjmp espacio
+       rjmp atajo15
 
 atajo8:
-       rjmp H
+       rjmp atajo16
 atajo9:
-       rjmp exclaamcion
+       rjmp atajo17
+
+
 
 
 atajoA:
        rjmp rombo
 
 atajoB:
-       rjmp carita_feliz
+       rjmp atajoF
 
 atajoC:
-       rjmp corazon
+       rjmp atajoG
 
 atajoD:
-       rjmp carita_triste
+       rjmp atajoH
 
 atajoe:
-       rjmp alien
+       rjmp atajoI
+
+
 
 
 
@@ -368,6 +353,16 @@ rombo:
 	 out PORTC, r28
      rcall delay			; termina rombo
      ret
+
+atajoF:
+       rjmp carita_feliz
+atajoG:
+       rjmp corazon
+atajoH:
+       rjmp carita_triste
+atajoI:
+       rjmp alien
+
 
 carita_feliz:
 	ldi r26,0x00        ; comienza carita feliz
@@ -443,6 +438,8 @@ carita_feliz:
     ret
 
 
+
+
 corazon:
           ldi r26, 0x00          ; comienza corazon
           ldi r27, 0x90
@@ -514,6 +511,33 @@ corazon:
           out PORTC, r28
 		  rcall delay				; termina corazon
        ret
+
+
+
+atajo10:
+        rjmp atajo42
+atajo11:
+       rjmp atajo39
+
+atajo12:
+       rjmp atajo40
+
+atajo13:
+       rjmp atajo37
+
+atajo14:
+       rjmp atajo38
+atajo15:
+        rjmp atajo36
+atajo16:
+       rjmp atajo35
+atajo17:
+       rjmp atajo34
+atajo18:
+        rjmp atajo41
+
+
+
 
 carita_triste:
     ldi r26,0x00			; comienza carita triste
@@ -649,6 +673,26 @@ alien:
 
     ret
 
+atajo34:
+        rjmp atajo27
+atajo35:
+        rjmp atajo28
+atajo36:
+        rjmp atajo29
+atajo37:
+        rjmp atajo30
+atajo38:
+        rjmp atajo31
+atajo39:
+        rjmp atajo32
+atajo40:
+        rjmp atajo33
+atajo41:
+        rjmp w
+atajo42:
+        rjmp e
+
+
 w:
 	ldi r26, 0x00
 	ldi r27, 0x00
@@ -781,6 +825,21 @@ e:
 	out PORTC, r28
 	call delay						; termina la letra e
   ret
+
+atajo27:
+        rjmp atajo22
+atajo28:
+        rjmp atajo23
+atajo29:
+        rjmp atajo24
+atajo30:
+        rjmp atajo25
+atajo31:
+        rjmp atajo26
+atajo32:
+        rjmp L
+atajo33:
+        rjmp C
 
 
 L:
@@ -915,6 +974,20 @@ C:
 	call delay						; termina la letra C
   ret
 
+
+atajo22:
+        rjmp atajo19
+atajo23:
+        rjmp atajo20
+atajo24:
+        rjmp atajo21
+atajo25:
+        rjmp O
+atajo26:
+        rjmp M
+
+
+
 O:
   	ldi r26, 0x00			; empieza la letra O
 	ldi r27, 0x00
@@ -1046,6 +1119,16 @@ M:
 	out PORTC, r28
 	call delay						; termina la letra M
   ret
+
+atajo19:
+        rjmp exclaamcion
+atajo20:
+        rjmp H
+atajo21:
+        rjmp espacio
+
+
+
 
 espacio:
 	ldi r26, 0x00			; empieza el espacio
@@ -1179,7 +1262,7 @@ H:
 	call delay						; termina la letra H
   ret
 
-exclaamcion:
+exclaamcion:            ; Comienza signo de exclamacion
 	ldi r26, 0x00
 	ldi r27, 0x00
 	ldi r28, 0x00
@@ -1243,10 +1326,10 @@ exclaamcion:
 	out PORTD, r27
 	out PORTC, r28
 	call delay
-	ret
+	ret                        ; Termina signo de exclamacion
 
 
-  
+; Inicio del delay
 
 delay: ldi r23, 20 ; Cargar el valor inicial en r23
 loop3: ldi r22, 20 ; Cargar el valor inicial en r22
