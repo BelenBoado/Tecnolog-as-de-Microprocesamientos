@@ -1,0 +1,151 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage{fancyvrb}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\begin{document}
+
+\title{Laboratorio 1 \\
+{\footnotesize \textsuperscript{*}Note: Sub-titles are not captured in Xplore and
+should not be used}
+\thanks{Identify applicable funding agency here. If none, delete this.}
+}
+
+\author{\IEEEauthorblockN{1\textsuperscript{st} Belen Boado}
+\IEEEauthorblockA{\textit{Ingenieria Mecatronica} \\
+\textit{Universidad Tecnologica (UTEC)}\\
+Fray Bentos, Rio Negro \\
+belen.boado@estudiantes.utec.edu.uy}
+\and
+\IEEEauthorblockN{2\textsuperscript{nd} Luis Nuñez}
+\IEEEauthorblockA{\textit{Ingenieria Mecatronica} \\
+\textit{Universidad Tecnologica (UTEC)}\\
+Fray Bentos, Rio Negro \\
+luis.nunez@estudiantes.utec.edu.uy}
+\and
+\IEEEauthorblockN{3\textsuperscript{rd} Adrian Terzaghi}
+\IEEEauthorblockA{\textit{Ingenieria Mecatronica} \\
+\textit{Universidad Tecnologica (UTEC)}\\
+Fray Bentos, Rio Negro \\
+adrian.terzaghi@estudiantes.utec.edu.uy}
+}
+
+\maketitle
+
+
+
+\section{Resumen}
+En esta práctica de laboratorio, se desarrolló un sistema de control para una lavadora y una matriz de LEDs utilizando el microcontrolador ATmega328P.
+El primer ejercicio fue programar el funcionamiento de la lavadora, dandole modos de operación como lavado, centrifugado y secado, ajustando los tiempos según la carga seleccionada. La comunicación con un sistema externo se realizó a través de USART, permitiendo el monitoreo del estado y el inicio del ciclo.
+En el segundo ejercicio, se controló una matriz de LEDs para mostrar un mensaje desplazable, “Welcome Home!”, con una velocidad ajustable y la opción de seleccionar entre el mensaje o figuras prediseñadas mediante UART.
+Esta práctica permitió aplicar conocimientos sobre programación en ensamblador y comunicación serial, logrando un funcionamiento eficiente de ambos sistemas.
+
+\section{Introducción}
+Como práctica de laboratorio se nos planteó desarrollar 2 ejercicios los cuales están enfocados a realizarse con los temas estudiados en la materia Tecnologías de Microprocesamiento. 
+Como ejercicio 1 tenemos el desarrollo de una lavadora la cual tenemos que desarrollar el software para controlar su funcionamiento.Gestionando los diferentes modos de funcionamiento y que nos permita la comunicación con un sistema de pruebas a través de USART. Teniendo en cuenta que como toda lavadora tiene modos principales de funcionamiento , uno de estos modos es procedimientos de lavado en el cual tenemos que hacer girar el tambor de la lavadora 2 segundos, después hacer una pausa de 1 segundo y repetir este proceso 5 veces. Dependiendo de la carga que se le ponga , sea ligera , media o completa.Esto hará que se agregue 1 segundo por cada vez que la carga aumente. 
+Procedimiento de centrifugado en este modo tenemos que girar el tambor a máxima velocidad durante un tiempo de 15 segundos.Para el ajuste dependiendo de la carga la duración del centrifugado se ajustará dependiendo de la carga como antes mencionado , por cada vez que la carga aumente , el tiempo aumenta en 3 segundos.
+Como último modo de esta lavadora tenemos el procedimiento de secado, en el cual tenemos que girar el tambor en sentido horario durante un tiempo de 5 segundos, esperar 3 segundos y girar en sentido antihorario durante otros 5 segundos.En este caso también dependerá de la carga , aumentando 2 segundos para los giros y la espera por cada aumento de carga.
+Cabe destacar que durante la fase de pruebas, la lavadora se comunicará con un sistema externo utilizando USART para poder indicar el estado en el que se encuentra , enviando un mensaje con cada cambio de estados. También deberá iniciar el lavado cuando se le envíe la letra A .
+Como ejercicio 2 se nos plantea controlar una matriz de LEDS , para poder realizar un desplazar un mensaje de derecha a izquierda a lo largo de la matriz. El mensaje debe ser claro , como lo es en este caso el cual es “Welcome Home!” , dicho circuito tiene que estar conectado a través de UART por el cual elegir si mostrar el mensaje o un diseño ya realizado anteriormente en otras prácticas de laboratorio.
+Como requisitos se nos pide que el mensaje de desplazamiento sea suave y continuo , la velocidad debe ser ajustable y a través de UART mostrar un mensaje de bienvenida y un menú.
+\section{Objetivo General}
+La comprensión de la comunicación UART y aplicación de conocimientos utilizando el lenguaje assembler, aplicado a procesos de la vida cotidiana como la programación de un lavarropas.
+\section{Objetivos Específicos}
+\begin{itemize}
+    \item El correcto armado del modelo fischertechnik.
+    \item El funcionamiento de un lavarropas según el diagrama de la máquina de estado.
+    \item Correcta comunicación UART con la matriz de Dolang y el modelo del lavarropas de fishertechnik.
+\end{itemize}
+\section{Materiales}
+Para este laboratorio en el problema A se utilizó un kit Fischertechnik , el cual nos proporcionó la estructura física del lavarropa , el motor , sensores y algunos actuadores como un led. También un kit arduino del cual fueron utilizados el arduino uno para la programación de su microcontrolador , botones , leds , cables. y protoboard. 
+Para el problema B se usó también el kit arduino y una matriz de leds de DOLANG para mostrar el mensaje.
+
+\section{Metodología}
+Con el fin de alcanzar los objetivos planteados se realizaron los montajes y diagramas necesarios con el fin de lograr un correcto funcionamiento para el problema A, así como los códigos correspondientes para ambos problemas, A y B.
+\subsection{Parte A}
+Para la parte A, se realizo el armado de un modelo de lavadora con el kit de fischertechnik ubicado en la pagina 22 del manual. En la "Figura ~\ref{fig1}" se ve el montaje en fisico realizado.
+
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.3\textwidth]{Imagen 1.jpg}}
+\caption{Diagrama modelo del lavarropa.}
+\label{fig1}
+\end{figure}
+
+\subsection{Parte B}
+En esta parte se presentan dos problematicas a resolver, el funcionamiento de un lavarropas y el desplazamiento en una matriz de leds de un mensaje o imagenes, dependiendo del codigo ingresado.
+
+\subsubsection{Problema A}
+Con el fin de realizar un código en lenguaje ensamblador para el microprocesador ATmega328p el cual simule el funcionamiento de un lavarropas, se utilizó un kit Firschertechnik para representar la estructura del dispositivo, también se utilizaron LEDs los cuales dejan visualizar el proceso en el que se encuentra el lavarropas así como la carga con la que se encuentra trabajando el mismo.
+Tres botones fueron utilizados para iniciar el proceso eligiendo una de las tres cargas disponibles, liviana, media y pesada. Y finalmente un motor DC el cual será controlado por un puente H L298N. 
+
+Antes de comenzar con el còdigo se realizó un diagrama del funcionamiento en draw.io el cual se puede ver anexado a este informe, ya que debido a su tamaño no sera posible incluirla en el formato del informe, este describe cada proceso del lavarropas así como sus acciones.
+
+Luego de realizado el diagrama se procedió a llevar a cabo las conexiones del microcontrolador, conectado una luz LED en cada salida del puerto D, que como se dijo antes, tendrá la función de señalar el proceso en el que el dispositivo se encuentra. Luego, se conectaron tres botones en los primeros tres pines del puerto C, con los cuales se podrá determinar la carga con la que trabará el lavarropas. Y finalmente se conectaron los dos primeros pines de puerto B a las entradas IN1 y IN2 del puente H, que a su vez irá conectado a un motor DC a través de sus salidas para el Motor A.
+
+Todo esto fue realizado en una simulación en proteus, la cual puede verse en el repositorio de GITHUB anexado a este informe.
+
+Una foto de la simulación del circuito puede verse en la “Figura ~\ref{fig4}”, ubicado en Anexos.
+
+\subsubsection{Problema B}
+Para resolver el problema encontrado en el problema B, se debieron revisar trabajos de evaluación continua anteriores con el fin de obtener ciertas imágenes, y volver a analizar el Funcionamiento interno de la matriz De leds ubicada en el Led Dolang. Luego de realizado esto, se comenzó con la implementación del código en assembler que pudiera recibir una comunicación serial el sistema. Por último, se realizó el diseño de las letras que formarían el mensaje “Welcome Home!”, contando con 12 caracteres, como se especificó en la guía del laboratorio. En la “Figura ~\ref{fig3}”, se observa el diseño de una de las letras. 
+
+Este problema incluía la implementación del desplazamiento de estas letras que forman el mensaje, mientras que las imágenes de Rombo, Corazón, Cara feliz, Cara triste y Space invader deben aparecer de forma sucesiva.
+
+Por último, se debe realizar la conexión con la matriz de leds en físico, que mediante la comunicación serial debe elegir entre una secuencia o la otra.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.2\textwidth]{letra.PNG}}
+\caption{Diagrama de letras realizadas.}
+\label{fig3}
+\end{figure}
+
+
+\section{Resultados}
+Todos los resultados obtenidos a lo largo de este laboratorio, como lo es a nivel codigo , imagenes , videos , circuitos , entre otros. Se encuentran en nuestro GitHub , en el cual el link para acceder se encuentra en Bibliografia.
+Aun asi, se pudo observar a traves de simulaciones el funcionamiento correcto del codigo utilizado en el lavarropas, aunque no se haya llegado a realizar el montaje en fisico debido a cuestiones de tiempo. 
+En cuanto a la matriz de leds, se logro el correcto funcionamiento de la comunicacion UART, pero no se logro el funcionamiento final del codigo. De todas formas, al realizar prueas iniciales del mismo, con una sola letra o imagen el codigo resultaba funcional, pero al agregar mas imagenes y funciones el codigo necesitaba atajos entre funciones, cosa que dificultaba la lectura del mismo por la plataforma AVR SIM.
+
+\section{Conclusiones}
+Los resultados mostrados cumplen con los objetivos planteados. 
+Si bien no logramos implementarlo en físico, logramos armar el circuito fishertechnik.
+Como vemos en la simulación el segundo objetivo se desarrolló con éxito, logrando así el correcto funcionamiento del lavarropas, lo cual se muestra a través de los diferentes estados que se nos planteó.
+En cuanto a la comunicación UART, se logró la comprensión del tema y la implementación para ambas problemáticas del mismo.
+
+
+\begin{thebibliography}{00}
+\bibitem{b1} Enlace a nuestro GibHub 
+
+https://github.com/BelenBoado/Tecnolog-as-de-Microprocesamientos/tree/inicializacion/Laboratorio1
+
+\end{thebibliography}
+
+\section{Anexos}
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.5\textwidth]{simulacion.PNG}}
+\caption{Circuito de la simulacion del lavarropas.}
+\label{fig4}
+\end{figure}
+
+\begin{Verbatim}[frame = single]
+Codigo en binario de una letra:
+
+{B00000000,
+B01000010,
+B01000010,
+B01000010,
+B01000010,
+B01011010,
+B01100110,
+B01000010}
+\end{Verbatim}
+\end{document}
