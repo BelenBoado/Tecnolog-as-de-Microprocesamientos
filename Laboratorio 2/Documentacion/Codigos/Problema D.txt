@@ -1,13 +1,6 @@
-/*
- * main.c
- *
- * Created: 10/14/2024 2:26:59 PM
- *  Author: UTEC-5695
- */ 
-
+//Incluimos las librerias principales
 #include <avr/io.h>
 #include <util/delay.h>
-#include <stdio.h>
 
 #define F_CPU 16000000UL 
 #define LDR 0
