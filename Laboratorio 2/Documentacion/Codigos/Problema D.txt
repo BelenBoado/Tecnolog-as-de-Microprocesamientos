@@ -1,1 +1,188 @@
+/*
+ * main.c
+ *
+ * Created: 10/14/2024 2:26:59 PM
+ *  Author: UTEC-5695
+ */ 
 
+#include <avr/io.h>
+#include <util/delay.h>
+#include <stdio.h>
+
+#define F_CPU 16000000UL 
+#define LDR 0
+
+//Funcion setup para el ADC
+void setupADC(){
+	ADMUX |= (1<<REFS0);                // Selecciona vcc como referencia
+	ADMUX &= ~(1<<ADLAR);				// Lectura justificada a la derecha
+	ADCSRA |= (1<<ADPS2) | (1<<ADPS1);	// Prescaler de 64
+	
+	// Habilita el ADC
+	ADCSRA |= (1<<ADEN);
+}
+
+//Funcion encargada de la lectura del ADC
+uint16_t readADC(uint8_t channel){
+	ADMUX = (ADMUX & 0xF0) | (channel & 0x0F);  // Selecciona el canal
+	// Inicia la conversión
+	ADCSRA |= (1<<ADSC);
+	// Espera a que termine la conversión
+	while (ADCSRA & (1<<ADSC));
+	// Retorna el resultado
+	return ADC;
+}
+
+//Funcion de configuracion del PWM
+void setupPWM(){
+	// Configurar el Timer1 para PWM en el pin OC1A (PB1)
+	TCCR1A |= (1<<COM1A1) | (1<<WGM11); // Fast PWM
+	TCCR1B |= (1<<WGM13) | (1<<WGM12) | (1<<CS11); // Prescaler de 8
+	ICR1 = 19999; // Configuramos la frecuencia para 50 Hz 
+	DDRB |= (1<<PB1); // Salida PWM en PB1
+}
+
+//FUncion que se encarga deenviar el valor del PWM al registro OCR1A para su salida
+void setPWM(uint16_t duty){
+	OCR1A = duty; // Ajusta ciclo útil del PWM
+}
+
+//Funcion de configuracion del UART
+void setupUART(uint16_t baud){
+	uint16_t ubrr = F_CPU/16/baud-1;  // Calcula el valor UBRR para el baud rate
+	UBRR0H = (ubrr>>8);  
+	UBRR0L = ubrr;       
+	UCSR0B = (1<<TXEN0); 
+	UCSR0C = (1<<UCSZ01) | (1<<UCSZ00); // 8 bits de datos, 1 bit de stop
+}
+
+//Funcion para enviar un caracter por UART
+void UART_sendChar(char data){
+	while (!(UCSR0A & (1<<UDRE0))); //Espera que el buffer este completo
+	UDR0 = data;                   // Recibe los datos en el registro de salida
+}
+
+//Funcion para enviar un string por UART
+void UART_sendString(const char* str){
+	while(*str){
+		UART_sendChar(*str++); // Envía cada carácter de la cadena
+	}
+}
+
+//Funcion que convierte un entero a un string
+void intToStr(uint16_t num, char* buffer) {
+	int i = 0;					//El inidice por el que se iniciara a el buffer
+	if (num == 0) {				//Si el numero es cero, creara un string de ceros
+		buffer[i++] = '0';
+		buffer[i] = '\0';
+		return;
+	}
+
+	while (num > 0) {						//Si es mayor a 0, obtienene la cifra menos significativa y la agrega a la cadena,
+		buffer[i++] = (num % 10) + '0';		//y luego, elimina el valor del numero haciendo la division
+		num /= 10;  
+	}
+	buffer[i] = '\0';
+
+	for (int j = 0; j < i / 2; j++) {		//Se invierte lacadena para que quede ordenada correctamente
+		char temp = buffer[j];
+		buffer[j] = buffer[i - j - 1];
+		buffer[i - j - 1] = temp;
+	}
+}
+
+int main(void)
+{
+	//Inicializamos las configuraciones principales
+	setupUART(9600);
+	setupADC();
+	setupPWM();
+	
+	//Declaramos algunas variables utiles
+ 	uint16_t valor_leido;
+	uint16_t valor_pwm;
+ 	char buffer[10];
+
+    while(1)
+    {
+	
+		valor_leido = readADC(LDR);  //Se lee el valor de la LDR
+
+		//Un mensaje para comprobar la correcta lectura
+		UART_sendString("Inicio de lectura");
+		UART_sendChar('\r');
+		UART_sendChar('\n');	
+		_delay_ms(2000);
+
+		//A continuacion, un if que comparara el valor obtenido de la LDR y lo compara con un color determinado, 
+		//convirtiendo el valor del ADC a un voltaje para el PWM que movera el Servo Motor apuntando un color especifico.
+  		if ((valor_leido>= 800) && (valor_leido<= 899))
+  		{
+  			UART_sendString("Color: Rojo");
+  			UART_sendChar('\r');
+  			UART_sendChar('\n');
+  			_delay_ms(2000);
+  	
+  			valor_pwm = ((valor_leido * 2000) / 1023 );
+  			setPWM(valor_pwm);
+  			UART_sendString("Valor pwm: ");
+  			intToStr(valor_pwm, buffer);
+  			UART_sendString(buffer);
+  			UART_sendChar('\r');
+  			UART_sendChar('\n');
+  	
+  			intToStr(valor_leido, buffer);  // Convierte el valor del ADC a un string
+  			UART_sendString("Valor leido: ");
+  			UART_sendString(buffer);
+  
+  			UART_sendChar('\r');
+  			UART_sendChar('\n');
+  			_delay_ms(2000);
+  		}else if ((valor_leido>= 900) && (valor_leido<=980))
+  		{
+  			UART_sendString("Color:Amarillo");
+  			UART_sendChar('\r');
+  			UART_sendChar('\n');
+  			_delay_ms(2000);
+  	
+  			valor_pwm = ((valor_leido * 2000) / 1023 ) + 2500;
+  			setPWM(valor_pwm);
+  			UART_sendString("Valor pwm: ");
+  			intToStr(valor_pwm, buffer);
+  			UART_sendString(buffer);
+  			UART_sendChar('\r');
+  			UART_sendChar('\n');
+  	
+  			intToStr(valor_leido, buffer);  // Convierte el valor del ADC a cadena
+  			UART_sendString("Valor leido: ");
+  			UART_sendString(buffer);
+  
+  			UART_sendChar('\r');
+  			UART_sendChar('\n');
+  			_delay_ms(2000);
+  	
+  			}else if((valor_leido>=981) && (valor_leido<=1023)){
+  			UART_sendString("Color: Verde");
+  			UART_sendChar('\r');
+  			UART_sendChar('\n');
+  			_delay_ms(2000);
+  	
+  			valor_pwm = ((valor_leido * 2000) / 1023 )+ 3980;
+  			setPWM(valor_pwm);
+  			UART_sendString("Valor pwm: ");
+  			intToStr(valor_pwm, buffer);
+  			UART_sendString(buffer);
+  			UART_sendChar('\r');
+  			UART_sendChar('\n');
+  	
+  			intToStr(valor_leido, buffer);  // Convierte el valor del ADC a cadena
+  			UART_sendString("Valor leido: ");
+  			UART_sendString(buffer);
+  
+  			UART_sendChar('\r');
+  			UART_sendChar('\n');
+  			_delay_ms(2000);
+  		}
+
+    }
+}
