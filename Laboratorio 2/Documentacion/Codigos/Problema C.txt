@@ -1,1 +1,50 @@
+#include <avr/io.h>
+#include <util/delay.h>
+#include <stdio.h>
 
+void setupADC(){
+	ADMUX |= (1<<REFS0);
+	ADMUX &= ~(1<<ADLAR);
+	ADCSRA |= (1<<ADPS2) | (1<<ADPS1);
+	ADCSRA |= (1<<ADEN);
+}
+
+uint16_t readADC(uint8_t channel){
+	ADMUX = (ADMUX & 0xF0) | (channel & 0x0F);
+	ADCSRA |= (1<<ADSC);
+	while (ADCSRA & (a<<ADSC));
+	return ADC;
+}
+
+void UART_init(unsigned int ubrr){
+	UBRR0H = (unsigned char)(ubrr >>8) ;
+	UBRR0L = (unsigned char) ubrr;
+	UCSR0B = (1<<RXEN0) | (1<<TXEN0);
+	UCSR0C = (1<<UCSZ01) | (1<<UCSZ00);
+	
+}
+
+void UART_sendChar(char data){
+	while(!(UCSR0A & (1<<UDRE0)));
+	UDR0 = data;
+}
+
+char UART_receiveChar(void){
+	while(!(UCSR0A & (1<<RXC0)));
+	return UDR0;
+}
+
+void UART_sendString(const char *str){
+	while(*str){
+		UART_sendChar(*str++);
+	}
+}
+
+int main(void){
+  UART_init(MYUBRR);  
+	setupADC();         
+
+  while(1){
+
+  }
+}
