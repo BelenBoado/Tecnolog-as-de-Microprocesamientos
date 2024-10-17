@@ -1,0 +1,17 @@
+%Script del grafico de acondicionamiento de la LDR:
+r = [100e3 1.1e3 0.100e3];  
+luz = [0 1 2];  
+
+% Ajuste lineal de los datos
+p = polyfit(luz, r, 1); 
+
+r_ajuste = polyval(p, luz);
+
+plot(luz, r, 'ob', 'markersize', 4, 'DisplayName', 'Datos Originales');
+hold on;
+plot(luz, r_ajuste, '-r', 'DisplayName', 'Ajuste Lineal');
+xlabel('Luz (nivel)');
+ylabel('Resistencia (Ohms)');
+title('Ajuste Lineal entre Luz y Resistencia');
+legend('show');
+grid on;
