@@ -1,96 +1,105 @@
-#include <avr/io.h>			//Libreria de uso del microcontrolador ATmega328P
+#include <avr/io.h>
 #include <util/delay.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-//Definimos algunas variables globales
-#define F_CPU 16000000UL  //Variable de la frecuencia
-#define TRIG_PIN PB1      //Variable para identificar el pin del trigger
-#define ECHO_PIN PB2      //Variable para identificar el pin del echo    
+#define F_CPU 16000000UL
+#define BAUD 9600
+#define MYUBRR F_CPU/16/BAUD-1
 
-// Configuración de comunicacion UART
+// Definición de pines para el motor
+#define MOTOR_DIR_PIN PB0
+#define MOTOR_PWM_PIN PB1
+
 void UART_init(unsigned int ubrr) {
 	UBRR0H = (unsigned char)(ubrr >> 8);
-	UBRR0L = (unsigned char)ubrr;
-	UCSR0B = (1 << TXEN0);
-	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
+	UBRR0L = (unsigned char) ubrr;
+	UCSR0B = (1 << RXEN0) | (1 << TXEN0);  // Habilitar RX y TX
+	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00); // Formato 8 bits
 }
 
-//Funcion para enviar un caracter por UART
-void UART_send_char(char data) {
-	while (!(UCSR0A & (1 << UDRE0)));
+void UART_sendChar(char data) {
+	while (!(UCSR0A & (1 << UDRE0)));  // Esperar a que el buffer esté listo
 	UDR0 = data;
 }
 
-//Funcion para enviar un string de caracteres (palabras)
-void UART_send_string(const char* str) {
+void UART_sendString(const char *str) {
 	while (*str) {
-		UART_send_char(*str++);
+		UART_sendChar(*str++);
 	}
 }
 
-// Función para convertir número entero en string
-void UART_send_int(uint16_t num) {
-	char buffer[5];
-	int i = 0;
+void setupADC() {
+	ADMUX |= (1 << REFS0); // Referencia AVcc
+	ADMUX &= ~(1 << ADLAR); // Justificación a la derecha
+	ADCSRA |= (1 << ADPS2) | (1 << ADPS1); // Prescaler de 64
+	ADCSRA |= (1 << ADEN); // Habilitar ADC
+}
 
-	do {
-		buffer[i++] = (num % 10) + '0';
-		num /= 10;
-	} while (num > 0);
+uint16_t readADC(uint8_t channel) {
+	ADMUX = (ADMUX & 0xF0) | (channel & 0x0F); // Seleccionar canal
+	ADCSRA |= (1 << ADSC);  // Iniciar conversión
+	while (ADCSRA & (1 << ADSC));  // Esperar a que finalice la conversión
+	return ADC;  // Retornar valor ADC
+}
 
-	while (i > 0) {
-		UART_send_char(buffer[--i]);
+void setupPWM() {
+	// Configurar PWM en el pin OC1A (PB1) y dirección del motor en PB0
+	TCCR1A |= (1 << COM1A1) | (1 << WGM11); // Modo Fast PWM, salida en OC1A
+	TCCR1B |= (1 << WGM12) | (1 << WGM13) | (1 << CS11); // Prescaler 8
+	ICR1 = 255; // Definir tope del contador
+	DDRB |= (1 << MOTOR_PWM_PIN) | (1 << MOTOR_DIR_PIN);  // PB1 como salida PWM, PB0 como dirección
+}
+
+void setMotorDirection(uint8_t direction) {
+	if (direction) {
+		PORTB |= (1 << MOTOR_DIR_PIN);  // Sentido horario
+		} else {
+		PORTB &= ~(1 << MOTOR_DIR_PIN); // Sentido antihorario
 	}
 }
 
-//Funcion que envia un pulso al sensor HCSR04
-void HCSR04_trigger_pulse() {
-	PORTB &= ~(1 << TRIG_PIN);  
-	_delay_us(2);                
-	PORTB |= (1 << TRIG_PIN);   
-	_delay_us(10);               
-	PORTB &= ~(1 << TRIG_PIN);  
+void setPWM(uint8_t value) {
+	OCR1A = value;  // Ajustar ciclo de trabajo PWM
 }
 
-//Funcion para leer la distancia del sensor HCSR04
-uint16_t HCSR04_get_distance() {
-	uint16_t distance;
-	uint32_t time = 0;
+int main(void) {
+	uint16_t pot1_value, pot2_value;
+	uint8_t pwm_value;
+	char buffer[64];
+	uint8_t direction;
 
-	HCSR04_trigger_pulse();  // Enviar pulso de trigger
+	UART_init(MYUBRR);  // Inicializar UART
+	setupADC();         // Inicializar ADC
+	setupPWM();         // Inicializar PWM
 
-	// Esperar el eco
-	while (!(PINB & (1 << ECHO_PIN)));  // Esperar a que el pin de echo esté en alto
-
-	// Reiniciar el temporizador (TCNT1)
-	TCNT1 = 0;
-	TCCR1B |= (1 << CS11);              
-
-	while (PINB & (1 << ECHO_PIN));  
-	TCCR1B = 0;                     
-	time = TCNT1;                    
-
-	// Calcular distancia (velocidad del sonido en cm/µs)
-	distance = ((time * 0.034) / 58);  
-
-	return distance;
-}
-
-int main() {
-	//Inicializacion de los pines y las configuraciones
-	DDRB |= (1 << TRIG_PIN); 
-	DDRB &= ~(1 << ECHO_PIN);                   
-	UART_init(103);
-	UART_send_string("Inicio funcionamiento\r\n");
 	while (1) {
+		// Leer valores de los dos potenciómetros
+		pot1_value = readADC(0);  // Potenciómetro 1 (referencia)
+		pot2_value = readADC(1);  // Potenciómetro 2 (motor)
 
-		uint16_t distance = HCSR04_get_distance();  
+		// Calcular PWM y dirección del motor
+		if (pot1_value > pot2_value) {
+			direction = 1;  // Sentido horario
+			pwm_value = ((pot1_value - pot2_value) * 255) / 1023;  // Ajuste proporcional
+			} else if (pot1_value < pot2_value) {
+			direction = 0;  // Sentido antihorario
+			pwm_value = ((pot2_value - pot1_value) * 255) / 1023;  // Ajuste proporcional
+			} else {
+			pwm_value = 0;  // Detener el motor si los valores son iguales
+		}
 
-		UART_send_string("Distancia:");
-		UART_send_int(distance);
-		UART_send_char('\r');
-		UART_send_char('\n');
+		// Ajustar dirección y PWM del motor
+		setMotorDirection(direction);
+		setPWM(pwm_value);
 
-		// Esperar un segundo antes de la siguiente medición
-		_delay_ms(1000);
+		// Enviar datos por UART
+		snprintf(buffer, sizeof(buffer), "Pot1: %u, Pot2: %u, PWM: %u, Dir: %s\r\n",
+		pot1_value, pot2_value, pwm_value, direction ? "Horario" : "Antihorario");
+		UART_sendString(buffer);
+		UART_sendString("\r\n");
+		_delay_ms(100);  // Esperar 100 ms antes de la siguiente iteración
 	}
+
+	return 0;
 }
