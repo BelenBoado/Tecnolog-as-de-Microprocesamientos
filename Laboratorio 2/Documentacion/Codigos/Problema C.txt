@@ -1,50 +1,96 @@
-#include <avr/io.h>
+#include <avr/io.h>			//Libreria de uso del microcontrolador ATmega328P
 #include <util/delay.h>
-#include <stdio.h>
 
-void setupADC(){
-	ADMUX |= (1<<REFS0);
-	ADMUX &= ~(1<<ADLAR);
-	ADCSRA |= (1<<ADPS2) | (1<<ADPS1);
-	ADCSRA |= (1<<ADEN);
+//Definimos algunas variables globales
+#define F_CPU 16000000UL  //Variable de la frecuencia
+#define TRIG_PIN PB1      //Variable para identificar el pin del trigger
+#define ECHO_PIN PB2      //Variable para identificar el pin del echo    
+
+// Configuración de comunicacion UART
+void UART_init(unsigned int ubrr) {
+	UBRR0H = (unsigned char)(ubrr >> 8);
+	UBRR0L = (unsigned char)ubrr;
+	UCSR0B = (1 << TXEN0);
+	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
 }
 
-uint16_t readADC(uint8_t channel){
-	ADMUX = (ADMUX & 0xF0) | (channel & 0x0F);
-	ADCSRA |= (1<<ADSC);
-	while (ADCSRA & (a<<ADSC));
-	return ADC;
-}
-
-void UART_init(unsigned int ubrr){
-	UBRR0H = (unsigned char)(ubrr >>8) ;
-	UBRR0L = (unsigned char) ubrr;
-	UCSR0B = (1<<RXEN0) | (1<<TXEN0);
-	UCSR0C = (1<<UCSZ01) | (1<<UCSZ00);
-	
-}
-
-void UART_sendChar(char data){
-	while(!(UCSR0A & (1<<UDRE0)));
+//Funcion para enviar un caracter por UART
+void UART_send_char(char data) {
+	while (!(UCSR0A & (1 << UDRE0)));
 	UDR0 = data;
 }
 
-char UART_receiveChar(void){
-	while(!(UCSR0A & (1<<RXC0)));
-	return UDR0;
-}
-
-void UART_sendString(const char *str){
-	while(*str){
-		UART_sendChar(*str++);
+//Funcion para enviar un string de caracteres (palabras)
+void UART_send_string(const char* str) {
+	while (*str) {
+		UART_send_char(*str++);
 	}
 }
 
-int main(void){
-  UART_init(MYUBRR);  
-	setupADC();         
+// Función para convertir número entero en string
+void UART_send_int(uint16_t num) {
+	char buffer[5];
+	int i = 0;
 
-  while(1){
+	do {
+		buffer[i++] = (num % 10) + '0';
+		num /= 10;
+	} while (num > 0);
 
-  }
+	while (i > 0) {
+		UART_send_char(buffer[--i]);
+	}
+}
+
+//Funcion que envia un pulso al sensor HCSR04
+void HCSR04_trigger_pulse() {
+	PORTB &= ~(1 << TRIG_PIN);  
+	_delay_us(2);                
+	PORTB |= (1 << TRIG_PIN);   
+	_delay_us(10);               
+	PORTB &= ~(1 << TRIG_PIN);  
+}
+
+//Funcion para leer la distancia del sensor HCSR04
+uint16_t HCSR04_get_distance() {
+	uint16_t distance;
+	uint32_t time = 0;
+
+	HCSR04_trigger_pulse();  // Enviar pulso de trigger
+
+	// Esperar el eco
+	while (!(PINB & (1 << ECHO_PIN)));  // Esperar a que el pin de echo esté en alto
+
+	// Reiniciar el temporizador (TCNT1)
+	TCNT1 = 0;
+	TCCR1B |= (1 << CS11);              
+
+	while (PINB & (1 << ECHO_PIN));  
+	TCCR1B = 0;                     
+	time = TCNT1;                    
+
+	// Calcular distancia (velocidad del sonido en cm/µs)
+	distance = ((time * 0.034) / 58);  
+
+	return distance;
+}
+
+int main() {
+	//Inicializacion de los pines y las configuraciones
+	DDRB |= (1 << TRIG_PIN); 
+	DDRB &= ~(1 << ECHO_PIN);                   
+	UART_init(103);
+	UART_send_string("Inicio funcionamiento\r\n");
+	while (1) {
+
+		uint16_t distance = HCSR04_get_distance();  
+
+		UART_send_string("Distancia:");
+		UART_send_int(distance);
+		UART_send_char('\r');
+		UART_send_char('\n');
+
+		// Esperar un segundo antes de la siguiente medición
+		_delay_ms(1000);
+	}
 }
