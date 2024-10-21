@@ -1,16 +1,20 @@
+//Inclusion de librerias basicas
 #include <avr/io.h>
 #include <util/delay.h>
 #include <stdio.h>
 #include <stdlib.h>
 
+//Definicion de baudios
 #define F_CPU 16000000UL
 #define BAUD 9600
 #define MYUBRR F_CPU/16/BAUD-1
 
 // Definición de pines para el motor
-#define MOTOR_DIR_PIN PB0
+#define MOTOR_DIR_PIN PB2
+#define MOTOR_DIR_PIN2 PB3
 #define MOTOR_PWM_PIN PB1
 
+//Funciones de setup y de envio de caracterese y cadenas de UART
 void UART_init(unsigned int ubrr) {
 	UBRR0H = (unsigned char)(ubrr >> 8);
 	UBRR0L = (unsigned char) ubrr;
@@ -48,15 +52,7 @@ void setupPWM() {
 	TCCR1A |= (1 << COM1A1) | (1 << WGM11); // Modo Fast PWM, salida en OC1A
 	TCCR1B |= (1 << WGM12) | (1 << WGM13) | (1 << CS11); // Prescaler 8
 	ICR1 = 255; // Definir tope del contador
-	DDRB |= (1 << MOTOR_PWM_PIN) | (1 << MOTOR_DIR_PIN);  // PB1 como salida PWM, PB0 como dirección
-}
-
-void setMotorDirection(uint8_t direction) {
-	if (direction) {
-		PORTB |= (1 << MOTOR_DIR_PIN);  // Sentido horario
-		} else {
-		PORTB &= ~(1 << MOTOR_DIR_PIN); // Sentido antihorario
-	}
+	DDRB |= (1 << MOTOR_PWM_PIN) | (1<< MOTOR_DIR_PIN) | (1<<MOTOR_DIR_PIN2);  // PB1 como salida PWM, PB2 y PB3 como dirección
 }
 
 void setPWM(uint8_t value) {
@@ -64,6 +60,7 @@ void setPWM(uint8_t value) {
 }
 
 int main(void) {
+	//Definicion de algunas variables 
 	uint16_t pot1_value, pot2_value;
 	uint8_t pwm_value;
 	char buffer[64];
@@ -72,7 +69,7 @@ int main(void) {
 	UART_init(MYUBRR);  // Inicializar UART
 	setupADC();         // Inicializar ADC
 	setupPWM();         // Inicializar PWM
-
+	setPWM(255);
 	while (1) {
 		// Leer valores de los dos potenciómetros
 		pot1_value = readADC(0);  // Potenciómetro 1 (referencia)
@@ -80,25 +77,35 @@ int main(void) {
 
 		// Calcular PWM y dirección del motor
 		if (pot1_value > pot2_value) {
-			direction = 1;  // Sentido horario
-			pwm_value = ((pot1_value - pot2_value) * 255) / 1023;  // Ajuste proporcional
+			//Direccion del motor
+			PORTB &= ~(1 << PB2);  // Poner PB2 en 0
+			PORTB |= (1 << PB3);	// Poner PB3 en 1
+			//Pwm del motor
+			pwm_value = (((pot1_value - pot2_value) * 255) / 1023) + 300;  // Ajuste del valor leido a valores de voltaje segun el mapeo de pwm
 			} else if (pot1_value < pot2_value) {
-			direction = 0;  // Sentido antihorario
-			pwm_value = ((pot2_value - pot1_value) * 255) / 1023;  // Ajuste proporcional
+				//Direccion del motor
+			PORTB |= (1 << PB2);  // Poner PB2 en 1
+			PORTB &= ~(1 << PB3); // Poner PB3 en 0
+			//Pwm del  motor
+			pwm_value = (((pot2_value - pot1_value) * 255) / 1023) + 300;  
 			} else {
 			pwm_value = 0;  // Detener el motor si los valores son iguales
 		}
+		
+		//Ajuste de los valores del pwm
+		if (pwm_value>0 && pwm_value<= 55){
+			setPWM(100);
+		}else if(pwm_value>55 && pwm_value<=250){
+			setPWM(200);
+		}
 
-		// Ajustar dirección y PWM del motor
-		setMotorDirection(direction);
-		setPWM(pwm_value);
 
 		// Enviar datos por UART
 		snprintf(buffer, sizeof(buffer), "Pot1: %u, Pot2: %u, PWM: %u, Dir: %s\r\n",
 		pot1_value, pot2_value, pwm_value, direction ? "Horario" : "Antihorario");
 		UART_sendString(buffer);
 		UART_sendString("\r\n");
-		_delay_ms(100);  // Esperar 100 ms antes de la siguiente iteración
+		_delay_ms(100);  
 	}
 
 	return 0;
