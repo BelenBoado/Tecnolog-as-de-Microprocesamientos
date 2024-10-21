@@ -1,0 +1,19 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Oct 13 20:13:47 2024
+
+@author: UTEC-5695
+"""
+import matplotlib.pyplot as plt
+
+x = [0, 1, 2, 3, 4, 5]
+y = [0, 1, 2, 3, 4, 5]
+
+plt.plot(x, y, marker='o')  
+plt.title("Gráfico de Ejemplo")
+plt.xlabel("Eje X")
+plt.ylabel("Eje Y")
+
+plt.show()
+
+plt.savefig("grafico_ejemplo.png")  
