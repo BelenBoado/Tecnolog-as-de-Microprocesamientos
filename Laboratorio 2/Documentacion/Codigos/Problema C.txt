@@ -52,7 +52,7 @@ void setupPWM() {
 	TCCR1A |= (1 << COM1A1) | (1 << WGM11); // Modo Fast PWM, salida en OC1A
 	TCCR1B |= (1 << WGM12) | (1 << WGM13) | (1 << CS11); // Prescaler 8
 	ICR1 = 255; // Definir tope del contador
-	DDRB |= (1 << MOTOR_PWM_PIN) | (1<< MOTOR_DIR_PIN) | (1<<MOTOR_DIR_PIN2);  // PB1 como salida PWM, PB2 y PB3 como dirección
+	DDRB |= (1 << MOTOR_PWM_PIN);  // PB1 como salida PWM, PB2 y PB3 como dirección
 }
 
 void setPWM(uint8_t value) {
@@ -65,6 +65,7 @@ int main(void) {
 	uint8_t pwm_value;
 	char buffer[64];
 	uint8_t direction;
+	DDRB |=  (1<< MOTOR_DIR_PIN) | (1<<MOTOR_DIR_PIN2);
 
 	UART_init(MYUBRR);  // Inicializar UART
 	setupADC();         // Inicializar ADC
@@ -81,22 +82,24 @@ int main(void) {
 			PORTB &= ~(1 << PB2);  // Poner PB2 en 0
 			PORTB |= (1 << PB3);	// Poner PB3 en 1
 			//Pwm del motor
-			pwm_value = (((pot1_value - pot2_value) * 255) / 1023) + 300;  // Ajuste del valor leido a valores de voltaje segun el mapeo de pwm
+			pwm_value = (((pot1_value - pot2_value) * 255) / 1023);  // Ajuste del valor leido a valores de voltaje segun el mapeo de pwm
 			} else if (pot1_value < pot2_value) {
 				//Direccion del motor
 			PORTB |= (1 << PB2);  // Poner PB2 en 1
 			PORTB &= ~(1 << PB3); // Poner PB3 en 0
 			//Pwm del  motor
-			pwm_value = (((pot2_value - pot1_value) * 255) / 1023) + 300;  
+			pwm_value = (((pot2_value - pot1_value) * 255) / 1023);  
 			} else {
+			PORTB &= ~(1 << PB2);  // Poner PB2 en 0
+			PORTB &= ~(1 << PB3);  // Poner PB3 en 0
 			pwm_value = 0;  // Detener el motor si los valores son iguales
 		}
 		
 		//Ajuste de los valores del pwm
 		if (pwm_value>0 && pwm_value<= 55){
-			setPWM(100);
+			setPWM(30);
 		}else if(pwm_value>55 && pwm_value<=250){
-			setPWM(200);
+			setPWM(160);
 		}
 
 
