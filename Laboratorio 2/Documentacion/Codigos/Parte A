@@ -119,13 +119,125 @@ void dibujar_circulo() {
     PORTD &= ~(1<<PD4);
     
     PORTD |= (1<<PD6);
-    _delay_ms(2500);
+    _delay_ms(5000);
     PORTD &= ~(1<<PD6);
     
     PORTD |= (1<<PD2);
     _delay_ms(100);
     PORTD &= ~(1<<PD2);
     
+    PORTD |= (1<<PD6);
+    _delay_ms(500);
+    PORTD &= ~(1<<PD6);
+    
+    for (int i = 0;i<5;i++) {
+       PORTD |= (1<<PD6);
+       _delay_ms(100);
+       PORTD &= ~(1<<PD6);
+       PORTD |= (1<<PD4);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD4);
+    }
+    for (int i = 0;i<5;i++) {
+       PORTD |= (1<<PD6);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD6);
+       PORTD |= (1<<PD4);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD4);
+    }
+    for (int i = 0;i<5;i++) {
+       PORTD |= (1<<PD6);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD6);
+       PORTD |= (1<<PD4);
+       _delay_ms(100);
+       PORTD &= ~(1<<PD4);
+    }
+    PORTD |= (1<<PD4);
+    _delay_ms(500);
+    PORTD &= ~(1<<PD4);
+    
+    for (int i = 0;i<5;i++) {
+       PORTD |= (1<<PD4);
+       _delay_ms(100);
+       PORTD &= ~(1<<PD4);
+       PORTD |= (1<<PD7);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD7);
+    }
+    for (int i = 0;i<5;i++) {
+       PORTD |= (1<<PD4);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD4);
+       PORTD |= (1<<PD7);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD7);
+    }
+    for (int i = 0;i<5;i++) {
+       PORTD |= (1<<PD4);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD4);
+       PORTD |= (1<<PD7);
+       _delay_ms(100);
+       PORTD &= ~(1<<PD7);
+    }
+    PORTD |= (1<<PD7);
+    _delay_ms(500);
+    PORTD &= ~(1<<PD7);
+    
+    for (int i = 0;i<5;i++) {
+       PORTD |= (1<<PD7);
+       _delay_ms(100);
+       PORTD &= ~(1<<PD7);
+       PORTD |= (1<<PD5);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD5);
+    }
+    for (int i = 0;i<5;i++) {
+       PORTD |= (1<<PD7);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD7);
+       PORTD |= (1<<PD5);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD5);
+    }
+    for (int i = 0;i<5;i++) {
+       PORTD |= (1<<PD7);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD7);
+       PORTD |= (1<<PD5);
+       _delay_ms(100);
+       PORTD &= ~(1<<PD5);
+    }
+    PORTD |= (1<<PD5);
+    _delay_ms(500);
+    PORTD &= ~(1<<PD5);
+    
+    for (int i = 0;i<5;i++) {
+       PORTD |= (1<<PD5);
+       _delay_ms(100);
+       PORTD &= ~(1<<PD5);
+       PORTD |= (1<<PD6);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD6);
+    }
+    for (int i = 0;i<5;i++) {
+       PORTD |= (1<<PD5);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD5);
+       PORTD |= (1<<PD6);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD6);
+    }
+    for (int i = 0;i<5;i++) {
+       PORTD |= (1<<PD5);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD5);
+       PORTD |= (1<<PD6);
+       _delay_ms(100);
+       PORTD &= ~(1<<PD6);
+    }
     PORTD |= (1<<PD3);
     _delay_ms(100);
     PORTD &= ~(1<<PD3);
