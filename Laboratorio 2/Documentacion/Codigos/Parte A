@@ -1,0 +1,160 @@
+#include <avr/io.h>
+#include <util/delay.h>
+#include <avr/interrupt.h>
+
+// Configuración UART para comunicación serial
+void UART_init(unsigned int baud) {
+    unsigned int ubrr = F_CPU/16/baud-1;
+    UBRR0H = (unsigned char)(ubrr>>8);
+    UBRR0L = (unsigned char)ubrr;
+    UCSR0B = (1<<RXEN0)|(1<<TXEN0);
+    UCSR0C = (1<<UCSZ01)|(1<<UCSZ00);
+}
+
+// Enviar datos por UART
+void UART_send(char data) {
+    while (!( UCSR0A & (1<<UDRE0)));
+    UDR0 = data;
+}
+
+void UART_send_cadena(const char *str) {
+    while (*str) {
+        UART_send(*str++);  
+    }
+}
+
+// Recibir datos por UART
+char UART_receive(void) {
+    while (!(UCSR0A & (1<<RXC0)));
+    return UDR0;
+}
+
+void menu() {
+    UART_send_cadena("Seleccione la figura a dibujar:\n");
+    UART_send_cadena("1. Triangulo\n");
+    UART_send_cadena("2. Circulo\n");
+    UART_send_cadena("3. Cruz\n");
+    UART_send_cadena("Ingrese su seleccion: ");
+}
+
+
+
+void dibujar_triangulo() {
+    PORTD |= (1<<PD4);
+    _delay_ms(5000);
+    PORTD &= ~(1<<PD4);
+    
+    PORTD |= (1<<PD6);
+    _delay_ms(2500);
+    PORTD &= ~(1<<PD6);
+    
+    PORTD |= (1<<PD2); 
+    _delay_ms(100);    
+    PORTD &= ~(1<<PD2);
+    
+    PORTD |= (1<<PD6); 
+    _delay_ms(2000);    
+    PORTD &= ~(1<<PD6);
+    for (int i = 0; i<20; i++) {
+       PORTD |= (1<<PD5); 
+       _delay_ms(50);    
+       PORTD &= ~(1<<PD5);
+       PORTD |= (1<<PD7); 
+       _delay_ms(50);    
+       PORTD &= ~(1<<PD7);
+    }
+  
+    for (int i = 0; i<20; i++) {
+       PORTD |= (1<<PD4); 
+       _delay_ms(50);    
+       PORTD &= ~(1<<PD4);
+       PORTD |= (1<<PD7); 
+       _delay_ms(50);    
+       PORTD &= ~(1<<PD7);
+    }
+      
+    PORTD |= (1<<PD3);
+    _delay_ms(100);
+    PORTD &= ~(1<<PD3);
+}
+
+void dibujar_cruz() {
+    PORTD |= (1<<PD4);
+    _delay_ms(5000);
+    PORTD &= ~(1<<PD4);
+    
+    PORTD |= (1<<PD6);
+    _delay_ms(2500);
+    PORTD &= ~(1<<PD6);
+    
+    PORTD |= (1<<PD2);
+    _delay_ms(100);
+    PORTD &= ~(1<<PD2);
+    
+    PORTD |= (1<<PD6);
+    _delay_ms(1000);
+    PORTD &= ~(1<<PD6);
+    
+    PORTD |= (1<<PD7);
+    _delay_ms(500);
+    PORTD &= ~(1<<PD7);
+    
+    PORTD |= (1<<PD5);
+    _delay_ms(500);
+    PORTD &= ~(1<<PD5);
+    
+    PORTD |= (1<<PD4);
+    _delay_ms(1000);
+    PORTD &= ~(1<<PD4);
+    
+    PORTD |= (1<<PD3);
+    _delay_ms(100);
+    PORTD &= ~(1<<PD3);
+    
+}
+
+void dibujar_circulo() {
+    PORTD |= (1<<PD4);
+    _delay_ms(5000);
+    PORTD &= ~(1<<PD4);
+    
+    PORTD |= (1<<PD6);
+    _delay_ms(2500);
+    PORTD &= ~(1<<PD6);
+    
+    PORTD |= (1<<PD2);
+    _delay_ms(100);
+    PORTD &= ~(1<<PD2);
+    
+    PORTD |= (1<<PD3);
+    _delay_ms(100);
+    PORTD &= ~(1<<PD3);
+}
+
+int main(void) {
+    UART_init(9600); 
+    DDRD = 0xFF;     
+    
+    while(1) {
+        menu();
+        char opcion = UART_receive();
+        
+        switch (opcion) {
+            case '1':
+                dibujar_triangulo();
+    UART_send_cadena("Figura dibujada correctamente!\n");
+                break;
+            case '2':
+                dibujar_circulo();
+    UART_send_cadena("Figura dibujada correctamente!\n");
+                break;
+            case '3':
+                dibujar_cruz();
+    UART_send_cadena("Figura dibujada correctamente!\n");
+                break;
+            default:
+                UART_send_cadena("Opcion invalida\n");
+        }
+         
+    }
+}
