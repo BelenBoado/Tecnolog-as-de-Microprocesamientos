@@ -1,5 +1,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
+#include <stdlib.h> // Para usar dtostrf()
+
 #define Sensor0 0
 
 void UART_init(unsigned int ubrr) {
@@ -8,19 +10,23 @@ void UART_init(unsigned int ubrr) {
 	UCSR0B = (1 << RXEN0) | (1 << TXEN0);
 	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
 }
+
 void UART_sendChar(char data) {
 	while (!(UCSR0A & (1 << UDRE0)));
 	UDR0 = data;
 }
+
 void UART_sendString(const char *str) {
 	while (*str) {
 		UART_sendChar(*str++);
 	}
 }
+
 char UART_receiveChar(void) {
 	while (!(UCSR0A & (1 << RXC0)));
 	return UDR0;
 }
+
 void setupADC() {
 	ADMUX |= (1 << REFS0);
 	ADMUX &= ~(1 << ADLAR);
@@ -47,10 +53,14 @@ int main() {
 	setupPWM();
 	UART_init(103);
 	UART_sendString("Bienvenido!!\r\n");
+	
 	// Configura el pin PD0 como salida
 	DDRD |= (1 << PD0);
+
 	float temperatura = 0;
 	char buffer[10];
+	float temperaturadatos[100]; // Cambiado a float para almacenar temperatura
+	int ciclo = 0;
 
 	while (1) {
 		uint16_t adcValue = readADC(Sensor0);
@@ -59,54 +69,67 @@ int main() {
 		if (adcValue <= 440) {
 			PORTD |= (1 << PD0);  // Enciende PD0
 			OCR1A = 0;             // PWM en 0%
-			temperatura = adcValue * 0.05
+			temperatura = adcValue * 0.05;
 			dtostrf(temperatura, 6, 2, buffer);
-			UART_sendString("Temperatura:");
-			UART_sendString(temperatura);
-			UART_sendString("Calefactor encendido!!\r\n");
+			UART_sendString("Temperatura: ");
+			UART_sendString(buffer);
+			UART_sendString("\r\nCalefactor encendido!!\r\n");
 		}
 		// 23 - 30
 		else if (adcValue > 440 && adcValue <= 600) {
 			PORTD &= ~(1 << PD0); // Apaga PD0
 			OCR1A = 0;             // PWM en 0%
-			temperatura = adcValue * 0.05
+			temperatura = adcValue * 0.05;
 			dtostrf(temperatura, 6, 2, buffer);
-			UART_sendString("Temperatura:");
-			UART_sendString(temperatura);
-			UART_sendString("Calefactor apagado y ventilador apagado\r\n");
+			UART_sendString("Temperatura: ");
+			UART_sendString(buffer);
+			UART_sendString("\r\nCalefactor apagado y ventilador apagado\r\n");
 		}
 		// 31 - 40
 		else if (adcValue > 600 && adcValue <= 800) {
 			PORTD &= ~(1 << PD0); // Apaga PD0
 			OCR1A = 6553;          // PWM en 10% (aprox.)
-			temperatura = adcValue * 0.05
+			temperatura = adcValue * 0.05;
 			dtostrf(temperatura, 6, 2, buffer);
-			UART_sendString("Temperatura:");
-			UART_sendString(temperatura);
-			UART_sendString("Ventilador encendido al minimo\r\n");
+			UART_sendString("Temperatura: ");
+			UART_sendString(buffer);
+			UART_sendString("\r\nVentilador encendido al minimo\r\n");
 		}
 		// 41 - 50
 		else if (adcValue > 800 && adcValue <= 1000) {
 			PORTD &= ~(1 << PD0); // Apaga PD0
 			OCR1A = 32765;         // PWM en 50% (aprox.)
-			temperatura = adcValue * 0.05
+			temperatura = adcValue * 0.05;
 			dtostrf(temperatura, 6, 2, buffer);
-			UART_sendString("Temperatura:");
-			UART_sendString(temperatura);
-			UART_sendString("Ventilador prendido a mitad de velocidad\r\n");
+			UART_sendString("Temperatura: ");
+			UART_sendString(buffer);
+			UART_sendString("\r\nVentilador prendido a mitad de velocidad\r\n");
 		}
 		// 50 o más
 		else if (adcValue > 1000) {
 			PORTD &= ~(1 << PD0); // Apaga PD0
 			OCR1A = 65530;         // PWM en 99% (aprox.)
-			temperatura = adcValue * 0.05
+			temperatura = adcValue * 0.05;
 			dtostrf(temperatura, 6, 2, buffer);
-			UART_sendString("Temperatura:");
-			UART_sendString(temperatura);
-			UART_sendString("Ventilador al maximo\r\n");
+			UART_sendString("Temperatura: ");
+			UART_sendString(buffer);
+			UART_sendString("\r\nVentilador al maximo\r\n");
 		}
 
-		// Espera para hacer la siguiente medicion
+		// Guarda el valor de temperatura
+		temperaturadatos[ciclo] = temperatura;
+		ciclo++;
 		_delay_ms(5000);
+		
+		// Si ciclo alcanza 100, reinicia
+		if (ciclo >= 100) {
+			UART_sendString("Ciclo completo, datos para la grafica:\r\n");
+			for (int i = 0; i < ciclo; i++) {
+				dtostrf(temperaturadatos[i], 6, 2, buffer);
+				UART_sendString(buffer);
+				UART_sendString("\r\n");
+			}
+			ciclo = 0; // Reinicia el ciclo
+		}
 	}
 }
