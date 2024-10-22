@@ -82,7 +82,7 @@ void dibujar_triangulo() {
 
 void dibujar_cruz() {
     PORTD |= (1<<PD4);
-    _delay_ms(5000);
+    _delay_ms(7000);
     PORTD &= ~(1<<PD4);
     
     PORTD |= (1<<PD6);
@@ -251,7 +251,7 @@ void dibujar_perro() {
     PORTD &= ~(1<<PD4);
     
     PORTD |= (1<<PD6);
-    _delay_ms(5000);
+    _delay_ms(10000);
     PORTD &= ~(1<<PD6);
     
     PORTD |= (1<<PD2);
@@ -572,125 +572,93 @@ void dibujar_conejo() {
     PORTD &= ~(1<<PD4);
     
     PORTD |= (1<<PD6);
-    _delay_ms(10000);
+    _delay_ms(15000);
     PORTD &= ~(1<<PD6);
     
     PORTD |= (1<<PD2);
     _delay_ms(100);
     PORTD &= ~(1<<PD2);
-    
+
     PORTD |= (1<<PD6);
-    _delay_ms(2000);
+    _delay_ms(1500);
     PORTD &= ~(1<<PD6);
-    
-    for (int i = 0;i<20;i++) {
-       PORTD |= (1<<PD6);
-       _delay_ms(100);
-       PORTD &= ~(1<<PD6);
-       PORTD |= (1<<PD4);
-       _delay_ms(50);
-       PORTD &= ~(1<<PD4);
-    }
-    for (int i = 0;i<20;i++) {
-       PORTD |= (1<<PD6);
-       _delay_ms(50);
-       PORTD &= ~(1<<PD6);
-       PORTD |= (1<<PD4);
-       _delay_ms(50);
-       PORTD &= ~(1<<PD4);
-    }
-    for (int i = 0;i<20;i++) {
-       PORTD |= (1<<PD6);
-       _delay_ms(50);
-       PORTD &= ~(1<<PD6);
-       PORTD |= (1<<PD4);
-       _delay_ms(100);
-       PORTD &= ~(1<<PD4);
-    }
-    PORTD |= (1<<PD4);
-    _delay_ms(2000);
-    PORTD &= ~(1<<PD4);
-    
-    for (int i = 0;i<20;i++) {
-       PORTD |= (1<<PD4);
-       _delay_ms(100);
-       PORTD &= ~(1<<PD4);
-       PORTD |= (1<<PD7);
-       _delay_ms(50);
-       PORTD &= ~(1<<PD7);
-    }
-    for (int i = 0;i<20;i++) {
-       PORTD |= (1<<PD4);
-       _delay_ms(50);
-       PORTD &= ~(1<<PD4);
-       PORTD |= (1<<PD7);
-       _delay_ms(50);
-       PORTD &= ~(1<<PD7);
-    }
-    for (int i = 0;i<20;i++) {
-       PORTD |= (1<<PD4);
-       _delay_ms(50);
-       PORTD &= ~(1<<PD4);
-       PORTD |= (1<<PD7);
-       _delay_ms(100);
-       PORTD &= ~(1<<PD7);
-    }
+
+    PORTD |= (1<<PD5);
+    _delay_ms(1500);
+    PORTD &= ~(1<<PD5);
+
     PORTD |= (1<<PD7);
-    _delay_ms(2000);
+    _delay_ms(750);
+    PORTD &= ~(1<<PD7);
+
+    PORTD |= (1<<PD4);
+    _delay_ms(1500);
+    PORTD &= ~(1<<PD4);
+
+    PORTD |= (1<<PD6);
+    _delay_ms(125);
+    PORTD &= ~(1<<PD6);
+
+    PORTD |= (1<<PD5);
+    _delay_ms(1375);
+    PORTD &= ~(1<<PD5);
+
+    PORTD |= (1<<PD6);
+    _delay_ms(500);
+    PORTD &= ~(1<<PD6);
+
+    PORTD |= (1<<PD4);
+    _delay_ms(1375);
+    PORTD &= ~(1<<PD4);
+
+    PORTD |= (1<<PD6);
+    _delay_ms(125);
+    PORTD &= ~(1<<PD6);
+
+    PORTD |= (1<<PD4);
+    _delay_ms(3000);
+    PORTD &= ~(1<<PD4);
+
+    PORTD |= (1<<PD7);
+    _delay_ms(3000);
+    PORTD &= ~(1<<PD7);
+
+    PORTD |= (1<<PD5);
+    _delay_ms(4500);
+    PORTD &= ~(1<<PD5);
+
+    PORTD |= (1<<PD6);
+    _delay_ms(750);
+    PORTD &= ~(1<<PD6);
+
+    PORTD |= (1<<PD4);
+    _delay_ms(1500);
+    PORTD &= ~(1<<PD4);
+
+    PORTD |= (1<<PD7);
+    _delay_ms(125);
     PORTD &= ~(1<<PD7);
     
-    for (int i = 0;i<20;i++) {
-       PORTD |= (1<<PD7);
-       _delay_ms(100);
-       PORTD &= ~(1<<PD7);
-       PORTD |= (1<<PD5);
-       _delay_ms(50);
-       PORTD &= ~(1<<PD5);
-    }
-    for (int i = 0;i<20;i++) {
-       PORTD |= (1<<PD7);
-       _delay_ms(50);
-       PORTD &= ~(1<<PD7);
-       PORTD |= (1<<PD5);
-       _delay_ms(50);
-       PORTD &= ~(1<<PD5);
-    }
-    for (int i = 0;i<20;i++) {
-       PORTD |= (1<<PD7);
-       _delay_ms(50);
-       PORTD &= ~(1<<PD7);
-       PORTD |= (1<<PD5);
-       _delay_ms(100);
-       PORTD &= ~(1<<PD5);
-    }
     PORTD |= (1<<PD5);
-    _delay_ms(2000);
+    _delay_ms(1375);
     PORTD &= ~(1<<PD5);
+
+    PORTD |= (1<<PD7);
+    _delay_ms(500);
+    PORTD &= ~(1<<PD7);
+
+    PORTD |= (1<<PD4);
+    _delay_ms(1375);
+    PORTD &= ~(1<<PD4);
+
+    PORTD |= (1<<PD7);
+    _delay_ms(125);
+    PORTD &= ~(1<<PD7);
+
+    PORTD |= (1<<PD6);
+    _delay_ms(1500);
+    PORTD &= ~(1<<PD6);
     
-    for (int i = 0;i<20;i++) {
-       PORTD |= (1<<PD5);
-       _delay_ms(100);
-       PORTD &= ~(1<<PD5);
-       PORTD |= (1<<PD6);
-       _delay_ms(50);
-       PORTD &= ~(1<<PD6);
-    }
-    for (int i = 0;i<20;i++) {
-       PORTD |= (1<<PD5);
-       _delay_ms(50);
-       PORTD &= ~(1<<PD5);
-       PORTD |= (1<<PD6);
-       _delay_ms(50);
-       PORTD &= ~(1<<PD6);
-    }
-    for (int i = 0;i<20;i++) {
-       PORTD |= (1<<PD5);
-       _delay_ms(50);
-       PORTD &= ~(1<<PD5);
-       PORTD |= (1<<PD6);
-       _delay_ms(100);
-       PORTD &= ~(1<<PD6);
-    }
     PORTD |= (1<<PD3);
     _delay_ms(100);
     PORTD &= ~(1<<PD3);
