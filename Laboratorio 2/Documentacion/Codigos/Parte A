@@ -35,6 +35,7 @@ void menu() {
     UART_send_cadena("2. Circulo\n");
     UART_send_cadena("3. Cruz\n");
     UART_send_cadena("4. Perro\n");
+    UART_send_cadena("5. Conejo\n");
     UART_send_cadena("Ingrese su seleccion: ");
 }
 
@@ -411,7 +412,7 @@ void dibujar_perro() {
        _delay_ms(50);
        PORTD &= ~(1<<PD7);
    }
-   for (int i = 0; i<10; i++) {
+   for (int i = 0; i<9; i++) {
        PORTD |= (1<<PD5);
        _delay_ms(50);
        PORTD &= ~(1<<PD5);
@@ -419,7 +420,7 @@ void dibujar_perro() {
        _delay_ms(50);
        PORTD &= ~(1<<PD7);
    }
-   for (int i = 0; i<10; i++) {
+   for (int i = 0; i<9; i++) {
        PORTD |= (1<<PD5);
        _delay_ms(50);
        PORTD &= ~(1<<PD5);
@@ -427,7 +428,7 @@ void dibujar_perro() {
        _delay_ms(50);
        PORTD &= ~(1<<PD6);
    }
-   for (int i = 0; i<10; i++) {
+   for (int i = 0; i<9; i++) {
        PORTD |= (1<<PD5);
        _delay_ms(50);
        PORTD &= ~(1<<PD5);
@@ -435,7 +436,7 @@ void dibujar_perro() {
        _delay_ms(50);
        PORTD &= ~(1<<PD7);
    }
-   for (int i = 0; i<10; i++) {
+   for (int i = 0; i<9; i++) {
        PORTD |= (1<<PD5);
        _delay_ms(50);
        PORTD &= ~(1<<PD5);
@@ -446,7 +447,7 @@ void dibujar_perro() {
    PORTD |= (1<<PD3);
    _delay_ms(100);
    PORTD &= ~(1<<PD3);
-   for (int i = 0; i<10; i++) {
+   for (int i = 0; i<9; i++) {
        PORTD |= (1<<PD4);
        _delay_ms(50);
        PORTD &= ~(1<<PD4);
@@ -454,7 +455,7 @@ void dibujar_perro() {
        _delay_ms(50);
        PORTD &= ~(1<<PD7);
    }
-   for (int i = 0; i<10; i++) {
+   for (int i = 0; i<9; i++) {
        PORTD |= (1<<PD4);
        _delay_ms(50);
        PORTD &= ~(1<<PD4);
@@ -462,7 +463,7 @@ void dibujar_perro() {
        _delay_ms(50);
        PORTD &= ~(1<<PD6);
    }
-   for (int i = 0; i<10; i++) {
+   for (int i = 0; i<9; i++) {
        PORTD |= (1<<PD4);
        _delay_ms(50);
        PORTD &= ~(1<<PD4);
@@ -473,7 +474,7 @@ void dibujar_perro() {
    PORTD |= (1<<PD2);
    _delay_ms(100);
    PORTD &= ~(1<<PD2);
-   for (int i = 0; i<10; i++) {
+   for (int i = 0; i<9; i++) {
        PORTD |= (1<<PD5);
        _delay_ms(50);
        PORTD &= ~(1<<PD5);
@@ -519,7 +520,7 @@ void dibujar_perro() {
    PORTD |= (1<<PD2);
    _delay_ms(100);
    PORTD &= ~(1<<PD2);
-   for (int i = 0; i<25; i++) {
+   for (int i = 0; i<23; i++) {
        PORTD |= (1<<PD5);
        _delay_ms(100);
        PORTD &= ~(1<<PD5);
@@ -527,7 +528,7 @@ void dibujar_perro() {
        _delay_ms(30);
        PORTD &= ~(1<<PD7);
     }
-    for (int i = 0; i<15; i++) {
+    for (int i = 0; i<14; i++) {
        PORTD |= (1<<PD6);
        _delay_ms(50);
        PORTD &= ~(1<<PD6);
@@ -535,7 +536,7 @@ void dibujar_perro() {
        _delay_ms(50);
        PORTD &= ~(1<<PD5);
     }
-    for (int i = 0; i<20; i++) {
+    for (int i = 0; i<18; i++) {
        PORTD |= (1<<PD7);
        _delay_ms(50);
        PORTD &= ~(1<<PD7);
@@ -543,7 +544,7 @@ void dibujar_perro() {
        _delay_ms(50);
        PORTD &= ~(1<<PD4);
     }
-    for (int i = 0; i<20; i++) {
+    for (int i = 0; i<18; i++) {
        PORTD |= (1<<PD7);
        _delay_ms(50);
        PORTD &= ~(1<<PD7);
@@ -551,7 +552,7 @@ void dibujar_perro() {
        _delay_ms(50);
        PORTD &= ~(1<<PD5);
     }
-    for (int i = 0; i<30; i++) {
+    for (int i = 0; i<27; i++) {
        PORTD |= (1<<PD6);
        _delay_ms(100);
        PORTD &= ~(1<<PD6);
@@ -571,13 +572,125 @@ void dibujar_conejo() {
     PORTD &= ~(1<<PD4);
     
     PORTD |= (1<<PD6);
-    _delay_ms(5000);
+    _delay_ms(10000);
     PORTD &= ~(1<<PD6);
     
     PORTD |= (1<<PD2);
     _delay_ms(100);
     PORTD &= ~(1<<PD2);
     
+    PORTD |= (1<<PD6);
+    _delay_ms(2000);
+    PORTD &= ~(1<<PD6);
+    
+    for (int i = 0;i<20;i++) {
+       PORTD |= (1<<PD6);
+       _delay_ms(100);
+       PORTD &= ~(1<<PD6);
+       PORTD |= (1<<PD4);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD4);
+    }
+    for (int i = 0;i<20;i++) {
+       PORTD |= (1<<PD6);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD6);
+       PORTD |= (1<<PD4);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD4);
+    }
+    for (int i = 0;i<20;i++) {
+       PORTD |= (1<<PD6);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD6);
+       PORTD |= (1<<PD4);
+       _delay_ms(100);
+       PORTD &= ~(1<<PD4);
+    }
+    PORTD |= (1<<PD4);
+    _delay_ms(2000);
+    PORTD &= ~(1<<PD4);
+    
+    for (int i = 0;i<20;i++) {
+       PORTD |= (1<<PD4);
+       _delay_ms(100);
+       PORTD &= ~(1<<PD4);
+       PORTD |= (1<<PD7);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD7);
+    }
+    for (int i = 0;i<20;i++) {
+       PORTD |= (1<<PD4);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD4);
+       PORTD |= (1<<PD7);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD7);
+    }
+    for (int i = 0;i<20;i++) {
+       PORTD |= (1<<PD4);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD4);
+       PORTD |= (1<<PD7);
+       _delay_ms(100);
+       PORTD &= ~(1<<PD7);
+    }
+    PORTD |= (1<<PD7);
+    _delay_ms(2000);
+    PORTD &= ~(1<<PD7);
+    
+    for (int i = 0;i<20;i++) {
+       PORTD |= (1<<PD7);
+       _delay_ms(100);
+       PORTD &= ~(1<<PD7);
+       PORTD |= (1<<PD5);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD5);
+    }
+    for (int i = 0;i<20;i++) {
+       PORTD |= (1<<PD7);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD7);
+       PORTD |= (1<<PD5);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD5);
+    }
+    for (int i = 0;i<20;i++) {
+       PORTD |= (1<<PD7);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD7);
+       PORTD |= (1<<PD5);
+       _delay_ms(100);
+       PORTD &= ~(1<<PD5);
+    }
+    PORTD |= (1<<PD5);
+    _delay_ms(2000);
+    PORTD &= ~(1<<PD5);
+    
+    for (int i = 0;i<20;i++) {
+       PORTD |= (1<<PD5);
+       _delay_ms(100);
+       PORTD &= ~(1<<PD5);
+       PORTD |= (1<<PD6);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD6);
+    }
+    for (int i = 0;i<20;i++) {
+       PORTD |= (1<<PD5);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD5);
+       PORTD |= (1<<PD6);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD6);
+    }
+    for (int i = 0;i<20;i++) {
+       PORTD |= (1<<PD5);
+       _delay_ms(50);
+       PORTD &= ~(1<<PD5);
+       PORTD |= (1<<PD6);
+       _delay_ms(100);
+       PORTD &= ~(1<<PD6);
+    }
     PORTD |= (1<<PD3);
     _delay_ms(100);
     PORTD &= ~(1<<PD3);
@@ -605,8 +718,13 @@ int main(void) {
     UART_send_cadena("Figura dibujada correctamente!\n");
                 break;
       case '4':
-          dibujar_perro();
+    dibujar_perro();
+    UART_send_cadena("Figura dibujada correctamente!\n");
+          break;
+      case '5':
+          dibujar_conejo();
           UART_send_cadena("Figura dibujada correctamente!\n");
+          break;
       default:
                 UART_send_cadena("Opcion invalida\n");
         }
