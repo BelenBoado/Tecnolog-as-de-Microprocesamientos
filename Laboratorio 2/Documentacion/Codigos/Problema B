@@ -1,0 +1,112 @@
+#include <avr/io.h>
+#include <util/delay.h>
+#define Sensor0 0
+
+void UART_init(unsigned int ubrr) {
+	UBRR0H = (unsigned char)(ubrr >> 8);
+	UBRR0L = (unsigned char)ubrr;
+	UCSR0B = (1 << RXEN0) | (1 << TXEN0);
+	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
+}
+void UART_sendChar(char data) {
+	while (!(UCSR0A & (1 << UDRE0)));
+	UDR0 = data;
+}
+void UART_sendString(const char *str) {
+	while (*str) {
+		UART_sendChar(*str++);
+	}
+}
+char UART_receiveChar(void) {
+	while (!(UCSR0A & (1 << RXC0)));
+	return UDR0;
+}
+void setupADC() {
+	ADMUX |= (1 << REFS0);
+	ADMUX &= ~(1 << ADLAR);
+	ADCSRA |= (1 << ADPS2) | (1 << ADPS1);
+	ADCSRA |= (1 << ADEN);
+}
+
+uint16_t readADC(uint8_t channel) {
+	ADMUX = (ADMUX & 0xF0) | (channel & 0x0F);
+	ADCSRA |= (1 << ADSC);
+	while (ADCSRA & (1 << ADSC));
+	return ADC;
+}
+
+void setupPWM() {
+	TCCR1A = (1 << WGM11) | (1 << COM1A1);
+	TCCR1B = (1 << WGM12) | (1 << WGM13) | (1 << CS10);
+	ICR1 = 65535;
+	DDRB |= (1 << DDB1);
+}
+
+int main() {
+	setupADC();
+	setupPWM();
+	UART_init(103);
+	UART_sendString("Bienvenido!!\r\n");
+	// Configura el pin PD0 como salida
+	DDRD |= (1 << PD0);
+	float temperatura = 0;
+	char buffer[10];
+
+	while (1) {
+		uint16_t adcValue = readADC(Sensor0);
+
+		// 0 - 22
+		if (adcValue <= 440) {
+			PORTD |= (1 << PD0);  // Enciende PD0
+			OCR1A = 0;             // PWM en 0%
+			temperatura = adcValue * 0.05
+			dtostrf(temperatura, 6, 2, buffer);
+			UART_sendString("Temperatura:");
+			UART_sendString(temperatura);
+			UART_sendString("Calefactor encendido!!\r\n");
+		}
+		// 23 - 30
+		else if (adcValue > 440 && adcValue <= 600) {
+			PORTD &= ~(1 << PD0); // Apaga PD0
+			OCR1A = 0;             // PWM en 0%
+			temperatura = adcValue * 0.05
+			dtostrf(temperatura, 6, 2, buffer);
+			UART_sendString("Temperatura:");
+			UART_sendString(temperatura);
+			UART_sendString("Calefactor apagado y ventilador apagado\r\n");
+		}
+		// 31 - 40
+		else if (adcValue > 600 && adcValue <= 800) {
+			PORTD &= ~(1 << PD0); // Apaga PD0
+			OCR1A = 6553;          // PWM en 10% (aprox.)
+			temperatura = adcValue * 0.05
+			dtostrf(temperatura, 6, 2, buffer);
+			UART_sendString("Temperatura:");
+			UART_sendString(temperatura);
+			UART_sendString("Ventilador encendido al minimo\r\n");
+		}
+		// 41 - 50
+		else if (adcValue > 800 && adcValue <= 1000) {
+			PORTD &= ~(1 << PD0); // Apaga PD0
+			OCR1A = 32765;         // PWM en 50% (aprox.)
+			temperatura = adcValue * 0.05
+			dtostrf(temperatura, 6, 2, buffer);
+			UART_sendString("Temperatura:");
+			UART_sendString(temperatura);
+			UART_sendString("Ventilador prendido a mitad de velocidad\r\n");
+		}
+		// 50 o más
+		else if (adcValue > 1000) {
+			PORTD &= ~(1 << PD0); // Apaga PD0
+			OCR1A = 65530;         // PWM en 99% (aprox.)
+			temperatura = adcValue * 0.05
+			dtostrf(temperatura, 6, 2, buffer);
+			UART_sendString("Temperatura:");
+			UART_sendString(temperatura);
+			UART_sendString("Ventilador al maximo\r\n");
+		}
+
+		// Espera para hacer la siguiente medicion
+		_delay_ms(5000);
+	}
+}
