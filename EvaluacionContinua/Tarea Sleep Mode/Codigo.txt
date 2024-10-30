@@ -1,0 +1,105 @@
+//Incluimos algunas librerias necesarias para la implementacion
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <avr/sleep.h>
+#include <avr/wdt.h>
+#include <util/delay.h>
+
+//definimos algunas variables para los LEDS
+#define LED1 PB0
+#define LED2 PB1
+#define LED3 PB2
+#define LED4 PB3
+#define LED5 PB4
+
+//Configuracion del puerto B para el funcionamiento de los LEDS
+void setup_leds() {
+
+	DDRB |= (1 << LED1) | (1 << LED2) | (1 << LED3) | (1 << LED4) | (1 << LED5);
+}
+
+//Estas funciones se encargaran de encender y apagar los LEDS segun sea necesario
+void turn_on_leds() {
+	PORTB |= (1 << LED1) | (1 << LED2) | (1 << LED3) | (1 << LED4) | (1 << LED5);
+}
+
+void turn_off_leds() {
+	PORTB &= ~((1 << LED1) | (1 << LED2) | (1 << LED3) | (1 << LED4) | (1 << LED5));
+}
+
+// Configuramos todos los sleep Modes necesarios que se vayana a utilizar
+void setup_timer1() {
+	TCCR1B |= (1 << WGM12);
+	OCR1A = 15624;          
+	TCCR1B |= (1 << CS12) | (1 << CS10); 
+	TIMSK1 |= (1 << OCIE1A); 
+}
+
+void setup_watchdog() {
+	cli(); 
+	wdt_reset(); 
+	WDTCSR |= (1 << WDCE) | (1 << WDE); 
+	WDTCSR = (1 << WDE) | (1 << WDP2) | (1 << WDP1); 
+	sei(); 
+}
+
+void reset_watchdog() {
+	wdt_reset();
+}
+
+void sleep_mode_idle() {
+	set_sleep_mode(SLEEP_MODE_IDLE);
+	sleep_enable();
+	sleep_cpu(); 
+	sleep_disable(); 
+}
+
+void sleep_mode_power_save() {
+	set_sleep_mode(SLEEP_MODE_PWR_SAVE);
+	sleep_enable();
+	sleep_cpu(); 
+	sleep_disable(); 
+}
+
+void watchdog_sleep_mode() {
+	setup_watchdog();
+	for (uint8_t i = 0; i < 15; i++) {
+
+		reset_watchdog();
+		_delay_ms(2000); 
+	}
+}
+
+
+int main(void) {
+//Iniciamos las configuraciones
+	setup_leds(); 
+	setup_timer1(); 
+	sei(); 
+
+	while (1) {
+
+		turn_on_leds(); // Encender LEDs
+		for (uint8_t i = 0; i < 30; i++) {
+			sleep_mode_idle(); //Iniciamos el sleep mode Idle
+		}
+
+		turn_off_leds(); 
+		_delay_ms(2000);
+
+		turn_on_leds(); 
+		watchdog_sleep_mode(); //Iniciamos el watchgdog
+
+		turn_off_leds(); //Apagar LEDS
+		_delay_ms(2000);
+
+		turn_on_leds(); // Encender LEDs
+		for (uint8_t i = 0; i < 30; i++) {
+			sleep_mode_power_save(); //Iniciamos el power save
+		}
+
+		turn_off_leds(); 
+		break;
+	}
+}
+
