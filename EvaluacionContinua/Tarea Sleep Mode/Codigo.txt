@@ -80,6 +80,7 @@ int main(void) {
 	while (1) {
 
 		turn_on_leds(); // Encender LEDs
+		_delay_ms(2000);
 		for (uint8_t i = 0; i < 30; i++) {
 			sleep_mode_idle(); //Iniciamos el sleep mode Idle
 		}
