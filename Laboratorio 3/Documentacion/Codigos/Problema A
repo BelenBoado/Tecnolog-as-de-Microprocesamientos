@@ -8,14 +8,15 @@
 #define clk_y PC3
 #define dir_y PC4
 #define en_y PC5
+#define SOL PC0
 
 
 
 void pwm_motor_x() {
 	DDRB |= (1 << clk_x) | (1 << dir_x) | (1 << en_x);  
 
-	TCCR2A |= (1 << COM2A1);
-	TCCR2A |= (1 << WGM21) | (1 << WGM20); 
+	TCCR2A |= (1 << COM2A0) | (1 << WGM21) | (1 << WGM20);
+	TCCR2B |= (1 << WGM22); 
 	TCCR2B |= (1 << CS21);  
 
 	OCR2A = 128;  
@@ -26,7 +27,7 @@ void motor_x_velocidad(uint8_t velocidad) {
 }
 
 void pwm_motor_y() {
-	DDRC |= (1 << clk_y) | (1 << dir_y) | (1 << en_y);
+	DDRC |= (1 << clk_y) | (1 << dir_y) | (1 << en_y) | (1 << SOL);
 
 	TCCR1A = 0; 
 	TCCR1B |= (1 << WGM12); 
@@ -52,34 +53,125 @@ void mover_derecha() {
 }
 
 void mover_izquierda() {
-	PORTB |= (0 << dir_x) | (1 << en_x);
+	PORTB |= (1 << en_x);
+	PORTB &= ~(1 << dir_x);
 }
 
 void detener() {
-	PORTB &= ~(1 << en_x);
-	PORTC &= ~(1 << en_y);
+	PORTB &= ~((1 << en_x) | (1 << dir_x));
+	PORTC &= ~((1 << en_y) | (1 << dir_y));
 }
 
 void mover_arriba() {
-	PORTC |= (0 << dir_y) | (1 << en_y);
+	PORTC |= (1 << en_y);
+	PORTC &= ~(1 << dir_y);
 }
 
 void mover_abajo() {
 	PORTC |= (1 << dir_y) | (1 << en_y);
 }
 
-void cruz() {
-	
+void bajar_lapiz() {
+   PORTC |= (1 << SOL);
 }
 
+void subir_lapiz() {
+   PORTC &= ~(1 << SOL);
+}
+
+void cruz() {
+   bajar_lapiz();
+   mover_derecha();
+   _delay_ms(1000);
+   mover_izquierda();
+   _delay_ms(500);
+   detener();
+   mover_arriba();
+   _delay_ms(500);
+   mover_abajo();
+   _delay_ms(1000);
+   detener();
+   subir_lapiz();
+}
+
+void triangulo() {
+   bajar_lapiz();
+   mover_derecha();
+   _delay_ms(1000);
+   mover_izquierda();
+   mover_arriba();
+   _delay_ms(500);
+   mover_abajo();
+   _delay_ms(500);
+   detener();
+   subir_lapiz();
+   
+}
+
+void circulo() {
+   bajar_lapiz();
+   mover_derecha();
+   mover_abajo();
+   int velocidad = 127;
+   motor_x_velocidad(velocidad);
+   motor_y_velocidad(128 - velocidad);
+   _delay_ms(50);
+   while (velocidad > 10) {
+      velocidad -= 10;
+      motor_x_velocidad(velocidad);
+      motor_y_velocidad(128 - velocidad);
+      _delay_ms(50);
+   }
+   velocidad = 127;
+   motor_x_velocidad(128 - velocidad);
+   motor_y_velocidad(velocidad);
+   _delay_ms(50);
+   mover_izquierda();
+   while (velocidad > 10) {
+      velocidad -= 10;
+      motor_x_velocidad(128 - velocidad);
+      motor_y_velocidad(velocidad);
+      _delay_ms(50);
+   }
+   velocidad = 127;
+   motor_x_velocidad(velocidad);
+   motor_y_velocidad(128 - velocidad);
+   _delay_ms(50);
+   mover_arriba();
+   while (velocidad > 10) {
+      velocidad -= 10;
+      motor_x_velocidad(velocidad);
+      motor_y_velocidad(128 - velocidad);
+      _delay_ms(50);
+   }
+   velocidad = 127;
+   motor_x_velocidad(128 - velocidad);
+   motor_y_velocidad(velocidad);
+   _delay_ms(50);
+   mover_derecha();
+   while (velocidad > 10) {
+      velocidad -= 10;
+      motor_x_velocidad(128 - velocidad);
+      motor_y_velocidad(velocidad);
+      _delay_ms(50);
+   }
+   velocidad = 127;
+   motor_x_velocidad(velocidad);
+   motor_y_velocidad(128 - velocidad);
+   _delay_ms(50);
+   detener();
+   subir_lapiz();
+   motor_x_velocidad(128);
+   motor_y_velocidad(128);
+}
 
 int main(void) {
 	pwm_motor_x();
 	pwm_motor_y();
-	mover_abajo();
-	mover_izquierda();
-	_delay_ms(500);
-	detener();
+	cruz();
+	triangulo();
+	circulo();
+	
 
 	while (1) {
 		motor_x_velocidad(128);
