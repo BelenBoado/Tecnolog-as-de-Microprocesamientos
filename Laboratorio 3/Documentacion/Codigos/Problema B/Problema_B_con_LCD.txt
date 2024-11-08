@@ -1,0 +1,279 @@
+//Definimos algunas variables globales necesarias y las librerias a utilizar en el programa
+#define PCF8574	0x27							
+
+#include <xc.h>
+#include <avr/io.h>
+#include <util/twi.h>
+
+#include <util/delay.h>
+#include "twi_lcd.h"
+
+#include <string.h>
+#include <avr/io.h>
+
+#define F_CPU 16000000UL
+#define BAUD 9600
+#define MYUBRR F_CPU/16/BAUD-1
+
+#define PASSWORD_LENGTH 6
+
+#define EEPROM_PASSWORD_ADDRESS 0x00
+
+#define LED_verde PD4
+#define LED_rojo PD5
+
+//Configuramos la comunicacion UART para visualizar datos desde la computadora al mismo tiempo que en la LCD
+void UART_init(unsigned int ubrr) {
+	UBRR0H = (unsigned char)(ubrr >> 8);
+	UBRR0L = (unsigned char)ubrr;
+	UCSR0B = (1 << RXEN0) | (1 << TXEN0);
+	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
+}
+
+void UART_sendChar(char data) {
+	while (!(UCSR0A & (1 << UDRE0)));
+	UDR0 = data;
+}
+
+void UART_sendString(const char *str) {
+	while (*str) {
+		UART_sendChar(*str++);
+	}
+}
+
+char UART_receiveChar(void){
+	while(!(UCSR0A & (1<<RXC0)));
+	return UDR0;
+}
+
+//Configuramos el teclado matricial
+char keypad[4][4] = {
+	{'1','2','3','A'},
+	{'4','5','6','B'},
+	{'7','8','9','C'},
+	{'*','0','#','D'},
+};
+
+//Funcion para leer el teclado matricial
+char read_keypad(void) {
+	for (uint8_t row = 0; row < 4; row++) {
+		PORTB = ~(1 << row);
+		for (uint8_t col = 0; col < 4; col++) {
+			if (!(PINC & (1 << col))) {
+				while (!(PINC & (1 << col)));
+				return keypad[row][col];
+			}
+		}
+	}
+	return 0;
+}
+
+//Configuramos la memoria EEPROM para leer y escribir
+void EEPROM_write(uint16_t address, uint8_t data) {
+	while (EECR & (1 << EEPE));
+	EEAR = address;
+	EEDR = data;
+	EECR |= (1 << EEMPE);
+	EECR |= (1 << EEPE);
+}
+
+uint8_t EEPROM_read(uint16_t address) {
+	while (EECR & (1 << EEPE));
+	EEAR = address;
+	EECR |= (1 << EERE);
+	return EEDR;
+}
+
+char stored_password[PASSWORD_LENGTH];
+
+// Cargar la contraseña de EEPROM a RAM una sola vez al inicio del programa
+void load_password_from_eeprom() {
+	for (uint8_t i = 0; i < PASSWORD_LENGTH; i++) {
+		stored_password[i] = EEPROM_read(EEPROM_PASSWORD_ADDRESS + i);
+	}
+}
+
+// Verificar la contraseña ingresada comparando la cadena completa
+uint8_t verify_password(char *input) {
+	char stored_password[PASSWORD_LENGTH];
+
+	for (uint8_t i = 0; i < PASSWORD_LENGTH; i++) {
+		stored_password[i] = EEPROM_read(EEPROM_PASSWORD_ADDRESS + i);
+	}
+
+
+	for (uint8_t i = 0; i < PASSWORD_LENGTH; i++) {
+		if (input[i] != stored_password[i]) {
+			return 0;
+		}
+	}
+	return 1;
+}
+
+// Inicializamos la contraseña en EEPROM 
+void init_eeprom() {
+	char test_password[PASSWORD_LENGTH] = {'A', 'A', 'A', 'A', 'A', 'A'};
+	if (EEPROM_read(EEPROM_PASSWORD_ADDRESS) == 0xFF) {
+		for (uint8_t i = 0; i < PASSWORD_LENGTH; i++) {
+			EEPROM_write(EEPROM_PASSWORD_ADDRESS + i, test_password[i]);
+		}
+	}
+}
+
+//Configuramos el PWM en modo FAST PWM para el funcionamiento del buzzer
+void setupPWM() {
+	// Configurar PWM en el pin OC0A (PD6)
+	TCCR0A |= (1 << COM0A1) | (1 << WGM00) | (1 << WGM01); // Modo Fast PWM, salida en OC0A
+	TCCR0B |= (1 << CS01); // Prescaler 8
+	DDRD |= (1 << PD6);  // Configura PD6 como salida PWM
+}
+
+void setPWM(uint8_t value) {
+	OCR0A = value;  // Ajusta el ciclo de trabajo PWM en el registro OCR0A
+}
+
+//Funcion para cambiar la contraseña en la EEPROM
+void cambiar_password2() {
+	char new_password[PASSWORD_LENGTH];                    //Se crea una cadena para guardar la nueva clave
+	UART_sendString("\r\n Ingrese la nueva contraseña: ");  //Se envia un mensaje por UART
+	twi_lcd_cmd(0x80);                                      //Y uno por la LCD
+	twi_lcd_msg("Ingrese clave");
+	twi_lcd_cmd(0xc0);
+	twi_lcd_msg("nueva:");
+	for (uint8_t i = 0; i < PASSWORD_LENGTH; i++) {
+		char key;
+		do {
+			key = read_keypad();  // Lee una tecla del teclado
+		} while (key == 0);       // Espera hasta que una tecla sea presionada
+		new_password[i] = key;    // Guarda la tecla ingresada en la nueva contraseña
+		UART_sendChar('*');       // Muestra un asterisco por UART como feedback visual
+		_delay_ms(200);           // Delay para evitar rebotes en el teclado
+	}
+	UART_sendString("\r\nContraseña cambiada.\r\n");
+	twi_lcd_clear();              //Si la contraseña se limpiara la pantalla
+	// Guarda la nueva contraseña en la EEPROM
+	for (uint8_t i = 0; i < PASSWORD_LENGTH; i++) {
+		EEPROM_write(EEPROM_PASSWORD_ADDRESS + i, new_password[i]);
+	}
+}
+
+
+int main(void)
+{
+
+  //Configuramos los puertos
+	DDRB = 0x0F;
+	PORTB = 0xFF;
+	DDRC = 0b11111100;
+	PORTC = 0b11111100;
+
+	DDRD |= (1 << LED_verde) | (1 << LED_rojo);
+	PORTD &= ~(1 << LED_verde);
+	PORTD &= ~(1 << LED_rojo);
+//Inicializamos las configuraciones de UART, LCD y EEPROM
+	init_eeprom();
+	UART_init(MYUBRR);
+	setupPWM();
+
+//Cargamos la ultima contraseña guardada en la RAM del arduino
+	load_password_from_eeprom();
+	char opcion = 0;
+
+	char tecla[PASSWORD_LENGTH + 1];
+	uint8_t index = 0;
+	uint8_t contador = 0;
+//Inicializamos la LCD con un mensaje de bienvenida y luego se muestra un menu interactivo
+	twi_init();
+	twi_lcd_init();
+	twi_lcd_cmd(0x80);
+	twi_lcd_clear();
+	twi_lcd_msg("  Bienvenido!");
+	_delay_ms(5000);
+
+	twi_lcd_cmd(0xC0);
+	twi_lcd_msg("Ingrese la opcion");
+	_delay_ms(5000);
+	twi_lcd_clear();
+	char tecla2;
+	twi_lcd_cmd(0x80);
+	twi_lcd_msg("    A-Cambiar clave");
+	twi_lcd_cmd(0xc0);
+	twi_lcd_msg("B-Ingresar clave");
+	while (1)
+	{
+//A continuacion se lee la opcion que desee el usuario
+		tecla2 = read_keypad();
+		UART_sendChar(tecla2);
+
+		if (tecla2 == 'A'){
+
+			//Codigo para cambiar contraseña
+			UART_sendString("Ingrese nueva clave:");
+			twi_lcd_clear();
+			twi_lcd_cmd(0x80);
+			twi_lcd_msg("Nueva clave");
+			cambiar_password2();
+			tecla2 = 0;
+			}else if(tecla2 == 'B'){
+
+			//Codigo para ingresar la contraseña
+			UART_sendString("\r\nLeyendo contraseña!\r\n");
+			twi_lcd_msg("Leyendo...");
+			while(1){
+//Entra en un while para leer la contraseña hasta que se ingrese la correcta
+				char key = read_keypad();
+
+				if (key != 0) {
+					if (index < PASSWORD_LENGTH) {
+						tecla[index++] = key;
+						UART_sendChar(key);
+						UART_sendChar('\r');
+						UART_sendChar('\n');
+					}
+
+					
+					if (index == PASSWORD_LENGTH) {
+						tecla[index] = '\0';
+						if (verify_password(tecla) == 1) {
+							UART_sendString("Contraseña correcta.\r\n");
+							PORTD |= (1 << LED_verde);
+							PORTD &= ~(1<<LED_rojo);
+							twi_lcd_clear();
+							twi_lcd_msg("            Correcta");
+							
+							} else {
+							contador ++;                  //Variable donde se almacenara la cantidad de veces incorrectas que se ingreso la clave
+							twi_lcd_clear();
+							twi_lcd_msg("          Incorrecta");
+							UART_sendString( "Contraseña incorrecta.\r\n");
+							UART_sendString("Contador:");
+							UART_sendChar('0' + contador);
+							UART_sendChar('\r');
+							UART_sendChar('\n');
+							PORTD |= (1 << LED_rojo);
+							PORTD &= ~(1<<LED_verde);
+							_delay_ms(5000);
+							PORTD &=(1<<LED_rojo);
+							if(contador == 3){          //Al llegar a 3, se activara el buzzer
+								UART_sendString("Buzzer encendido!\r\n");
+								setPWM(255);
+								_delay_ms(3000);
+								setPWM(0);
+								contador = 0;
+							}
+						}
+						index = 0;
+						tecla2 = 0;
+
+					}
+					_delay_ms(200);
+				}
+			}
+			
+		}
+		
+		
+	}
+}
+
+
