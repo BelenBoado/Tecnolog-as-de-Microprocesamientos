@@ -1,0 +1,91 @@
+#include <avr/io.h>
+#include <util/delay.h>
+#include <avr/interrupt.h>
+
+#define clk_x PB3
+#define dir_x PB4
+#define en_x PB5
+#define clk_y PC3
+#define dir_y PC4
+#define en_y PC5
+
+
+
+void pwm_motor_x() {
+	DDRB |= (1 << clk_x) | (1 << dir_x) | (1 << en_x);  
+
+	TCCR2A |= (1 << COM2A1);
+	TCCR2A |= (1 << WGM21) | (1 << WGM20); 
+	TCCR2B |= (1 << CS21);  
+
+	OCR2A = 128;  
+}
+
+void motor_x_velocidad(uint8_t velocidad) {
+	OCR2A = velocidad;
+}
+
+void pwm_motor_y() {
+	DDRC |= (1 << clk_y) | (1 << dir_y) | (1 << en_y);
+
+	TCCR1A = 0; 
+	TCCR1B |= (1 << WGM12); 
+	TCCR1B |= (1 << CS11);  
+
+	OCR1A = 128; 
+
+	TIMSK1 |= (1 << OCIE1A);
+	
+	sei();
+}
+
+ISR(TIMER1_COMPA_vect) {
+	PORTC ^= (1 << clk_y); 
+}
+
+void motor_y_velocidad(uint8_t velocidad) {
+	OCR1A = velocidad;
+}
+
+void mover_derecha() {
+	PORTB |= (1 << dir_x) | (1 << en_x);
+}
+
+void mover_izquierda() {
+	PORTB |= (0 << dir_x) | (1 << en_x);
+}
+
+void detener() {
+	PORTB &= ~(1 << en_x);
+	PORTC &= ~(1 << en_y);
+}
+
+void mover_arriba() {
+	PORTC |= (0 << dir_y) | (1 << en_y);
+}
+
+void mover_abajo() {
+	PORTC |= (1 << dir_y) | (1 << en_y);
+}
+
+void cruz() {
+	
+}
+
+
+int main(void) {
+	pwm_motor_x();
+	pwm_motor_y();
+	mover_abajo();
+	mover_izquierda();
+	_delay_ms(500);
+	detener();
+
+	while (1) {
+		motor_x_velocidad(128);
+		motor_y_velocidad(128);
+		
+	}
+	
+	return 0;
+}
