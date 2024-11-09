@@ -1,0 +1,150 @@
+#include <avr/io.h>
+#include <util/delay.h>
+char opcion;
+char received_char = UART_receiveChar();
+//Configuramos la comunicacion UART 
+void UART_init(unsigned int ubrr) {
+	UBRR0H = (unsigned char)(ubrr >> 8);
+	UBRR0L = (unsigned char)ubrr;
+	UCSR0B = (1 << RXEN0) | (1 << TXEN0);
+	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
+}
+
+void UART_sendChar(char data) {
+	while (!(UCSR0A & (1 << UDRE0)));
+	UDR0 = data;
+}
+
+void UART_sendString(const char *str) {
+	while (*str) {
+		UART_sendChar(*str++);
+	}
+}
+char UART_receiveChar(void){
+	while(!(UCSR0A & (1<<RXC0)));
+	return UDR0;
+}
+
+void setupPorts() {
+	// Configura los bits 3 a 7 del puerto D como entrada
+	DDRD &= ~((1 << PD2) | (1 << PD3) | (1 << PD4) | (1 << PD5) | (1 << PD6) | (1 << PD7));
+	// Configura los bits 3 y 4 del puerto B como entrada
+	DDRB &= ~((1 << PB2) | (1 << PB3));
+	PORTD &= ~((1 << PD2) | (1 << PD3) | (1 << PD4) | (1 << PD5) | (1 << PD6) | (1 << PD7));
+	PORTB &= ~((1 << PB2) | (1 << PB3));
+	
+}
+
+void DO(){
+	OCR1A = 953 ;
+}
+void RE(){
+	OCR1A = 849 ;
+}
+void MI(){
+	OCR1A =757 ;
+}
+void FA(){
+	OCR1A = 715 ;
+}
+void SOL(){
+	OCR1A = 637 ;
+}
+void LA(){
+	OCR1A = 567;
+}
+void SI(){
+	OCR1A = 505 ;
+}
+void DOO(){
+	OCR1A = 477;
+}
+void off(){
+	OCR1A = 0;
+}
+void pause(){
+	OCR1A = 0;
+	_delay_ms(100);
+}
+void Cancion1(){
+	//Twinkle, Twinkle, Little Star
+	DO();DO();SOL();SOL();LA();LA();SOL();  // Twinkle, twinkle, little star
+	FA();FA();MI();MI();RE();RE();DO();		// How I wonder what you are
+	SOL();SOL();FA();FA();MI();MI();RE();   // Up above the world so high
+	SOL();SOL();FA();FA();MI();MI();RE();   // Like a diamond in the sky
+	DO();DO();SOL();SOL();LA();LA();SOL();	// Twinkle, twinkle, little star
+	FA();FA();MI();MI();RE();RE();DO();		// How I wonder what you are
+}
+void Cancion2(){
+	MI();MI();MI();pause();MI();MI();MI();pause();MI();SOL();DO();RE();MI(); // Jingle bells, jingle bells, jingle all the way
+	FA();FA();FA();FA();FA();MI();MI();MI();MI();RE();RE();MI();RE();SOL();  // Oh what fun it is to ride in a one-horse open sleigh
+	MI();MI();MI();pause();MI();MI();MI();pause();MI();SOL();DO();RE();MI(); // Jingle bells, jingle bells, jingle all the way
+	FA();FA();FA();FA();FA();MI();MI();MI();MI();RE();RE();MI();RE();SOL();  // Oh what fun it is to ride in a one-horse open sleigh
+}
+void Piano(){
+	while(1){
+		if (received_char) {
+			opcion = received_char;
+			UART_sendChar(opcion);
+			if(opcion == 'A'){
+				Cancion1();
+				}else if(opcion == 'B'){
+				Cancion2();
+				}else{
+				Piano();
+			}
+		}
+		if(PIND & (1 << PD2)){
+			DO();
+			_delay_ms(100);
+			off();
+			}else if(PIND & (1 << PD3)){
+			RE();
+			_delay_ms(100);
+			off();
+			}else if(PIND & (1 << PD4)){
+			MI();
+			_delay_ms(100);
+			off();
+			}else if(PIND & (1 << PD5)){
+			FA();
+			_delay_ms(100);
+			off();
+			}else if(PIND & (1 << PD6)){
+			SOL();
+			_delay_ms(100);
+			off();
+			}else if(PIND & (1 << PD7)){
+			LA();
+			_delay_ms(100);
+			off();
+			}else if(PINB & (1 << PB2)){
+			SI();
+			_delay_ms(100);
+			off();
+			}else if(PINB & (1 << PB3)){
+			DOO();
+			_delay_ms(100);
+			off();
+		}
+	}
+}
+int main(void) {
+	setupPorts();
+	// Configuración del pin OC1A (PB1) como salida
+	DDRB |= (1 << PB1);
+	// Configuración del temporizador 1 para PWM de 8 bits en modo Fast PWM
+	TCCR1A = (1 << WGM11) | (1 << WGM10) | (1 << COM1A1);
+	TCCR1B = (1 << WGM13) |(1 << WGM12) | (1 << CS11) | (1 << CS10);   // Prescaler 64, frecuencia ajustada
+	UART_sendString("Eliga una opcion");
+	UART_sendString("(A)Twinkle, Twinkle, Little Star (B)Jingle Bells (c)Tocar piano");
+		if (opcion == 'A') {
+		Cancion1();  // Llamar a la función para reproducir Cancion 1
+		} else if (opcion == 'B') {
+		Cancion2();  // Llamar a la función para reproducir Cancion 2
+		} else if (opcion == 'C') {
+		Piano();  // Llamar a la función para tocar el piano
+		} else {
+		UART_sendString("\nOpcion no valida\n");  // Manejo de opción no válida
+	}
+}
