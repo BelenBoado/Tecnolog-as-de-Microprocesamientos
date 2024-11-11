@@ -1,1 +1,298 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage{fancyvrb}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\begin{document}
 
+\title{Laboratorio 3\\}
+
+
+\author{\IEEEauthorblockN{1\textsuperscript{st} Belen Boado}
+\IEEEauthorblockA{\textit{Ingenieria Mecatronica} \\
+\textit{Universidad Tecnologica (UTEC)}\\
+Fray Bentos, Rio Negro \\
+\url{belen.boado@estudiantes.utec.edu.uy}
+}
+\and
+\IEEEauthorblockN{2\textsuperscript{nd} Luis Nuñez}
+\IEEEauthorblockA{\textit{Ingenieria Mecatronica} \\
+\textit{Universidad Tecnologica (UTEC)}\\
+Fray Bentos, Rio Negro \\
+\url{luis.nunez@estudiantes.utec.edu.uy}}
+\and
+\IEEEauthorblockN{3\textsuperscript{rd} Adrian Terzaghi}
+\IEEEauthorblockA{\textit{Ingenieria Mecatronica} \\
+\textit{Universidad Tecnologica (UTEC)}\\
+Fray Bentos, Rio Negro \\
+\url{adrian.terzaghi@estudiantes.utec.edu.uy}}
+}
+
+\maketitle
+
+
+\begin{IEEEkeywords}
+ATmega328P, Plotter, Teclado, LCD
+\end{IEEEkeywords}
+\section{Resumen}
+
+\section{Introducción}
+
+En este informe se describe el diseño y desarrollo de tres problemas utilizando el microcontrolador ATmega328P. El primer sistema es un plotter de dibujo que emplea motores paso a paso y una válvula solenoide, controlado mediante comandos UART para seleccionar figuras y ajustar límites de movimiento, asegurando precisión en el trazado. El segundo proyecto es una cerradura electrónica con teclado y pantalla LCD, que permite almacenar contraseñas en la memoria EEPROM y emite alertas en caso de múltiples intentos fallidos. Además, incluye una función para cambiar la contraseña, mostrando un manejo seguro de datos.
+
+El tercer sistema implementa un piano electrónico de ocho notas controlado por pulsadores, que también permite la selección de canciones predefinidas mediante comandos UART. Cada proyecto aborda configuraciones de hardware específicas, algoritmos de control, y comunicación serial, proporcionando a los estudiantes experiencia en control de motores, manejo de datos en EEPROM, y generación de sonidos, habilidades clave en el campo de los sistemas embebidos.
+
+
+\section{Objetivos}
+
+\subsection{Objetivo General}
+Realizar codigos en lenguaje c de bajo nivel que resulten funcionales para los problemas planteados en clase, ademas de la implementacion de montajes fisicos asi como de simulaciones que logren simular de forma correcta.
+\subsection{Objetivos especificos}
+\begin{itemize}
+    \item Implementacion de codigo y dibujo en un plotter.
+    \item Implementacion de codigo y montaje fisico de una cerradura electronica.
+    \item Implementacion de codigo y montaje fisico de un piano electronico.
+    \item Implementacion de una libreria especializada para el uso de LCD.
+    \item Correcto manejo de PWM para las notas musicales.
+\end{itemize}
+
+
+\section{Marco teórico}
+A continuacion, se plantearan algunos conceptos fundamentales para la realizacion de esta practica, como el concepto del microcontrolador ATmega328P, una breve definicion del lenguaje C, y algunas definiciones de componentes importantes de los problemas a realizar.  
+
+\subsection{Microcontrolador ATmega328P}\label{AA}
+El microcontrolador ATmega328 es un microcontrolador de 8 bits basado en una arquitectura de RISC. Posee muchas características como una memoria flash de 32KB con una capacidad de lectura en simultáneo a escritura, una memoria EEPROM de 1KB, un SRAM de 2KB y 23 pines de uso. Además, posee 32 registros, 3 temporizadores flexibles, soporta interrupciones externas y posee internas, una interfaz para la comunicación serial en los pines PD0 y PD1, y Conversor Análogo Digital. Por último, posee temporizador de modo de ahorro de energía y un temporizador “Watchdog”. Este microcontrolador opera entre 1.8 y 5.5 volts.
+
+Un reemplazo frecuente  para este microcontrolador es el ATmega328P, ya que comparten en su mayoría las mismas características. Este se encuentra comúnmente en la plataforma de Arduino UNO y Arduino Nano.
+
+\subsubsection{Caracteristicas}
+\begin{itemize}
+    \item 131 instrucciones.
+    \item Hasta 20 MIPS a 20 MHz.
+    \item Memoria FLASH programable en el sistema de 32 KB.
+    \item 2 KB de SRAM interna.
+    \item 1 KB de EEPROM.
+    \item 6 canales PWM.
+    \item 6 canales analógicos para el ADC.
+    \item Puerto USART, SPI e interfaz serial de 2 cables.
+    \item Temporizador watchdog y comparador analógico.
+    \item Soporte para múltiples modos de bajo consumo.
+
+\end{itemize}
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.5\textwidth]{Imagenes/Imagen atmega328p.PNG}}
+\caption{Circuito interno del ATmega328P.}
+\label{fig}
+\end{figure}
+
+\subsection{Lenguaje C}
+Este lenguaje es uno de los más importantes y utilizados a nivel informático. Fue desarrollado en la década de 1970 por los Laboratorios Bell por Dennis Ritchie, evolucionando del lenguaje B y fue creado con la idea de implementar el sistema operativo UNIX, por lo cual fue muy popular en la industria.
+
+C es un lenguaje destacado por su capacidad de manipulación de hardware y memoria, volviendolo un lenguaje eficiente y portatil.Su impacto ha sido muy grande en la industria, influyendo en la creación de lenguajes como C++, Java y Javascript.
+
+\subsubsection{Características}
+\begin{itemize}
+    \item Manipulación directa de hardware y memoria.
+    \item Eficiencia y portabilidad.
+    \item Amplia influencia en otros lenguajes de programación.
+
+\end{itemize}
+
+\subsection{Plotter}
+Los plotters pueden dividirse en 3 grandes grupos, los plotters de impresión, los de corte y los mixtos. Los de impresión son considerados impresoras de gran formato, son ideales para imprimir desde planos hasta fotografías o carteles de gran tamaño. Los de corte se utilizan para cortar vinilos de colores o formas previamente impresas, y los mixtos combinan ambas funciones.
+
+El plotter de impresión es una de las formas rápidas y eficientes de producir impresiones de gran tamaño de alta calidad. Además, con esta tecnología es posible realizar impresiones sobre tela, crear carteles publicitarios, planos de arquitectura e ingeniería.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.3\textwidth]{Imagenes/Plotter.jpeg}}
+\caption{Plotter del Laboratorio de Mecatronica.}
+\label{fig}
+\end{figure}
+
+\subsection{Pantalla LCD}
+LCD, del inglés, significa ‘Pantalla de Cristal Líquido’. Es una tecnología de pantalla plana que se encuentra comúnmente en televisores y monitores de computadora, así como en dispositivos móviles como celulares, tablets y laptops.
+
+Las pantallas LCD forman de forma muy distinta a la de los monitores CRT (por tubo de rayos catódicos), en lugar de disparar electrones a una pantalla de vidrio, las pantallas LCD poseen una luz de fondo que proporciona una fuente de luz para los píxeles individuales dispuestos en cuadrícula rectangular. Cada uno de estos subpixeles RGB (rojo, verde y azul, del ingles) se puede activar o desactivar a voluntad del usuario, cuandoe sten todos apagados aparecera negro y cuando todos se encuentren encendidos, se vera blanco. Realizando ajustes se pueden alcanzar diferentes combinaciones de colores.
+
+Las pantallas LCD consisten en una capa de cristal líquido entre dos electrodos transparentes, típicamente hechos de óxido de indio y estaño (ITO), y dos filtros polarizadores. Al no emitir luz propia, necesitan retroiluminación, generalmente LED, para su visibilidad en entornos oscuros. Los píxeles se crean mediante el control de la orientación de las moléculas de cristal líquido, permitiendo o bloqueando el paso de luz a través de los polarizadores. Para pantallas a color, se añaden filtros RGB, y pueden integrar un panel táctil al frente.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.3\textwidth]{Imagenes/16X2-LCD.jpg}}
+\caption{Pantalla LCD 16x2.}
+\label{fig}
+\end{figure}
+
+Algunos tipos de pantallas que existen son:
+\begin{itemize}
+    \item TN (Nemática Torcida): Económicas y con rápida respuesta, pero limitadas en color y ángulos de visión.
+    \item IPS (Conmutación en el Plano): Alta calidad de imagen y colores precisos, ideales para diseño gráfico.
+    \item VA (Alineación Vertical): Ofrece mejor color y negros profundos que TN, pero con tiempos de respuesta más lentos.
+    \item AFFS: Gran rendimiento y precisión de color, usado en entornos avanzados.
+    \item Matriz Activa y Pasiva: La matriz activa (TFT) mejora la precisión y tiempo de respuesta sobre la pasiva.
+
+\end{itemize}
+En particular la que se utilizará en este proyecto será la LCD 16x2 se refiere a un pequeño dispositivo con pantalla de cristal líquido que cuenta con dos filas, de dieciséis caracteres cada una, que se utiliza para mostrar información, por lo general alfanumérica.
+
+\subsection{Modulo I2C}
+
+Este módulo permite la comunicación simplificada entre un microcontrolador y una pantalla LCD a través del protocolo Inter-Integrated Circuit, o I2C. Este módulo utiliza un chip PCF8574 que se encargará de expandir el número de pines de entrada y salida, reduciendo de forma significativa el número de conexiones necesarias para controlar la pantalla. Ayuda a reducir la cantidad de conexiones necesarias para el correcto funcionamiento de la pantalla LCD. Esto permite mostrar información en tiempo real, como datos de sensores, mensajes de estado u otra información relevante que necesite ser visualizada.
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.3\textwidth]{Imagenes/MODULO-I2C.jpg}}
+\caption{Modulo I2C para LCD.}
+\label{fig}
+\end{figure}
+
+\subsection{Motores paso a paso}
+Los motores paso a paso se encargan de convertir señales eléctricas en movimientos mecánicos y son generalmente utilizados en la industria para controlar el movimiento en automatizaciones de maquinarias, impresión 3d, robótica, y control CNC, entre otros. Se caracterizan por su precisión en la posición y velocidad a la que operan.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.3\textwidth]{Imagenes/motor-paso-a-paso-nema-17-32kg-cm.jpg}}
+\caption{Simulacion en Proteus.}
+\label{fig}
+\end{figure}
+
+\subsubsection{Caracteristicas}
+\begin{itemize}
+    \item Compatibles con los controladores de motores más comunes.
+    \item Posicionamiento posible también sin encoder.
+    \item Disponibles en varios tamaños de instalación.
+    \item Pares elevados.
+    \item Encoders y frenos disponibles para una mayor fiabilidad de la planta. 
+    \item Grado de protección alto (clase IP68).
+
+\end{itemize}
+
+\subsubsection{Funcionamiento}
+Existen tres posibles formas de funcionamiento: por activación de bobina simple, por bobina doble y por medios pasos. La secuencia de bobina doble ofrece más torque, mientras que los medios pasos mejoran la precisión. También, si es necesaria mucha precisión, se pueden alternar entre doble bobinado y micro pasos, estos se logran combinando la corriente del motor a través de modulación por ancho de pulso (PWM).
+
+\section{Metodología}
+\subsection{Problema A}\label{Problema A}
+Para activar y controlar los motores paso a paso, se decidió emplear los temporizadores (Timers) 1 y 2 del microcontrolador. El Timer 2 se configuró con un preescaler de 8 bits y en modo fast PWM, activando la función Compare Match en el canal A, debido a que este canal controla el pin de reloj de uno de los motores paso a paso.
+
+El segundo motor fue controlado mediante el Timer 1, configurado en modo CTC (Clear Timer on Compare Match) y también con un preescaler de 8. Adicionalmente, se habilitó la interrupción por comparación para que, cada vez que el timer alcanzara un valor específico, la rutina ISR generara una señal cuadrada sincronizada en un pin diferente a las salidas estándar del temporizador. En este caso, los pulsos se asignaron al pin 3 del puerto C, el cual controla el reloj del segundo motor paso a paso.
+
+Gracias a esta configuración, se logró controlar el plotter manipulando los pines de habilitación y dirección de cada motor, lo que permitió dibujar figuras. Para el trazado de curvas se ajustó la frecuencia del reloj de los motores dentro de bucles while, logrando así curvas más precisas.
+
+
+\subsection{Problema B}
+Para resolver este problema se siguió la siguiente metodología, primero se plantea la situación problema. La misma trata de la creación de una cerradura electrónica que integre un teclado matricial de 4x4 para ingresar la contraseña, una LCD de 16x2 que se encargará de enseñar un mensaje de bienvenida, así como el menú de opciones, una para cambiar la contraseña y otra para ingresar la contraseña. Además, el sistema contará con dos Leds, uno rojo que indicará cuando la contraseña sea incorrecta, y uno verde que avisará cuando la contraseña ingresada sea correcta. Por último, integrará un buzzer que se activará luego de ingresar 3 veces de forma incorrecta la contraseña, además de mostrar en la LCD ciertos mensajes indicativos.
+
+Las contraseñas serán almacenadas en la memoria EEPROM del dispositivo, con esto se puede hacer que el dispositivo conserve la contraseña guardada aun así después de apagado o cortada la corriente.
+
+\subsubsection{Requerimientos}
+\begin{itemize}
+    \item Microcontrolador: ATmega328P 
+    \item Teclado Matricial: 4x4 (16 teclas)
+    \item Pantalla LCD: 16x2 o similar 
+    \item LED Verde: Indica éxito (contraseña correcta) 
+    \item LED Rojo: Indica error (contraseña incorrecta)
+    \item Alarma: Buzzer o LED de advertencia 
+    \item EEPROM: Almacena la contraseña de manera persistente 
+
+\end{itemize}
+
+A continuación se detalla las funcionalidades específicas del sistema a implementar: el programa contará con una función encargada de almacenar la contraseña en la memoria EEPROM, otra que deberá verificar que la contraseña incorrecta se ingrese 3 veces y hará sonar el buzzer, además de una función que verifique que la contraseña ingresada sea correcta. Luego, están los indicadores de estado, o los leds rojo y verde, que indican si la respuesta es incorrecta o correcta respectivamente. Contará con un menú interactivo donde el usuario podrá elegir si desea cambiar la contraseña, y por último la pantalla LCD, donde se enseñaran mensajes.
+
+\subsubsection{Codigo y simulaciones}
+Para la realización del código, se siguió una metodología de crear funciones e ir validando y verificando función por función, ya fuera por código o por simulación. Primero se inició la memoria EEPROM y las configuraciones de PWM necesarias para el buzzer. Luego, se utilizó la librería sugerida en clase para el funcionamiento de la LCD, pero al sobrecargar demasiado a Proteus fue necesaria la implementación de comunicación UART para visualizar los mensajes en el simulador. A raíz de este problema, se terminó implementando 2 códigos distintos, uno que funcionara completamente por comunicación UART, con todas las funciones necesarias de verificación de contraseñas, memoria EEPROM y funciones especificadas en la letra del problema; Y otro donde se logró el funcionamiento físico del LCD, logrando mostrar mensajes de confirmación.
+
+En cuanto a la configuración elegida para el circuito se utilizaron los puertos B y C para la lectura del teclado, también desde el puerto C se realiza la comunicación mediante los pines A4 y A5 con la pantalla LCD, ya que estos son SDA y SCL, respectivamente. Desde el puerto D se controlan los LEDS (PD4 y PD5), el PWM para el buzzer de alarma(PD6) y la comunicación UART (PD0 y PD1).
+
+
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.5\textwidth]{Imagenes/Imagen de la cerradura.PNG}}
+\caption{Simulacion en Proteus.}
+\label{fig1}
+\end{figure}
+
+
+\subsubsection{Montaje fisico}
+Para realizar el montaje en físico fue necesario contar con un LCD, un microcontrolador ATmega328P (Placa Arduino UNO), un LED rojo, un LED verde, un buzzer y un teclado matricial de 4x4.
+
+Se conecto todo como en la "Figura ~\ref{fig1}" donde se ve el circuito diseñado en el simulador Proteus, resultando como se ve en la "Figura \ref{fig2}". Primero, se probó el funcionamiento del sistema mediante el uso de comunicación UART y funciono correctamente, se adjunta el video de prueba en la carpeta correspondiente de GITHUB, y luego, se procede a realizar las pruebas con la pantalla LCD, se adjunta video del funcionamiento en la carpeta de GITHUB correspondiente.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.5\textwidth]{Imagenes/Circuito fidico.jpeg}}
+\caption{Circuito fisico.}
+\label{fig2}
+\end{figure}
+Por último, la disposición del teclado utilizada fue la observada en la "Figura ~\ref{fig3}".
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.3\textwidth]{Imagenes/Disposicion teclado.jpeg}}
+\caption{Disposición del teclado.}
+\label{fig2}
+\end{figure}
+\subsection{Problema C}
+
+En este problema fue necesario el uso del microcontrolador ATmega328P, resistencias, pulsadores, buzzer y protoboard. Para hacer un piano el cual sea capaz de reproducir cada nota a través del buzzer y tocar canciones. Tuvimos que calcular la frecuencia de cada nota para llevarlas a la frecuencia del PWM para esto usamos la ecuación que se nos proporcionó en la materia tecnología de micro de procesamientos, la cual es TOP = (16 Mhz / (PreScaler * frecuencia de la nota)) - 1  .
+Teniendo en cuenta cada frecuencia de la notas en hz, Do (C): 262 Hz, Re (D): 294 Hz ,Mi (E): 330 Hz, Fa (F): 349 Hz ,Sol (G): 392 Hz ,La (A): 440 Hz ,Si (B): 494 Hz ,Do (C): 523 Hz.
+Calculamos obteniendo para PWM: Do (C): 953 Hz, Re (D): 849 Hz ,Mi (E): 757 Hz, Fa (F): 715 Hz ,Sol (G): 637 Hz ,La (A): 567 Hz ,Si (B): 505 Hz ,Do (C): 477Hz.
+Configuramos el PWM y para OCR1A le daremos los valores de frecuencia de pwm dependiendo de la nota. Una vez hecho esto configuramos los botones dependiendo de la nota , para cada botón una nota, asociando la nota con su respectivo botón.
+Configuramos el puerto D como entrada y para el puerto B el PB1 como salida , mientras que el PBO y PB2 como entrada. 
+Programando la lógica , la cual consta que al tocar el botón suene cierta nota , a través de un ciclo while(1) , if y else if.
+Para la parte de reproducción de música , configuramos el UART y a través de lo que el usuario elija reproducirá una melodía o la otra, que se encontraran predeterminadas en el código.
+
+
+
+
+\section{Resultados}
+\subsection{Problema A}
+
+Al realizar los pasos expuestos en el apartado \ref{Problema A}, se logro realizar que el plotter trace la figura de una cruz y un triangulo, ambos trazos pueden verse en la "Figura ~\ref{fig9}" y la "Figura ~\ref{fig10}".
+
+Como puede verse en la figura referente al triángulo, fue posible trazar curvas, sin embargo, no se logró que estas fueran lo suficientemente homogéneas de tal forma que la figura que se dibuje sea una circunferencia, este se debió a la diferencia en la frecuencia de los motores utilizados, lo que impidió lograr la homogeneidad deseada en las curvas.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.3\textwidth]{Imagenes/Problema A - Cruz.jpg}}
+\caption{Cruz trazada por el plotter.}
+\label{fig9}
+\end{figure}
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.3\textwidth]{Imagenes/Problema A - Triagulo.jpg}}
+\caption{Triangulo trazado por el plotter.}
+\label{fig10}
+\end{figure}
+
+\subsection{Problema B}
+En este problema se encontraron ciertas dificultades en el montaje físico, ya que al inicializar la pantalla LCD, comenzaba a enlentecer y dificultar la lectura del teclado matricial. Esto se pudo solucionar por código, afortunadamente. Se realizaron varias pruebas y quedó documentado el funcionamiento en vídeo, adjunto al informe. 
+
+El montaje físico y código realizados resultaron funcionales y útiles, logrando el fin para el cual fueron implementados, simular el funcionamiento de una cerradura electrónica donde el usuario pueda ingresar una contraseña o cambiarla a voluntad de la EEPROM y esta queda guardada. El funcionamiento del sistema complemento quedó registrado en fotos y videos adjuntados en GITHUB.
+
+\subsection{Problema C}
+
+Al realizar el funcionamiento del montaje físico, nos encontramos con cierta dificultad al momento de reproducir las notas a través del buzzer ,ya que este se mantenía encendido por más que se le diera la orden de 0 PWM o Sonaban todas las notas igual.Surgiendo así un problema con el buzzer o el PWM que no se pudo identificar por falta de tiempo.
+Pero cabe destacar que se llegó a una implementación física y a un código estructurado y funcional.
+\section{Conclusiones}
+
+Se puede concluir que se realizaron códigos funcionales, simulaciones acertadas y montajes físicos funcionales. En cuanto a los objetivos planteados al inicio de la práctica, se cumplieron el de implementar el lenguaje C de bajo nivel con el fin de crear sistemas funcionales. En cuanto a los específicos, se cumplió realizar una cerradura electrónica al igual que la implementación de la librería encargada del  funcionamiento del módulo I2C. En cuanto a los otros problemas, no se logro una realización del montaje físico funcional o del completo funcionamiento, ya sea por falta de tiempo de algunos integrantes del equipo.
+
+\newpage
+
+\begin{thebibliography}{00}
+\bibitem{b1} Repositorio de GitHub. \url{https://github.com/BelenBoado/Tecnolog-as-de-Microprocesamientos/tree/inicializacion/Laboratorio%202}
+\bibitem{b2} Informacion sobre microcontrolador ATmega328P. \url{https://www.incb.com.mx/index.php/articulos/78-microcontroladores-y-dsps/2546-conociendo-el-microcontrolador-nucleo-core-atmega328p-de-arduino-uno-mic019s}
+\bibitem{b3} Informacion sobre microcontrolador ATmega328P. \url{https://es.wikipedia.org/wiki/Atmega328}
+\bibitem{b4} Informacion sobre el lenguaje de programacion C. \url{https://openwebinars.net/blog/que-es-c/}
+\bibitem{b5} Informacion sobre la LCD. \url{https://www.orientdisplay.com/es/knowledge-base/lcd-basics/what-is-lcd-liquid-crystal-display/?fbclid=IwAR3MT8DqiG6ehTGLwZKNp11pLBifaIaHeEnNVtgEODLrEAZrYPgS8NeRTgA}
+\bibitem{b6} Informacion sobre Plotter. \url{https://digipressystem.com/que-es-un-plotter-utilidades-tipos-diferencias/#:~:text=Un%20plotter%20de%20impresi%C3%B3n%2C%20tambi%C3%A9n,y%20rotulaci%C3%B3n%20de%20todo%20tipo.}
+\bibitem{b7} Informacion sobre la LCD. \url{https://www.orientdisplay.com/es/knowledge-base/lcd-basics/what-is-lcd-liquid-crystal-display/?fbclid=IwAR3MT8DqiG6ehTGLwZKNp11pLBifaIaHeEnNVtgEODLrEAZrYPgS8NeRTgA}
+\bibitem{b8} Informacion sobre el modulo I2C. \url{https://uelectronics.com/producto/i2c-interfaz-lcd-1602-pcf8574/?srsltid=AfmBOoqSdldWfU3TBQGMxFNl_3J45d05n6hBMdoIBYIJVrzx0nl842gA}
+\bibitem{b9} Informacion sobre motores paso a paso.\url{https://www.igus.es/e-motors/motores-paso-a-paso}
+\bibitem{b10} Berti,S. Roitman, J. Verrastro,C. "Controlador de motores paso a paso mediante tecnica de micropasos por modulacion de ancho de pulso". (2021). \url{https://www.frba.utn.edu.ar/wp-content/uploads/2021/02/SDC16.pdf}
+\bibitem{b11} Carpeta de Videos en Google Drive. \url{https://drive.google.com/drive/folders/10ZdGqlqFxs3GYFl6ayGwOZS7oCwBvKJ-?usp=sharing}
+\end{thebibliography}
+\newpage
+\section{Anexos}
+
+\end{document}
