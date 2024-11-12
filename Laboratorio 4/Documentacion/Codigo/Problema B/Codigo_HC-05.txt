@@ -1,0 +1,110 @@
+/*
+ * main.c
+ *
+ * Created: 11/10/2024 8:54:52 PM
+ *  Author: UTEC-5695
+ */ 
+#define F_CPU 16000000UL
+
+#include <xc.h>
+#include <avr/io.h>
+#include <util/delay.h>
+
+#define BAUD 9600
+#define MY_UBRR F_CPU/10/BAUD-1
+
+#define TX_PIN PB2
+#define RX_PIN PB3
+#define LED_PIN PC5
+
+void initSerial(){
+	//Configura como salida PB0 (TX)
+	DDRB |= (1<<TX_PIN);
+	//Configura PB! como entrada (RX)
+	DDRB &= ~(1<<RX_PIN);
+}
+
+void USART_Init(){
+	UBRR0H = (MY_UBRR >> 8);
+	UBRR0L = MY_UBRR;
+	UCSR0B = (1<<RXEN0) | (1<<TXEN0);
+	UCSR0C = (1<<UCSZ01) | (1<<UCSZ00);
+}
+
+void USART_Transmit(unsigned char data){
+	while(!(UCSR0A & (1<<UDRE0)));
+	UDR0 = data;
+}
+
+unsigned char USART_Receive(){
+	while(!(UCSR0A & (1<<RXC0)));
+	return UDR0;
+}
+
+void sendByteGPIO(uint8_t data){
+	//Enviar un byte a traves de PB0(TX)
+	PORTB &= ~(1<<TX_PIN); //Start bit
+	_delay_us(105); //Esperar
+	
+	for(int i=0; i<8; i++){
+		if(data & (1<<i)){
+			PORTB |= (1<<TX_PIN);//Enviar bit alto
+		}else{
+			PORTB &= ~(1<<TX_PIN);//Enviar bit bajo
+		}
+		_delay_us(105); //Esperar por el siguiente bit
+	}
+	PORTB |= (1<<TX_PIN);//Stop bit
+	_delay_us(105); //Esperar antes de enviar el siguiente byte
+}
+
+uint8_t receiveByteGPIO(){
+	uint8_t data = 0;
+	
+	//ESpera a que el pin RX(PB1) sea bajo (start bit)
+	while(PINB & (1<<RX_PIN));
+	
+	_delay_us(105); //Esperar a que el primer bit se estabilice
+	
+	for(int i = 0; i<8; i++){
+		if (PINB & (1<<RX_PIN)){
+			data |= (1<<i); //Leer bit
+			
+		}
+		_delay_us(105);//Esperar por el siguiente bit
+	}
+	
+	//Esperar a que el pin RX sea alto(stop bit)
+	while(!(PINB & (1<<RX_PIN)));
+
+	return data;
+}
+
+int main(void)
+{
+	DDRC |= (1<<LED_PIN);
+	initSerial();
+	USART_Init();
+    while(1)
+    {
+		if(!(PINB &(1<<RX_PIN))){
+			uint8_t receivedGPIO = receiveByteGPIO();
+			USART_Transmit(receivedGPIO); //Enviando el bit
+			if (receivedGPIO == 'A'){
+				PORTC |= (1<<LED_PIN);
+				_delay_ms(5000);
+				PORTC &= ~(1<<LED_PIN);
+				USART_Transmit("LED ENCENDIDO!");
+			}else{
+				PORTC &= ~(1<<LED_PIN);
+			}
+				
+		}
+		
+		if(UCSR0A & (1<<RXC0)){
+			uint8_t receivedUSART = USART_Receive();
+			sendByteGPIO(receivedUSART); //Enviar el bit
+		}
+    }
+	return 0;
+}
