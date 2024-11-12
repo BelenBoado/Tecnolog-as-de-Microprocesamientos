@@ -1,0 +1,119 @@
+/*
+ * main.c
+ *
+ * Created: 11/12/2024 4:00:51 PM
+ *  Author: UTEC-5695
+ */ 
+#define F_CPU 16000000UL
+
+#include <xc.h>
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <util/delay.h>
+
+#define BAUD 9600
+#define MYUBRR F_CPU/16/BAUD-1
+#define MOTOR_HORARIO PB0
+#define MOTOR_ANTIHORARIO PB1
+
+void UART_init(unsigned int ubrr) {
+	UBRR0H = (unsigned char)(ubrr >> 8);
+	UBRR0L = (unsigned char)ubrr;
+	UCSR0B = (1 << RXEN0) | (1 << TXEN0);
+	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
+}
+
+void UART_sendChar(char data) {
+	while (!(UCSR0A & (1 << UDRE0)));
+	UDR0 = data;
+}
+
+void UART_sendString(const char *str) {
+	while (*str) {
+		UART_sendChar(*str++);
+	}
+}
+
+
+void timer1_init() {
+	// Configura el Timer1 en modo CTC
+	TCCR1B |= (1 << WGM12);
+
+	// Establece OCR1A para generar una interrupción cada 5 segundos (con prescaler de 1024)
+	OCR1A = 78124;
+
+	// Habilita la interrupción de comparación para OCR1A
+	TIMSK1 |= (1 << OCIE1A);
+}
+
+
+void int1_int0_init(){
+    // Configura PD2 y PD3 como entradas
+    DDRD &= ~(1 << PD2);  // INT0
+    DDRD &= ~(1 << PD3);  // INT1
+
+    // Habilita resistencias pull-up en PD2 y PD3
+    PORTD |= (1 << PD2) | (1 << PD3);
+
+    // Configura INT0 y INT1 para flanco de bajada
+    EICRA |= (1 << ISC01);    // INT0: Flanco de bajada
+    EICRA &= ~(1 << ISC00);
+    EICRA |= (1 << ISC11);    // INT1: Flanco de bajada
+    EICRA &= ~(1 << ISC10);
+
+    // Habilita interrupciones INT0 e INT1
+    EIMSK |= (1 << INT0) | (1 << INT1);
+
+    // Habilita interrupciones globales
+    sei();
+}
+
+ISR(INT0_vect){
+	PORTB |= (1<<MOTOR_HORARIO);	
+	PORTB &= ~(1<<MOTOR_ANTIHORARIO);
+    TCCR1B |= (1 << CS12) | (1 << CS10);
+}
+
+ISR(INT1_vect){
+	PORTB |= (1<<MOTOR_ANTIHORARIO);
+	PORTB &= ~(1<<MOTOR_HORARIO);
+	TCCR1B |= (1 << CS12) | (1 << CS10);
+}
+
+ISR(TIMER1_COMPA_vect) {
+	// Poner PB1 en bajo después de 5 segundos
+    PORTB &= ~(1 << MOTOR_HORARIO);
+    PORTB &= ~(1 << MOTOR_ANTIHORARIO);
+
+    // Detener el temporizador al desactivar el prescaler
+    TCCR1B &= ~((1 << CS12) | (1 << CS10));
+}
+
+int main(void)
+{
+	UART_init(MYUBRR);
+	UART_sendString("Motores apagados!");
+	UART_sendChar('\r');
+	UART_sendChar('\n');
+	DDRB |= (1 << MOTOR_HORARIO) | (1 << MOTOR_ANTIHORARIO);
+// Inicializa las interrupciones externas y el temporizador
+	int1_int0_init();
+	timer1_init();
+	
+    while(1)
+    {
+        if (PORTB & (1 << MOTOR_HORARIO)) {
+	        UART_sendString("Giro en sentido horario activado!");
+			UART_sendChar('\r');
+			UART_sendChar('\n');
+	        } else if(PORTB & (1 << MOTOR_ANTIHORARIO)){
+	        UART_sendString("Giro en sentido antihorario activado!");
+	        UART_sendChar('\r');
+			UART_sendChar('\n');
+        }else{
+			UART_sendString("Motor apagado!");
+			UART_sendChar('\r');
+			UART_sendChar('\n');
+		}
+    }
+}
