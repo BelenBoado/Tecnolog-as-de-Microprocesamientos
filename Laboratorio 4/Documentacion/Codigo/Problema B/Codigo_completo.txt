@@ -21,6 +21,9 @@
 #define LED_PIN PC5
 #define MOTOR_HORARIO PB0
 #define MOTOR_ANTIHORARIO PB1
+#define APAGADO_EMERGENCIA PC3
+
+volatile uint8_t motor_direction = 0;  // 0: Motor apagado, 1: Horario, 2: Antihorario
 
 void initSerial() {
     DDRB |= (1<<TX_PIN);   // Configura TX como salida
@@ -101,24 +104,34 @@ void int1_int0_init() {
 }
 
 ISR(INT0_vect) {
-    PORTB |= (1<<MOTOR_HORARIO);
-    PORTB &= ~(1<<MOTOR_ANTIHORARIO);
-    TCCR1B |= (1 << CS12) | (1 << CS10);
+	if (motor_direction == 0) {  // Solo activar si el motor está apagado
+		PORTB |= (1 << MOTOR_HORARIO);
+		PORTB &= ~(1 << MOTOR_ANTIHORARIO);
+		motor_direction = 1;  // Indica giro horario
+		TCCR1B |= (1 << CS12) | (1 << CS10);
+	}
 }
 
 ISR(INT1_vect) {
-    PORTB |= (1<<MOTOR_ANTIHORARIO);
-    PORTB &= ~(1<<MOTOR_HORARIO);
-    TCCR1B |= (1 << CS12) | (1 << CS10);
+	if (motor_direction == 0) {  // Solo activar si el motor está apagado
+		PORTB |= (1 << MOTOR_ANTIHORARIO);
+		PORTB &= ~(1 << MOTOR_HORARIO);
+		motor_direction = 2;  // Indica giro antihorario
+		TCCR1B |= (1 << CS12) | (1 << CS10);
+	}
 }
 
 ISR(TIMER1_COMPA_vect) {
-    PORTB &= ~((1 << MOTOR_HORARIO) | (1 << MOTOR_ANTIHORARIO));
+    PORTB &= ~(1 << MOTOR_HORARIO);
+    PORTB &= ~(1 << MOTOR_ANTIHORARIO);
+	motor_direction = 0;  // Indica que el motor está apagado
+    // Detener el temporizador al desactivar el prescaler
     TCCR1B &= ~((1 << CS12) | (1 << CS10));
 }
 
 int main(void) {
-    DDRC |= (1<<LED_PIN);
+	DDRC &= ~(1 << APAGADO_EMERGENCIA);  // Configurar APAGADO_EMERGENCIA como entrada
+	PORTC |= (1 << APAGADO_EMERGENCIA);
     DDRB |= (1 << MOTOR_HORARIO) | (1 << MOTOR_ANTIHORARIO);
     initSerial();
     USART_Init();
@@ -131,15 +144,29 @@ int main(void) {
         if (!(PINB & (1<<RX_PIN))) {
             uint8_t receivedGPIO = receiveByteGPIO();
             USART_Transmit(receivedGPIO);
-
-            if (receivedGPIO == 'A') {
-                PORTC |= (1<<LED_PIN);
-                _delay_ms(5000);
-                PORTC &= ~(1<<LED_PIN);
-                UART_sendString("LED ENCENDIDO!\r\n");
-            } else {
-                PORTC &= ~(1<<LED_PIN);
-            }
+			
+            if(!(PINC & (1 << APAGADO_EMERGENCIA))){
+				PORTB &=~(1<<MOTOR_ANTIHORARIO);
+				PORTB &= ~(1<<MOTOR_HORARIO);
+				motor_direction = 0;				
+				
+				}else if  (receivedGPIO == 'C'){
+				PORTB &=~(1<<MOTOR_ANTIHORARIO);
+				PORTB &= ~(1<<MOTOR_HORARIO);
+				motor_direction = 0;
+				} else if ((receivedGPIO == 'A') | (PORTB & (1 << MOTOR_HORARIO))) {
+                PORTB |= (1<<MOTOR_HORARIO);
+             /*   _delay_ms(5000);*/
+                PORTB &= ~(1<<MOTOR_ANTIHORARIO);
+                UART_sendString("Motor en sentido horario encendido!\r\n");
+            } else if((receivedGPIO == 'B') | (PORTB & (1 << MOTOR_ANTIHORARIO))){
+                PORTB &= ~(1<<MOTOR_HORARIO);
+				PORTB |= (1<<MOTOR_ANTIHORARIO);
+				
+            }else{
+				PORTB &= ~(1<<MOTOR_ANTIHORARIO);
+				PORTB &= ~(1<<MOTOR_HORARIO);
+			}
         }
 
         if (UCSR0A & (1<<RXC0)) {
@@ -147,12 +174,6 @@ int main(void) {
             sendByteGPIO(receivedUSART);
         }
 
-        if (PORTB & (1 << MOTOR_HORARIO)) {
-            UART_sendString("Giro en sentido horario activado!\r\n");
-        } else if (PORTB & (1 << MOTOR_ANTIHORARIO)) {
-            UART_sendString("Giro en sentido antihorario activado!\r\n");
-        } else {
-            UART_sendString("Motor apagado!\r\n");
-        }
+
     }
 }
