@@ -89,7 +89,7 @@ uint8_t receiveByteGPIO() {
 
 void timer1_init() {
     TCCR1B |= (1 << WGM12);
-    OCR1A = 78124;
+    OCR1A = 390620;
     TIMSK1 |= (1 << OCIE1A);
 }
 
@@ -146,27 +146,26 @@ int main(void) {
             USART_Transmit(receivedGPIO);
 			
             if(!(PINC & (1 << APAGADO_EMERGENCIA))){
-				PORTB &=~(1<<MOTOR_ANTIHORARIO);
-				PORTB &= ~(1<<MOTOR_HORARIO);
-				motor_direction = 0;				
+		PORTB &=~(1<<MOTOR_ANTIHORARIO);
+		PORTB &= ~(1<<MOTOR_HORARIO);
+		motor_direction = 0;				
 				
-				}else if  (receivedGPIO == 'C'){
-				PORTB &=~(1<<MOTOR_ANTIHORARIO);
-				PORTB &= ~(1<<MOTOR_HORARIO);
-				motor_direction = 0;
-				} else if ((receivedGPIO == 'A') | (PORTB & (1 << MOTOR_HORARIO))) {
+	    }else if  (receivedGPIO == 'C'){
+			PORTB &=~(1<<MOTOR_ANTIHORARIO);
+			PORTB &= ~(1<<MOTOR_HORARIO);
+			motor_direction = 0;
+	    } else if ((receivedGPIO == 'A') | (PORTB & (1 << MOTOR_HORARIO))) {
                 PORTB |= (1<<MOTOR_HORARIO);
-             /*   _delay_ms(5000);*/
                 PORTB &= ~(1<<MOTOR_ANTIHORARIO);
                 UART_sendString("Motor en sentido horario encendido!\r\n");
             } else if((receivedGPIO == 'B') | (PORTB & (1 << MOTOR_ANTIHORARIO))){
                 PORTB &= ~(1<<MOTOR_HORARIO);
-				PORTB |= (1<<MOTOR_ANTIHORARIO);
+		PORTB |= (1<<MOTOR_ANTIHORARIO);
 				
             }else{
-				PORTB &= ~(1<<MOTOR_ANTIHORARIO);
-				PORTB &= ~(1<<MOTOR_HORARIO);
-			}
+		PORTB &= ~(1<<MOTOR_ANTIHORARIO);
+		PORTB &= ~(1<<MOTOR_HORARIO);
+		}
         }
 
         if (UCSR0A & (1<<RXC0)) {
