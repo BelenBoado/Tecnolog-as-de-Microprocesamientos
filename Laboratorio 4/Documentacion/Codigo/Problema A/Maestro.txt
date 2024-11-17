@@ -1,0 +1,39 @@
+#include <avr/io.h>
+#include <util/delay.h>
+
+void SPI_IniciarMaestro(void) {
+    DDRB = (1 << DDB3) | (1 << DDB5) | (1 << DDB2);  
+    PORTB |= (1 << PORTB2);  
+
+    SPCR = (1 << SPE) | (1 << MSTR) | (1 << SPR0);
+}
+
+void SPI_EnviarAEsclavo(int dato) {
+    SPDR = dato;
+    
+    while (!(SPSR & (1 << SPIF)));
+}
+
+int main(void) {
+    SPI_IniciarMaestro();  
+
+        
+    UBRR0H = 0;
+    UBRR0L = 103;  
+    UCSR0B = (1 << TXEN0);  
+    UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);  
+    
+    while (1) {
+        PORTB &= ~(1 << PORTB2);  
+        
+        SPI_EnviarAEsclavo(99);  
+        
+        while (!(UCSR0A & (1 << UDRE0)));
+        UDR0 = 42;
+
+        
+        PORTB |= (1 << PORTB2);  
+        
+        _delay_ms(1000);  
+    }
+}
