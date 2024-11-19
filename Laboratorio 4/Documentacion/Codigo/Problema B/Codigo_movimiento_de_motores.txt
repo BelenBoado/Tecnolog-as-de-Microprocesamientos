@@ -1,119 +1,102 @@
-/*
- * main.c
- *
- * Created: 11/12/2024 4:00:51 PM
- *  Author: UTEC-5695
- */ 
-#define F_CPU 16000000UL
-
-#include <xc.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
 
-#define BAUD 9600
-#define MYUBRR F_CPU/16/BAUD-1
-#define MOTOR_HORARIO PB0
-#define MOTOR_ANTIHORARIO PB1
+// Variables globales
+volatile uint8_t led_status = 0; // Rastreo del estado de los LEDs
+volatile uint8_t emergency_active = 0; // Estado del apagado de emergencia
 
-void UART_init(unsigned int ubrr) {
-	UBRR0H = (unsigned char)(ubrr >> 8);
-	UBRR0L = (unsigned char)ubrr;
-	UCSR0B = (1 << RXEN0) | (1 << TXEN0);
-	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
-}
+ISR(PCINT0_vect) {
+	// Verificar si se presionó el botón de apagado de emergencia en PB4
+	if (!(PINB & (1 << PB4))) {
+		// Apagar todos los LEDs y el motor
+		PORTD &= ~((1 << PD2) | (1 << PD3));
+		PORTD |= (1<<PD4);
+		led_status = 0;
 
-void UART_sendChar(char data) {
-	while (!(UCSR0A & (1 << UDRE0)));
-	UDR0 = data;
-}
+		// Encender el LED en PD4 durante el apagado de emergencia
+		PORTD |= (1 << PD4);
 
-void UART_sendString(const char *str) {
-	while (*str) {
-		UART_sendChar(*str++);
+		// Marcar apagado de emergencia como activo
+		emergency_active = 1;
+
+		// Configurar Timer1 para apagar el LED en PD4 después de 5 segundos
+		TCNT1 = 0;                         // Reiniciar contador
+		OCR1A = 7812;                      // Comparar cada 5 segundos (16 MHz, prescaler 1024)
+		TCCR1B |= (1 << WGM12) | (1 << CS12) | (1 << CS10); // CTC, prescaler 1024
+		TIMSK1 |= (1 << OCIE1A);           // Habilitar interrupción por comparación
+		return; // Salir de la ISR
+	}
+
+	// Si el apagado de emergencia está activo, ignorar otros botones
+	if (emergency_active) return;
+
+	// Verificar qué botón fue presionado
+	if (!(PINB & (1 << PB2)) && !(led_status & (1 << PB3))) {  // Botón en PB2 y PB3 no está activo
+		PORTD |= (1 << PD2);     // Encender LED en PD2
+		led_status |= (1 << PB2); // Marcar LED PD2 activo
+	}
+	if (!(PINB & (1 << PB3)) && !(led_status & (1 << PB2))) {  // Botón en PB3 y PB2 no está activo
+		PORTD |= (1 << PD3);     // Encender LED en PD3
+		led_status |= (1 << PB3); // Marcar LED PD3 activo
+	}
+
+	// Si PB2 o PB3 se activaron, iniciar Timer1
+	if (led_status & ((1 << PB2) | (1 << PB3))) {
+		// Configurar Timer1 para 5 segundos
+		TCNT1 = 0;                         // Reiniciar contador
+		OCR1A = 390620;                      // Comparar cada 5 segundos (16 MHz, prescaler 1024)
+		TCCR1B |= (1 << WGM12) | (1 << CS12) | (1 << CS10); // CTC, prescaler 1024
+		TIMSK1 |= (1 << OCIE1A);           // Habilitar interrupción por comparación
 	}
 }
 
-
-void timer1_init() {
-	// Configura el Timer1 en modo CTC
-	TCCR1B |= (1 << WGM12);
-
-	// Establece OCR1A para generar una interrupción cada 5 segundos (con prescaler de 1024)
-	OCR1A = 78124;
-
-	// Habilita la interrupción de comparación para OCR1A
-	TIMSK1 |= (1 << OCIE1A);
-}
-
-
-void int1_int0_init(){
-    // Configura PD2 y PD3 como entradas
-    DDRD &= ~(1 << PD2);  // INT0
-    DDRD &= ~(1 << PD3);  // INT1
-
-    // Habilita resistencias pull-up en PD2 y PD3
-    PORTD |= (1 << PD2) | (1 << PD3);
-
-    // Configura INT0 y INT1 para flanco de bajada
-    EICRA |= (1 << ISC01);    // INT0: Flanco de bajada
-    EICRA &= ~(1 << ISC00);
-    EICRA |= (1 << ISC11);    // INT1: Flanco de bajada
-    EICRA &= ~(1 << ISC10);
-
-    // Habilita interrupciones INT0 e INT1
-    EIMSK |= (1 << INT0) | (1 << INT1);
-
-    // Habilita interrupciones globales
-    sei();
-}
-
-ISR(INT0_vect){
-	PORTB |= (1<<MOTOR_HORARIO);	
-	PORTB &= ~(1<<MOTOR_ANTIHORARIO);
-    TCCR1B |= (1 << CS12) | (1 << CS10);
-}
-
-ISR(INT1_vect){
-	PORTB |= (1<<MOTOR_ANTIHORARIO);
-	PORTB &= ~(1<<MOTOR_HORARIO);
-	TCCR1B |= (1 << CS12) | (1 << CS10);
-}
-
 ISR(TIMER1_COMPA_vect) {
-	// Poner PB1 en bajo después de 5 segundos
-    PORTB &= ~(1 << MOTOR_HORARIO);
-    PORTB &= ~(1 << MOTOR_ANTIHORARIO);
+	// Si el apagado de emergencia está activo, apagar el LED en PD4
+	if (emergency_active) {
+		PORTD &= ~(1 << PD4);  // Apagar LED en PD4
+		emergency_active = 0;  // Resetear el estado de emergencia
+		TCCR1B = 0;             // Detener Timer1
+		TIMSK1 &= ~(1 << OCIE1A); // Deshabilitar interrupción
+		return;
+	}
 
-    // Detener el temporizador al desactivar el prescaler
-    TCCR1B &= ~((1 << CS12) | (1 << CS10));
+	// Apagar LEDs PB2 y PB3 después de 5 segundos
+	if (led_status & (1 << PB2)) {
+		PORTD &= ~(1 << PD2);  // Apagar LED en PD2
+		led_status &= ~(1 << PB2);
+	}
+	if (led_status & (1 << PB3)) {
+		PORTD &= ~(1 << PD3);  // Apagar LED en PD3
+		led_status &= ~(1 << PB3);
+	}
+
+	// Si no hay LEDs activos, detener el timer
+	if (!(led_status & ((1 << PB2) | (1 << PB3)))) {
+		TCCR1B = 0;             // Detener Timer1
+		TIMSK1 &= ~(1 << OCIE1A); // Deshabilitar interrupción
+	}
 }
 
-int main(void)
-{
-	UART_init(MYUBRR);
-	UART_sendString("Motores apagados!");
-	UART_sendChar('\r');
-	UART_sendChar('\n');
-	DDRB |= (1 << MOTOR_HORARIO) | (1 << MOTOR_ANTIHORARIO);
-// Inicializa las interrupciones externas y el temporizador
-	int1_int0_init();
-	timer1_init();
-	
-    while(1)
-    {
-        if (PORTB & (1 << MOTOR_HORARIO)) {
-	        UART_sendString("Giro en sentido horario activado!");
-			UART_sendChar('\r');
-			UART_sendChar('\n');
-	        } else if(PORTB & (1 << MOTOR_ANTIHORARIO)){
-	        UART_sendString("Giro en sentido antihorario activado!");
-	        UART_sendChar('\r');
-			UART_sendChar('\n');
-        }else{
-			UART_sendString("Motor apagado!");
-			UART_sendChar('\r');
-			UART_sendChar('\n');
-		}
-    }
+int main() {
+	// Configurar PD2, PD3 y PD4 como salida para los LEDs
+	DDRD |= (1 << PD2) | (1 << PD3) | (1 << PD4);
+	PORTD &= ~((1 << PD2) | (1 << PD3) | (1 << PD4)); // Asegurar LEDs apagados
+
+	// Configurar PB2, PB3 y PB4 como entrada con pull-up
+	DDRB &= ~((1 << PB2) | (1 << PB3) | (1 << PB4));
+	PORTB |= (1 << PB2) | (1 << PB3) | (1 << PB4); // Activar pull-up interno
+
+	// Habilitar interrupciones de cambio de pin para PCINT0 (PB2, PB3, PB4)
+	PCICR |= (1 << PCIE0);           // Habilitar grupo PCINT0
+	PCMSK0 |= (1 << PCINT2) | (1 << PCINT3) | (1 << PCINT4); // Habilitar PCINT2, PCINT3, PCINT4
+
+	// Habilitar interrupciones globales
+	sei();
+
+	while (1) {
+		// Nada que hacer en el bucle principal, todo ocurre en las ISR
+	}
+
+	return 0;
 }
