@@ -1,0 +1,187 @@
+/*
+ * main.c
+ *
+ * Created: 11/17/2024 8:35:43 PM
+ *  Author: UTEC-5695
+ */ 
+
+#include <xc.h>
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <util/delay.h>
+
+
+volatile uint8_t temporizador_activo = 0;
+volatile uint8_t segundos = 0;
+volatile uint8_t secuencia = 0;   // 0 - Pistón1, 1 - Pistón2, 2 - Vacío, 3 - Reversa (Vacío, Pistón2, Pistón1)
+volatile uint8_t tiempo_total = 0; // Contador de tiempo total
+
+#define PISTON1_PIN   (1 << PIND2)    // PB0 para pistón1
+#define PISTON2_PIN   (1 << PIND3)    // PB1 para pistón2
+#define VACIO_PIN     (1 << PIND4)    // PB3 para vacío
+
+#define BUTTON1_PIN PCINT11
+#define BUTTON2_PIN PCINT12
+#define BUTTON3_PIN PCINT13
+
+// Flags para saber si los dispositivos están encendidos
+volatile uint8_t piston1_encendido = 0;
+volatile uint8_t piston2_encendido = 0;
+volatile uint8_t vacio_encendido = 0;
+
+// ISR para PCINT0 (botón para activar la secuencia)
+ISR(PCINT0_vect) {
+	if (!(PINB & (1 << PINB2))) {  // Si el botón está presionado (PB2 en LOW)
+		temporizador_activo = 1;    // Activar el temporizador
+		TCCR1B = (1 << WGM12) | (1 << CS12) | (1 << CS10);  // Iniciar Timer1
+		secuencia = 0;  // Comenzar con el pistón1
+		tiempo_total = 0;  // Reiniciar contador de tiempo total
+		activarSecuencia();  // Activar el primer paso
+	}
+		
+
+}
+
+ISR(PCINT1_vect) {
+	
+
+	
+	if (!(PINC & (1<<BUTTON1_PIN))) {   // Si el botón 1 (PB3) está presionado
+		// Activar pistón 1 (PD2)
+		PORTD |= PISTON1_PIN;      // Encender pistón 1
+		_delay_ms(5000);            // Mantenerlo encendido por un tiempo (ajustable)
+		PORTD &= ~PISTON1_PIN;     // Apagar pistón 1
+	}
+
+	if (!(PINC & (1<<BUTTON2_PIN))) {   // Si el botón 2 (PB4) está presionado
+		// Activar pistón 2 (PD3)
+		PORTD |= PISTON2_PIN;      // Encender pistón 2
+		_delay_ms(5000);            // Mantenerlo encendido por un tiempo (ajustable)
+		PORTD &= ~PISTON2_PIN;     // Apagar pistón 2
+	}
+
+	if (!(PINC & (1<<BUTTON3_PIN))) {   // Si el botón 3 (PB5) está presionado
+		// Activar vacío (PD4)
+		PORTD |= VACIO_PIN;        // Encender vacío
+		_delay_ms(5000);            // Mantenerlo encendido por un tiempo (ajustable)
+		PORTD &= ~VACIO_PIN;       // Apagar vacío
+	}
+}
+// ISR para Timer1 (CTC)
+ISR(TIMER1_COMPA_vect) {
+	if (temporizador_activo) {
+		segundos++;
+		if (segundos >= 2) {  // Después de 2 segundos por paso
+			segundos = 0;     // Reiniciar contador de segundos
+			tiempo_total += 2; // Sumar 2 segundos al tiempo total
+			cambiarSecuencia();  // Cambiar al siguiente paso de la secuencia
+			if (tiempo_total >= 30) {  // Después de 30 segundos
+				apagarSecuenciaReversa();  // Apagar la secuencia en reversa
+			}
+		}
+	}
+}
+
+// Función para activar la secuencia (encender los dispositivos)
+void activarSecuencia() {
+	switch (secuencia) {
+		case 0:  // Pistón1
+		PORTD |= PISTON1_PIN;    // Encender pistón1
+		piston1_encendido = 1;   // Marcar como encendido
+		break;
+		case 1:  // Pistón2
+		PORTD |= PISTON2_PIN;    // Encender pistón2
+		piston2_encendido = 1;   // Marcar como encendido
+		break;
+		case 2:  // Vacío
+		PORTD |= VACIO_PIN;    // Encender vacío
+		vacio_encendido = 1;   // Marcar como encendido
+		break;
+		case 3:  // Vacío (reversa)
+		PORTD &= ~(VACIO_PIN);    // Mantener vacío encendido
+		vacio_encendido = 0;   // Marcar como encendido
+		break;
+		case 4:  // Pistón2 (reversa)
+		PORTD &= ~(PISTON2_PIN);  // Mantener pistón2 encendido
+		piston2_encendido = 0; // Marcar como encendido
+		break;
+		case 5:  // Pistón1 (reversa)
+		PORTD &= ~(PISTON1_PIN);  // Mantener pistón1 encendido
+		piston1_encendido = 0; // Marcar como encendido
+		break;
+	}
+}
+
+// Función para cambiar la secuencia
+void cambiarSecuencia() {
+	if (secuencia < 6) {
+		secuencia++;  // Avanzar al siguiente paso de la secuencia
+		} else {
+		secuencia = 0;  // Volver al inicio de la secuencia
+	}
+	activarSecuencia();  // Activar el siguiente paso de la secuencia
+}
+
+// Función para apagar la secuencia en reversa (cuando se han cumplido 30 segundos)
+void apagarSecuenciaReversa() {
+	// Apagar los dispositivos en orden inverso
+	if (piston1_encendido) {
+		PORTD &= ~PISTON1_PIN;  // Apagar pistón1
+		piston1_encendido = 0;  // Marcar como apagado
+	}
+	if (piston2_encendido) {
+		PORTD &= ~PISTON2_PIN;  // Apagar pistón2
+		piston2_encendido = 0;  // Marcar como apagado
+	}
+	if (vacio_encendido) {
+		PORTD &= ~VACIO_PIN;    // Apagar vacío
+		vacio_encendido = 0;    // Marcar como apagado
+	}
+
+	// Resetear el temporizador y la secuencia
+	temporizador_activo = 0;
+	TCCR1B = 0;  // Detener Timer1
+	tiempo_total = 0;  // Resetear el contador de tiempo total
+	secuencia = 0;  // Volver al inicio de la secuencia
+}
+
+// Función para configurar interrupciones PCINT0 (botón)
+void configurarPCINT0() {
+	PCICR = (1 << PCIE0);               // Habilitar interrupciones PCINT0 (puerto B)
+	PCMSK0 = (1 << PCINT2);             // Habilitar interrupción en PCINT2 (PB2)
+}
+
+// Función para configurar Timer1
+void configurarTimer1() {
+	TCCR1A = 0;                         // Modo CTC
+	OCR1A = 15624;                      // Configurar OCR1A para 1 segundo (16 MHz / 1024)
+	TIMSK1 = (1 << OCIE1A);             // Habilitar interrupción por comparación
+}
+
+void configurar_PCINT1(void){
+		
+		DDRC &= ~((1<<BUTTON1_PIN) | (1<<BUTTON2_PIN) | (1<<BUTTON3_PIN));  // Configurar PB3, PB4, PB5 como entradas
+		
+		// Activar las resistencias pull-up internas (asumimos botones conectados a GND)
+		PORTC |= ((1<<BUTTON1_PIN) | (1<<BUTTON2_PIN) | (1<<BUTTON3_PIN));  // Habilitar pull-ups para PB3, PB4, PB5
+
+		// Habilitar interrupciones para el grupo de pines PCINT8-14 (PB3, PB4, PB5)
+		PCICR |= (1 << PCIE1);  // Habilitar interrupciones para PCINT1 (PB3, PB4, PB5)
+		PCMSK1 |= ((1<<BUTTON1_PIN) | (1<<BUTTON2_PIN) | (1<<BUTTON3_PIN));
+}
+int main() {
+
+	
+	// Configuración de puertos y temporizador
+	DDRD |= (PISTON1_PIN | PISTON2_PIN | VACIO_PIN); // Configurar los pines como salida
+	configurarPCINT0();  // Configurar interrupciones para el botón
+	configurar_PCINT1();
+	configurarTimer1();  // Configurar Timer1
+
+	// Habilitar interrupciones globales
+	sei();
+
+	while (1) {
+		// El programa principal no hace nada más
+	}
+}
