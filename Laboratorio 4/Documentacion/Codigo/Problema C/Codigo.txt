@@ -1,1 +1,99 @@
+#define F_CPU 16000000UL
+#include <avr/io.h>
+#include <util/delay.h>
+#define BAUD 9600
+#define MY_UBRR F_CPU/10/BAUD-1
+#define M1A PD3
+#define M1B PD5
+#define M2A PB2
+#define M2B PB3
 
+void USART_Init(){
+	UBRR0H = (MY_UBRR >> 8);
+	UBRR0L = MY_UBRR;
+	UCSR0B = (1<<RXEN0) | (1<<TXEN0);
+	UCSR0C = (1<<UCSZ01) | (1<<UCSZ00);
+}
+
+void USART_Transmit(unsigned char data){
+	while(!(UCSR0A & (1<<UDRE0)));
+	UDR0 = data;
+}
+
+unsigned char USART_Receive(){
+	while(!(UCSR0A & (1<<RXC0)));
+	return UDR0;
+}
+
+
+// ------------------ Separacion --------------------------
+
+void setpin() {
+	DDRD |= (1 << M1A);
+	DDRD |= (1 << M1B);
+	DDRB |= (1 << M2B);
+	DDRB |= (1 << M2A);
+}
+
+// Movimiento hacia adelante
+void adelante() {
+	PORTD |= (1 << M1A);  // PD0 en alto
+	PORTD &= ~(1 << M1B); // PD1 en bajo
+	PORTB |= (1 << M2A);  // PD2 en alto
+	PORTB &= ~(1 << M2B); // PD3 en bajo
+}
+
+// Movimiento hacia atrás
+void atras() {
+	PORTD &= ~(1 << M1A);
+	PORTD |= (1 << M1B);  // PD1 en alto
+	PORTB &= ~(1 << M2A); // PD2 en bajo
+	PORTB |= (1 << M2B);  // PD3 en alto
+}
+
+// Movimiento a la izquierda
+void izquierda() {
+	PORTD |= (1 << M1A);  // PD0 en alto
+	PORTD &= ~(1 << M1B); // PD1 en bajo
+	PORTB &= ~(1 << M2A); // PD2 en bajo
+	PORTB &= ~(1 << M2B); // PD3 en bajo
+}
+
+// Movimiento a la derecha
+void derecha() {
+	PORTD &= ~(1 << M1A); // PD0 en bajo
+	PORTD &= ~(1 << M1B); // PD1 en bajo
+	PORTB |= (1 << M2A);  // PD2 en alto
+	PORTB &= ~(1 << M2B); // PD3 en bajo
+}
+void stop(){
+	PORTD &= ~(1 << M1A); // PD0 en bajo
+	PORTD &= ~(1 << M1B); // PD1 en bajo
+	PORTB &= ~(1 << M2A);  // PD2 en bajo
+	PORTB &= ~(1 << M2B); // PD3 en bajo
+}
+int main(void){
+	unsigned char data;
+	setpin();
+	USART_Init();
+	_delay_ms(1000);
+	if(UCSR0A & (1<<RXC0)){
+		data = USART_Receive();
+		if (data == 'F'){
+			adelante();
+		}
+		else if(data == 'B'){
+			atras();
+		}
+		else if(data == 'L'){
+			izquierda();
+		}
+		else if(data == 'R'){
+			derecha();
+		}
+		else if(data == 'S'){
+			stop();
+		}
+	}
+	return 0;
+}
