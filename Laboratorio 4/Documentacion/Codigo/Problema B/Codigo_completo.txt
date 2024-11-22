@@ -1,178 +1,124 @@
-/*
- * main.c
- *
- * Created: 11/10/2024 8:54:52 PM
- * Author: UTEC-5695
- */
-
-#define F_CPU 16000000UL
-
-#include <xc.h>
+#define F_CPU 16000000UL // Frecuencia del CPU
 #include <avr/io.h>
-#include <avr/interrupt.h>
 #include <util/delay.h>
+#define BAUD 9600 //104 para 9600 - 26 para 38400
+#define MY_UBRR F_CPU/16/BAUD-1
+#define M1A PD3
+#define M1B PD5
+#define M2A PB2
+#define M2B PB3
 
-#define BAUD 9600
-#define MY_UBRR F_CPU/10/BAUD-1
-#define MYUBRR F_CPU/16/BAUD-1
-
-#define TX_PIN PB2
-#define RX_PIN PB3
-#define LED_PIN PC5
-#define MOTOR_HORARIO PB0
-#define MOTOR_ANTIHORARIO PB1
-#define APAGADO_EMERGENCIA PC3
-
-volatile uint8_t motor_direction = 0;  // 0: Motor apagado, 1: Horario, 2: Antihorario
-
-void initSerial() {
-    DDRB |= (1<<TX_PIN);   // Configura TX como salida
-    DDRB &= ~(1<<RX_PIN);  // Configura RX como entrada
+void setupPWM(){
+	// Configurar el Timer1 para PWM en el pin OC1A (PB1)
+	TCCR1A |= (1<<COM1A1) | (1<<WGM11); // Fast PWM
+	TCCR1B |= (1<<WGM13) | (1<<WGM12) | (1<<CS11); // Prescaler de 8
+	ICR1 = 19999; // Configuramos la frecuencia para 50 Hz
+	DDRB |= (1<<PB1); // Salida PWM en PB1
 }
 
-void USART_Init() {
-    UBRR0H = (MY_UBRR >> 8);
-    UBRR0L = MY_UBRR;
-    UCSR0B = (1<<RXEN0) | (1<<TXEN0);
-    UCSR0C = (1<<UCSZ01) | (1<<UCSZ00);
+//FUncion que se encarga deenviar el valor del PWM al registro OCR1A para su salida
+void setPWM(uint16_t duty){
+	OCR1A = duty; // Ajusta ciclo útil del PWM
 }
 
-void USART_Transmit(unsigned char data) {
-    while (!(UCSR0A & (1<<UDRE0)));
-    UDR0 = data;
+void uart_init(unsigned int ubrr) {
+	UBRR0H = (unsigned char)(ubrr >> 8);
+	UBRR0L = (unsigned char)ubrr;
+	UCSR0B = (1 << RXEN0) | (1 << TXEN0);  // Habilitar receptor y transmisor
+	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00); // Modo 8 datos, 1 stop bit
 }
 
-unsigned char USART_Receive() {
-    while (!(UCSR0A & (1<<RXC0)));
-    return UDR0;
+unsigned char uart_receive() {
+	while (!(UCSR0A & (1 << RXC0))); // Esperar dato
+	return UDR0;
+}
+// ------------------ Separacion --------------------------
+void setpin() {
+	DDRD |= (1 << M1A);
+	DDRD |= (1 << M1B);
+	DDRB |= (1 << M2B);
+	DDRB |= (1 << M2A);
 }
 
-void UART_sendString(const char *str) {
-    while (*str) {
-        USART_Transmit(*str++);
-    }
+// Movimiento hacia adelante
+void adelante() {
+	PORTD |= (1 << M1A);  // PD0 en alto
+	PORTD &= ~(1 << M1B); // PD1 en bajo
+	PORTB |= (1 << M2A);  // PD2 en alto
+	PORTB &= ~(1 << M2B); // PD3 en bajo
 }
 
-void sendByteGPIO(uint8_t data) {
-    PORTB &= ~(1<<TX_PIN);  // Start bit
-    _delay_us(105);
-
-    for (int i=0; i<8; i++) {
-        if (data & (1<<i)) {
-            PORTB |= (1<<TX_PIN);
-        } else {
-            PORTB &= ~(1<<TX_PIN);
-        }
-        _delay_us(105);
-    }
-
-    PORTB |= (1<<TX_PIN);  // Stop bit
-    _delay_us(105);
+// Movimiento hacia atrás
+void atras() {
+	PORTD &= ~(1 << M1A);
+	PORTD |= (1 << M1B);  // PD1 en alto
+	PORTB &= ~(1 << M2A); // PD2 en bajo
+	PORTB |= (1 << M2B);  // PD3 en alto
 }
 
-uint8_t receiveByteGPIO() {
-    uint8_t data = 0;
-
-    while (PINB & (1<<RX_PIN));
-    _delay_us(105);
-
-    for (int i=0; i<8; i++) {
-        if (PINB & (1<<RX_PIN)) {
-            data |= (1<<i);
-        }
-        _delay_us(105);
-    }
-
-    while (!(PINB & (1<<RX_PIN)));
-    return data;
+// Movimiento a la izquierda
+void derecha() {
+	PORTD |= (1 << M1A);  // PD0 en alto
+	PORTD &= ~(1 << M1B); // PD1 en bajo
+	PORTB &= ~(1 << M2A); // PD2 en bajo
+	PORTB &= ~(1 << M2B); // PD3 en bajo
 }
 
-void timer1_init() {
-    TCCR1B |= (1 << WGM12);
-    OCR1A = 390620;
-    TIMSK1 |= (1 << OCIE1A);
+// Movimiento a la derecha
+void izquierda() {
+	PORTD &= ~(1 << M1A); // PD0 en bajo
+	PORTD &= ~(1 << M1B); // PD1 en bajo
+	PORTB |= (1 << M2A);  // PD2 en alto
+	PORTB &= ~(1 << M2B); // PD3 en bajo
 }
-
-void int1_int0_init() {
-    DDRD &= ~(1 << PD2) & ~(1 << PD3);
-    PORTD |= (1 << PD2) | (1 << PD3);
-
-    EICRA |= (1 << ISC01) | (1 << ISC11);
-    EICRA &= ~((1 << ISC00) | (1 << ISC10));
-    EIMSK |= (1 << INT0) | (1 << INT1);
-    sei();
+void stop(){
+	PORTD &= ~(1 << M1A); // PD0 en bajo
+	PORTD &= ~(1 << M1B); // PD1 en bajo
+	PORTB &= ~(1 << M2A);  // PD2 en bajo
+	PORTB &= ~(1 << M2B); // PD3 en bajo
 }
-
-ISR(INT0_vect) {
-	if (motor_direction == 0) {  // Solo activar si el motor está apagado
-		PORTB |= (1 << MOTOR_HORARIO);
-		PORTB &= ~(1 << MOTOR_ANTIHORARIO);
-		motor_direction = 1;  // Indica giro horario
-		TCCR1B |= (1 << CS12) | (1 << CS10);
+int main() {
+	uart_init(MY_UBRR);
+	setpin();
+	setupPWM();
+	unsigned char data;
+	adelante();
+	_delay_ms(3000);
+	atras();
+	_delay_ms(3000);
+	izquierda();
+	_delay_ms(1000);
+	derecha();
+	_delay_ms(1000);
+	stop();
+	_delay_ms(1000);
+	while (1){
+		 data = uart_receive();
+		switch (data){
+			case 'X':
+			adelante();
+			break;
+			case 'B':
+			atras();
+			break;
+			case 'L':
+			izquierda();
+			break;
+			case 'R':
+			derecha();
+			break;
+			case 'S':
+			stop();
+			break;
+			case 'O':
+			adelante();
+			atras();
+			break;
+			case 'Y':
+			atras();
+			adelante();
+			break;		
+			}
 	}
-}
-
-ISR(INT1_vect) {
-	if (motor_direction == 0) {  // Solo activar si el motor está apagado
-		PORTB |= (1 << MOTOR_ANTIHORARIO);
-		PORTB &= ~(1 << MOTOR_HORARIO);
-		motor_direction = 2;  // Indica giro antihorario
-		TCCR1B |= (1 << CS12) | (1 << CS10);
-	}
-}
-
-ISR(TIMER1_COMPA_vect) {
-    PORTB &= ~(1 << MOTOR_HORARIO);
-    PORTB &= ~(1 << MOTOR_ANTIHORARIO);
-	motor_direction = 0;  // Indica que el motor está apagado
-    // Detener el temporizador al desactivar el prescaler
-    TCCR1B &= ~((1 << CS12) | (1 << CS10));
-}
-
-int main(void) {
-	DDRC &= ~(1 << APAGADO_EMERGENCIA);  // Configurar APAGADO_EMERGENCIA como entrada
-	PORTC |= (1 << APAGADO_EMERGENCIA);
-    DDRB |= (1 << MOTOR_HORARIO) | (1 << MOTOR_ANTIHORARIO);
-    initSerial();
-    USART_Init();
-    int1_int0_init();
-    timer1_init();
-
-    UART_sendString("Motores apagados!\r\n");
-
-    while (1) {
-        if (!(PINB & (1<<RX_PIN))) {
-            uint8_t receivedGPIO = receiveByteGPIO();
-            USART_Transmit(receivedGPIO);
-			
-            if(!(PINC & (1 << APAGADO_EMERGENCIA))){
-		PORTB &=~(1<<MOTOR_ANTIHORARIO);
-		PORTB &= ~(1<<MOTOR_HORARIO);
-		motor_direction = 0;				
-				
-	    }else if  (receivedGPIO == 'C'){
-			PORTB &=~(1<<MOTOR_ANTIHORARIO);
-			PORTB &= ~(1<<MOTOR_HORARIO);
-			motor_direction = 0;
-	    } else if ((receivedGPIO == 'A') | (PORTB & (1 << MOTOR_HORARIO))) {
-                PORTB |= (1<<MOTOR_HORARIO);
-                PORTB &= ~(1<<MOTOR_ANTIHORARIO);
-                UART_sendString("Motor en sentido horario encendido!\r\n");
-            } else if((receivedGPIO == 'B') | (PORTB & (1 << MOTOR_ANTIHORARIO))){
-                PORTB &= ~(1<<MOTOR_HORARIO);
-		PORTB |= (1<<MOTOR_ANTIHORARIO);
-				
-            }else{
-		PORTB &= ~(1<<MOTOR_ANTIHORARIO);
-		PORTB &= ~(1<<MOTOR_HORARIO);
-		}
-        }
-
-        if (UCSR0A & (1<<RXC0)) {
-            uint8_t receivedUSART = USART_Receive();
-            sendByteGPIO(receivedUSART);
-        }
-
-
-    }
+	return 0;
 }
