@@ -1,33 +1,37 @@
-#define F_CPU 16000000UL
+#define F_CPU 16000000UL // Frecuencia del CPU
 #include <avr/io.h>
 #include <util/delay.h>
-#define BAUD 9600
-#define MY_UBRR F_CPU/10/BAUD-1
+#define BAUD 9600 
+#define MY_UBRR F_CPU/16/BAUD-1
 #define M1A PD3
 #define M1B PD5
 #define M2A PB2
 #define M2B PB3
 
-void USART_Init(){
-	UBRR0H = (MY_UBRR >> 8);
-	UBRR0L = MY_UBRR;
-	UCSR0B = (1<<RXEN0) | (1<<TXEN0);
-	UCSR0C = (1<<UCSZ01) | (1<<UCSZ00);
+void setupPWM(){
+	// Configurar el Timer1 para PWM en el pin OC1A (PB1)
+	TCCR1A |= (1<<COM1A1) | (1<<WGM11); // Fast PWM
+	TCCR1B |= (1<<WGM13) | (1<<WGM12) | (1<<CS11); // Prescaler de 8
+	ICR1 = 19999; // Configuramos la frecuencia para 50 Hz
+	DDRB |= (1<<PB1); // Salida PWM en PB1
 }
 
-void USART_Transmit(unsigned char data){
-	while(!(UCSR0A & (1<<UDRE0)));
-	UDR0 = data;
+//FUncion que se encarga deenviar el valor del PWM al registro OCR1A para su salida
+void setPWM(uint16_t duty){
+	OCR1A = duty; // Ajusta ciclo útil del PWM
 }
 
-unsigned char USART_Receive(){
-	while(!(UCSR0A & (1<<RXC0)));
+void uart_init(unsigned int ubrr) {
+	UBRR0H = (unsigned char)(ubrr >> 8);
+	UBRR0L = (unsigned char)ubrr;
+	UCSR0B = (1 << RXEN0) | (1 << TXEN0);  // Habilitar receptor y transmisor
+	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00); // Modo 8 datos, 1 stop bit
+}
+
+unsigned char uart_receive() {
+	while (!(UCSR0A & (1 << RXC0))); // Esperar dato
 	return UDR0;
 }
-
-
-// ------------------ Separacion --------------------------
-
 void setpin() {
 	DDRD |= (1 << M1A);
 	DDRD |= (1 << M1B);
@@ -37,63 +41,88 @@ void setpin() {
 
 // Movimiento hacia adelante
 void adelante() {
-	PORTD |= (1 << M1A);  // PD0 en alto
-	PORTD &= ~(1 << M1B); // PD1 en bajo
-	PORTB |= (1 << M2A);  // PD2 en alto
-	PORTB &= ~(1 << M2B); // PD3 en bajo
+	PORTD |= (1 << M1A); 
+	PORTD &= ~(1 << M1B);
+	PORTB |= (1 << M2A);  
+	PORTB &= ~(1 << M2B); 
 }
 
 // Movimiento hacia atrás
 void atras() {
 	PORTD &= ~(1 << M1A);
-	PORTD |= (1 << M1B);  // PD1 en alto
-	PORTB &= ~(1 << M2A); // PD2 en bajo
-	PORTB |= (1 << M2B);  // PD3 en alto
+	PORTD |= (1 << M1B); 
+	PORTB &= ~(1 << M2A); 
+	PORTB |= (1 << M2B);  
 }
 
 // Movimiento a la izquierda
-void izquierda() {
-	PORTD |= (1 << M1A);  // PD0 en alto
-	PORTD &= ~(1 << M1B); // PD1 en bajo
-	PORTB &= ~(1 << M2A); // PD2 en bajo
-	PORTB &= ~(1 << M2B); // PD3 en bajo
+void derecha() {
+	PORTD |= (1 << M1A);  
+	PORTD &= ~(1 << M1B); 
+	PORTB &= ~(1 << M2A); 
+	PORTB &= ~(1 << M2B); 
 }
 
 // Movimiento a la derecha
-void derecha() {
-	PORTD &= ~(1 << M1A); // PD0 en bajo
-	PORTD &= ~(1 << M1B); // PD1 en bajo
-	PORTB |= (1 << M2A);  // PD2 en alto
-	PORTB &= ~(1 << M2B); // PD3 en bajo
+void izquierda() {
+	PORTD &= ~(1 << M1A); 
+	PORTD &= ~(1 << M1B); 
+	PORTB |= (1 << M2A);  
+	PORTB &= ~(1 << M2B); 
 }
 void stop(){
-	PORTD &= ~(1 << M1A); // PD0 en bajo
-	PORTD &= ~(1 << M1B); // PD1 en bajo
-	PORTB &= ~(1 << M2A);  // PD2 en bajo
-	PORTB &= ~(1 << M2B); // PD3 en bajo
+	PORTD &= ~(1 << M1A); 
+	PORTD &= ~(1 << M1B); 
+	PORTB &= ~(1 << M2A); 
+	PORTB &= ~(1 << M2B);
 }
-int main(void){
-	unsigned char data;
+
+int main() {
+	uart_init(MY_UBRR);
 	setpin();
-	USART_Init();
+	setupPWM();
+	unsigned char data;
+	adelante();
+	_delay_ms(3000);
+	atras();
+	_delay_ms(3000);
+	izquierda();
 	_delay_ms(1000);
-	if(UCSR0A & (1<<RXC0)){
-		data = USART_Receive();
-		if (data == 'F'){
+	derecha();
+	_delay_ms(1000);
+	stop();
+	_delay_ms(1000);
+	while (1){
+		 data = uart_receive();
+		switch (data){
+			case 'X':
 			adelante();
-		}
-		else if(data == 'B'){
+			break;
+			case 'B':
 			atras();
-		}
-		else if(data == 'L'){
-			izquierda();
-		}
-		else if(data == 'R'){
+			break;
+			case 'L':
 			derecha();
-		}
-		else if(data == 'S'){
+			break;
+			case 'R':
+			izquierda();
+			break;
+			case 'S':
 			stop();
-		}
+			break;
+			case 'O':
+			setPWM(100);
+			_delay_ms(1000);
+			setPWM(2000);
+			_delay_ms(1000);
+			break;
+			case 'Y':
+			setPWM(3500);
+			_delay_ms(1000);
+			setPWM(2000);
+			_delay_ms(1000);
+			break;		
+			}
 	}
 	return 0;
 }
