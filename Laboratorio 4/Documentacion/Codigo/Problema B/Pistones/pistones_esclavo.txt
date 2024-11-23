@@ -1,0 +1,175 @@
+#define F_CPU 16000000UL
+
+#include <avr/io.h>
+#include <util/delay.h>
+
+#define BAUD 9600
+#define MY_UBRR F_CPU/16/BAUD-1
+
+#define TX_PIN PB0
+#define RX_PIN PB1
+
+void initSerial() {
+	DDRB |= (1 << TX_PIN);
+	DDRB &= ~(1 << RX_PIN);
+}
+
+void USART_Init() {
+	UBRR0H = ((MY_UBRR) >> 8);
+	UBRR0L = MY_UBRR;
+	UCSR0B = (1 << RXEN0) | (1 << TXEN0);
+	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
+
+}
+
+void USART_Transmit(unsigned char data) {
+	while (!(UCSR0A & (1 << UDRE0)));
+	UDR0 = data;
+}
+
+unsigned char USART_Receive(void) {
+	while (!(UCSR0A & (1 << RXC0)));
+	return UDR0;
+}
+
+void sendByteGPIO(uint8_t data) { //enviar un byte a través de PB0(tx)
+	PORTB &= ~(1 << TX_PIN);
+	_delay_us(105);
+	
+	for(int i = 0; i < 8; i++) {
+		if (data & (1 << i)) {
+			PORTB |= (1 << TX_PIN);
+			} else {
+			PORTB &= ~(1 << TX_PIN);
+		}
+		_delay_us(105);
+	}
+
+	PORTB |= (1 << TX_PIN);
+	_delay_us(105);
+}
+
+uint8_t receiveByteGPIO() {
+	uint8_t data = 0;
+	
+	while (PINB & (1 << RX_PIN));
+	
+	_delay_us(105);
+
+	for(int i = 0; i < 8; i++) {
+		if (PINB & (1 << RX_PIN)) {
+			data |= (1 << i);
+		}
+		_delay_us(105);
+	}
+
+	while (!(PINB & (1 << RX_PIN)));
+
+	return data;
+}
+
+// Definición de pines para relés
+#define RELAY_1 PD5// Piston 1
+#define RELAY_2 PD6 //Sistema de vacío
+#define RELAY_3 PD7 //  Piston 2
+
+void initRelays() {
+	// Configura los pines de los relés como salida
+	DDRD |= (1 << RELAY_1) | (1 << RELAY_2) | (1 << RELAY_3);
+
+	// Inicializa los relés apagados
+	PORTD &= ~((1 << RELAY_1) | (1 << RELAY_2) | (1 << RELAY_3));
+}
+
+
+void activateRelay(uint8_t relay) {
+	PORTD |= (1 << relay);  // Activa el relé
+}
+
+void deactivateRelay(uint8_t relay) {
+	PORTD &= ~(1 << relay); // Desactiva el relé
+}
+
+void automaticSequence() {
+	// Activar pistón 1 (depósito de etiquetas)
+	activateRelay(RELAY_1);
+	_delay_ms(4000); // Esperar 1 segundo (ajustable)
+
+	// Activar pistón 2 (etiquetadora)
+	activateRelay(RELAY_3);
+	_delay_ms(4000);
+
+	// Activar sistema de vacío
+	activateRelay(RELAY_2);
+	_delay_ms(4000);
+
+	deactivateRelay(RELAY_3);
+	_delay_ms(4000);
+	// 	// Mantener el sistema activo por 30 segundos
+	// 	_delay_ms(8000);
+
+	deactivateRelay(RELAY_1);
+	_delay_ms(4000);
+	// Desactivar relés en orden inverso
+	
+	activateRelay(RELAY_3);
+	_delay_ms(4000);
+	
+	deactivateRelay(RELAY_2);
+	_delay_ms(4000);
+	
+	deactivateRelay(RELAY_3);
+	_delay_ms(4000);
+	
+	activateRelay(RELAY_2);
+	_delay_ms(4000);
+	
+	deactivateRelay(RELAY_3);
+	_delay_ms(4000);
+	
+	deactivateRelay(RELAY_2);
+	_delay_ms(4000);
+	
+}
+
+
+int main() {
+	USART_Init();
+	initSerial();
+	initRelays();   // Inicializar relés
+
+	while (1) {
+		if ((PINB & (1 << RX_PIN))) {
+			uint8_t command = receiveByteGPIO();
+			USART_Transmit(command);
+			_delay_us(100);
+
+			// Controlar los LEDs en función del comando recibido con if-else
+			if (command == '5') {
+				PORTD |= (1 << PD6);   // Enciende el LED en PD6
+				PORTD &= ~((1 << PD5) | (1 << PD7)); // Apaga los demás
+				_delay_ms(3000);
+				PORTD &= ~(1<<PD6);
+				asm("jmp main");
+				} else if (command == '3') {
+				PORTD |= (1 << PD7);   // Enciende el LED en PD7
+				PORTD &= ~((1 << PD5) | (1 << PD6)); // Apaga los demás
+				_delay_ms(3000);
+				asm("jmp main");
+				} else if (command == 'A') {
+				PORTD &= ~((1 << PD6) | (1 << PD7)); // Apaga PD6 y PD7
+				PORTD |= (1 << PD5);    // Enciende PD5
+				_delay_ms(3000);
+				asm("jmp main");
+				}else if(command == '9'){
+				automaticSequence();
+				_delay_ms(3000);
+				} else {
+				PORTD &= ~((1 << PD5) | (1 << PD6) | (1 << PD7)); // Apaga todos los LEDs
+				}
+			
+}
+	}
+
+	return 0;
+}
