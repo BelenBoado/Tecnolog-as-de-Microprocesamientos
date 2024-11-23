@@ -1,0 +1,133 @@
+//Definimos las librerias a utilzar y variables 
+#define F_CPU 16000000UL
+
+#include <avr/io.h>
+#include <util/delay.h>
+
+#define BAUD 9600
+#define MY_UBRR F_CPU/16/BAUD-1
+
+#define TX_PIN PB0
+#define RX_PIN PB1
+//Configuramos la comunicacion serial entre modulos
+void initSerial() {
+	DDRB |= (1 << TX_PIN);
+	DDRB &= ~(1 << RX_PIN);
+}
+
+void USART_Init() {
+	UBRR0H = ((MY_UBRR) >> 8);
+	UBRR0L = MY_UBRR;
+	UCSR0B = (1 << RXEN0) | (1 << TXEN0);
+	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
+
+}
+
+void USART_Transmit(unsigned char data) {
+	while (!(UCSR0A & (1 << UDRE0)));
+	UDR0 = data;
+}
+
+unsigned char USART_Receive(void) {
+	while (!(UCSR0A & (1 << RXC0)));
+	return UDR0;
+}
+
+void sendByteGPIO(uint8_t data) { //enviar un byte a través de PB0(tx)
+	PORTB &= ~(1 << TX_PIN);
+	_delay_us(105);
+	
+	for(int i = 0; i < 8; i++) {
+		if (data & (1 << i)) {
+			PORTB |= (1 << TX_PIN);
+			} else {
+			PORTB &= ~(1 << TX_PIN);
+		}
+		_delay_us(105);
+	}
+
+	PORTB |= (1 << TX_PIN);
+	_delay_us(105);
+}
+
+uint8_t receiveByteGPIO() {
+	uint8_t data = 0;
+	
+	while (PINB & (1 << RX_PIN));
+	
+	_delay_us(105);
+
+	for(int i = 0; i < 8; i++) {
+		if (PINB & (1 << RX_PIN)) {
+			data |= (1 << i);
+		}
+		_delay_us(105);
+	}
+
+	while (!(PINB & (1 << RX_PIN)));
+
+	return data;
+}
+
+
+int main() {
+//Inicializamos las comunicaciones
+	USART_Init();
+	initSerial();
+	//Configuramos como salidas el puerto D para los reles
+	DDRD |= (1 << PD5) | (1 << PD6) | (1 << PD7);
+	PORTD &= ~((1 << PD5) | (1 << PD6) | (1 << PD7));
+
+	DDRB |= (1 << TX_PIN);  // TX_PIN como salida
+	DDRB &= ~(1 << RX_PIN); // RX_PIN como entrada
+	while (1) {
+		if ((PINB & (1 << RX_PIN))) {
+			uint8_t command = receiveByteGPIO();
+			USART_Transmit(command);
+			_delay_us(100);
+
+			// Controlar los LEDs en función del comando recibido
+			if (command == '5') {
+				PORTD |= (1 << PD6);   
+				PORTD &= ~((1 << PD5) | (1 << PD7)); 
+				_delay_ms(8000);
+				asm("jmp main");
+				} else if (command == 'B') {
+				PORTD |= (1 << PD7);  
+				PORTD &= ~((1 << PD5) | (1 << PD6)); 
+				_delay_ms(5000);
+
+				PORTD &= ~((1<<PD5) | (1<<PD7));				
+				PORTD |= (1 << PD6);
+				_delay_ms(8000);				
+				asm("jmp main");
+				} else if (command == '9') {
+				PORTD &= ~((1 << PD6) | (1 << PD7)); 
+				PORTD |= (1 << PD5);    
+				_delay_ms(5000);
+				PORTD &= ~((1<<PD5) | (1<<PD7));
+				PORTD |= (1 << PD6);				
+				_delay_ms(8000);				
+				asm("jmp main");
+				} else if (command == '3'){
+				PORTD |= (1<<PD5);
+				PORTD &= ~((1<<PD6) | (1<<PD7));
+				_delay_ms(5000);
+				PORTD |= (1<<PD6);
+				PORTD &= ~((1<<PD5) | (1<<PD7));
+				_delay_ms(8000);
+				PORTD |= (1<<PD7);
+				PORTD &= ~((1<<PD5) | (1<<PD6));
+				_delay_ms(5000);
+				PORTD |= (1<<PD6);
+				PORTD &= ~((1<<PD5) | (1<<PD7));
+				_delay_ms(8000);	
+				PORTD &= ~((1<<PD6) | (1<<PD7) | (1<<PD5));			
+				}else {
+				PORTD &= ~((1 << PD5) | (1 << PD6) | (1 << PD7)); 
+			}
+		}
+	}
+
+	return 0;
+}
