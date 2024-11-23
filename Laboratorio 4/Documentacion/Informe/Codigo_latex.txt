@@ -1,1 +1,307 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage{fancyvrb}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\begin{document}
+
+\title{Laboratorio 4\\}
+
+
+\author{\IEEEauthorblockN{1\textsuperscript{st} Belen Boado}
+\IEEEauthorblockA{\textit{Ingenieria Mecatronica} \\
+\textit{Universidad Tecnologica (UTEC)}\\
+Fray Bentos, Rio Negro \\
+\url{belen.boado@estudiantes.utec.edu.uy}
+}
+\and
+\IEEEauthorblockN{2\textsuperscript{nd} Luis Nuñez}
+\IEEEauthorblockA{\textit{Ingenieria Mecatronica} \\
+\textit{Universidad Tecnologica (UTEC)}\\
+Fray Bentos, Rio Negro \\
+\url{luis.nunez@estudiantes.utec.edu.uy}}
+\and
+\IEEEauthorblockN{3\textsuperscript{rd} Adrian Terzaghi}
+\IEEEauthorblockA{\textit{Ingenieria Mecatronica} \\
+\textit{Universidad Tecnologica (UTEC)}\\
+Fray Bentos, Rio Negro \\
+\url{adrian.terzaghi@estudiantes.utec.edu.uy}}
+}
+
+\maketitle
+
+
+\begin{IEEEkeywords}
+ATmega328P, Plotter, Teclado, LCD
+\end{IEEEkeywords}
+\section{Resumen}
+En este laboratorio se trabajó con microcontroladores ATmega328P y tecnologías como comunicación SPI y Bluetooth para desarrollar tres proyectos principales: un sistema maestro-esclavo para control de dispositivos, un sistema inalámbrico para supervisión remota y un vehículo eléctrico para competencias. Estos proyectos permitieron aplicar conceptos de automatización y comunicación, superar desafíos técnicos relacionados con la configuración de módulos Bluetooth y la sincronización de dispositivos, y fomentar el trabajo en equipo. Los resultados reflejan una realizacion positiva en cuantos a los objetivos planteados.
+\section{Introducción}
+Los sistemas embebidos son herramientas clave en el diseño de soluciones modernas para controlar y supervisar procesos en distintos contextos, como la industria y la educación. Este informe detalla los proyectos realizados en el Laboratorio 4, donde se trabajó con microcontroladores ATmega328P y tecnologías como comunicación SPI y Bluetooth para resolver desafíos prácticos.
+
+El laboratorio incluyó tres actividades principales: la creación de un sistema maestro-esclavo para controlar dispositivos, la implementación de un sistema inalámbrico para supervisar procesos a distancia y el diseño de un vehículo eléctrico controlado remotamente para una competencia. Cada proyecto buscó aplicar conceptos de automatización, comunicación y trabajo en equipo, fomentando el desarrollo de habilidades prácticas.
+
+
+\section{Objetivos}
+
+\subsection{Objetivo General}
+Diseñar e implementar sistemas de control distribuidos utilizando microcontroladores, aplicados a escenarios específicos como sistemas maestro-esclavo, comunicación inalámbrica y manejo de autos a control remoto.
+\subsection{Objetivos especificos}
+\begin{itemize}
+    \item Comprender el funcionamiento de un sistema maestro-esclavo.
+    \item Implementar comunicación inalámbrica mediante modulos HC-05.
+    \item Comprender el funcionamiento de motores industriales y pistones automaticos.
+    \item Desarrollar un auto a control remoto.
+
+\end{itemize}
+
+
+\section{Marco teórico}
+A continuacion, se plantearan algunos conceptos fundamentales para la realizacion de esta practica, como el concepto del microcontrolador ATmega328P, una breve definicion del lenguaje C, y algunas definiciones de componentes importantes de los problemas a realizar.  
+
+\subsection{Microcontrolador ATmega328P}\label{AA}
+El microcontrolador ATmega328 es un microcontrolador de 8 bits basado en una arquitectura de RISC. Posee muchas características como una memoria flash de 32KB con una capacidad de lectura en simultáneo a escritura, una memoria EEPROM de 1KB, un SRAM de 2KB y 23 pines de uso. Además, posee 32 registros, 3 temporizadores flexibles, soporta interrupciones externas y posee internas, una interfaz para la comunicación serial en los pines PD0 y PD1, y Conversor Análogo Digital. Por último, posee temporizador de modo de ahorro de energía y un temporizador “Watchdog”. Este microcontrolador opera entre 1.8 y 5.5 volts.
+
+Un reemplazo frecuente  para este microcontrolador es el ATmega328P, ya que comparten en su mayoría las mismas características. Este se encuentra comúnmente en la plataforma de Arduino UNO y Arduino Nano.
+
+\subsubsection{Caracteristicas}
+\begin{itemize}
+    \item 131 instrucciones.
+    \item Hasta 20 MIPS a 20 MHz.
+    \item Memoria FLASH programable en el sistema de 32 KB.
+    \item 2 KB de SRAM interna.
+    \item 1 KB de EEPROM.
+    \item 6 canales PWM.
+    \item 6 canales analógicos para el ADC.
+    \item Puerto USART, SPI e interfaz serial de 2 cables.
+    \item Temporizador watchdog y comparador analógico.
+    \item Soporte para múltiples modos de bajo consumo.
+
+\end{itemize}
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.5\textwidth]{Imagenes/Imagen atmega328p.PNG}}
+\caption{Circuito interno del ATmega328P.}
+\label{fig}
+\end{figure}
+
+\subsection{Lenguaje C}
+Este lenguaje es uno de los más importantes y utilizados a nivel informático. Fue desarrollado en la década de 1970 por los Laboratorios Bell por Dennis Ritchie, evolucionando del lenguaje B y fue creado con la idea de implementar el sistema operativo UNIX, por lo cual fue muy popular en la industria.
+
+C es un lenguaje destacado por su capacidad de manipulación de hardware y memoria, volviendolo un lenguaje eficiente y portatil.Su impacto ha sido muy grande en la industria, influyendo en la creación de lenguajes como C++, Java y Javascript.
+
+\subsubsection{Características}
+\begin{itemize}
+    \item Manipulación directa de hardware y memoria.
+    \item Eficiencia y portabilidad.
+    \item Amplia influencia en otros lenguajes de programación.
+
+\end{itemize}
+
+\subsection{HC-05}
+El módulo Bluetooth HC-05 es un dispositivo muy utilizado en proyectos con el fin de establecer comunicación inalámbrica mediante la conexión Bluetooth. Este módulo puede configurarse tanto como maestro (para iniciar conexiones) como esclavo (para recibir conexiones), lo que lo hace más versátil que el HC-06, que solo funciona como esclavo. Soporta una velocidad de transmisión de datos de hasta 1 Mbps y posee un rango operativo de aproximadamente 10 metros.
+
+El HC-05 opera con un voltaje de alimentación entre 3.6V y 6V, y consume una corriente de 50 mA. Por defecto, el módulo tiene configurado un baud rate de 38400 bps, pero esto puede ajustarse mediante comandos AT, que también permiten modificar el nombre del dispositivo, la contraseña, y su rol de maestro o esclavo. Su uso más común incluye la integración con microcontroladores como Arduino, PIC o AVR, y su configuración se realiza a través de pines RXD y TXD para la comunicación serial TTL.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.3\textwidth]{Imagenes/hc-05.jpeg}}
+\caption{Circuito integrado Puente H.}
+\label{fig}
+\end{figure}
+
+
+\subsection{Motor Induccion AC}
+Los motores de inducción son ampliamente utilizados en la industria debido a su durabilidad, eficiencia y bajo costo de mantenimiento. Funcionan por inducción electromagnética: un campo magnético del estator induce una corriente en el rotor, generando un par motor. Existen versiones monofásicas y trifásicas. Los motores monofásicos requieren un capacitor de arranque, mientras que los trifásicos no lo necesitan y son más comunes en aplicaciones industriales, como ventiladores y bombas. La velocidad del rotor de un motor de inducción es siempre algo menor que la del campo magnético del estator. Esta diferencia de velocidad se conoce como "deslizamiento", y es una característica clave del funcionamiento de estos motores.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.3\textwidth]{Imagenes/WhatsApp Image 2024-11-23 at 13.38.53.jpeg}}
+\caption{Circuito integrado Puente H.}
+\label{fig}
+\end{figure}
+
+\subsection{SPI}
+SPI (Serial Peripheral Interface) es un protocolo de comunicación utilizado para conectar un dispositivo maestro con uno o más dispositivos esclavos. Utiliza cuatro líneas principales: MOSI (del maestro al esclavo), MISO (del esclavo al maestro), SCK (reloj generado por el maestro), y SS (selección de esclavo).
+
+SPI permite comunicación full-duplex, lo que significa que puede enviar y recibir datos simultáneamente a altas velocidades, hasta 70 MHz. Sin embargo, cada dispositivo esclavo requiere una línea SS separada, lo que puede complicar el diseño en sistemas con muchos esclavos.
+
+
+\subsection{Puente H}
+El integrado Puente H es un controlador de motores de corriente directa, el cual permite enviar señales a al menos 2 motores al mismo tiempo, proporcionando el control de giro independiente para cada uno.
+
+Este integrado permite utilizar motores de un voltaje inferior a 36 voltios (según el modelo de integrado, en nuestro caso el máximo permitido es 12V) y una corriente proporcional a este valor. 
+
+El Puente H posee una configuración que permite que el voltaje fluya en cualquier dirección, se utiliza, generalmente, para hacer funcionar motores en sentido horario o antihorario.
+
+Aun así, en este laboratorio se utilizo un adaptador especial para la placa Arduino UNO, que facilito el cableado del auto a control bluetooth.
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.5\textwidth]{Imagenes/Puente H (1).jpeg}}
+\caption{Circuito integrado Puente H.}
+\label{fig}
+\end{figure}
+
+\subsection{Servomotores}
+
+Un servomotor es un motor diseñado para el control preciso de movimientos rotativos o lineales, utilizando un sistema de retroalimentación que asegura un posicionamiento exacto. Este tipo de motor se desarrolló a lo largo del siglo XX, inicialmente para aplicaciones en el ámbito militar y aeronáutico, y ha evolucionado para convertirse en un componente clave en la ingeniería moderna.
+
+Su funcionamiento implica recibir una señal de control que indica la posición deseada y ajustar el movimiento del motor mediante un mecanismo de engranaje y un sistema de retroalimentación, que monitorea continuamente la posición actual. Esta capacidad de corrección de errores lo hace esencial en aplicaciones que requieren alta precisión, como la robótica y la maquinaria CNC.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.3\textwidth]{Imagenes/Servomotor (1).jpeg}}
+\caption{Servomotor.}
+\label{fig}
+\end{figure}
+
+\section{Metodología}
+\subsection{Problema A}\label{Problema A} 
+La problemática A consistió en el diseño e implementación de un circuito capaz de establecer comunicación SPI entre dos microcontroladores Atmega328P. El microcontrolador configurado como maestro se encarga de recopilar datos de tres sensores, entre los cuales se incluye un sensor de temperatura y humedad DHT11, y de transmitir dicha información al microcontrolador esclavo. Por su parte, el microcontrolador esclavo recibe los datos enviados por el maestro y controla, como mínimo, tres actuadores en función de la información recibida.
+
+Para cumplir con los objetivos planteados, se diseñó un circuito en el que el microcontrolador maestro incluye:
+\begin{itemize}
+    \item Un sensor DHT11 para medir temperatura y humedad.
+    \item Un botón, utilizado como indicador para la activación de un actuador específico.
+    \item Un potenciómetro, empleado como entrada analógica para controlar la intensidad de otro actuador.
+\end{itemize}
+
+El microcontrolador esclavo, por su parte, controla los siguientes actuadores:
+\begin{enumerate}
+    \item \textbf{Buzzer}: cuya activación está condicionada por el estado del botón conectado al maestro.
+    \item \textbf{LED}: cuya intensidad lumínica varía en función del valor obtenido del potenciómetro en el maestro.
+    \item \textbf{Motor}: cuya dirección de giro depende de la relación entre los valores de temperatura y humedad obtenidos del sensor DHT11. Si la humedad supera a la temperatura, el motor gira en sentido horario; en caso contrario, gira en sentido antihorario. Para el control del motor, se utilizó un puente H (L298N) conectado al esclavo.
+\end{enumerate}
+
+Adicionalmente, se implementaron medios de comunicación para facilitar la visualización de datos durante la operación del sistema:
+\begin{itemize}
+    \item En el microcontrolador maestro, se utilizó una pantalla LCD 16x2 para mostrar en tiempo real cuál dato que está siendo transmitido.
+    \item En el microcontrolador esclavo, los datos de los sensores recibidos se comunican mediante UART para monitoreo externo.
+\end{itemize}
+
+Este diseño asegura una interacción efectiva entre los componentes, cumpliendo con los requisitos establecidos para esta problemática.
+
+\subsection{Problema B}
+
+El problema B consta de dos partes, hacer un programa capaz de realizar la inversión de giro de un motor y un sistema de pistones que simula una cadena de etiquetado y sellado al vació de productos. Para realizar esto fue necesario implementar dos microcontroladores ATmega328P con un modulo HC-05 cada uno, con el fin de realizar una comunicación de maestro-esclavo entre ellos.
+
+\subsubsection{Inversión de giro}
+Para realizar esta primera parte, fue necesario conocer el procedimiento necesario para realizar la configuración de los módulos HC-05, siguiendo las instrucciones proporcionadas por los profesores y ayuda de foros de Arduino.
+
+Para la configuración se siguieron estos pasos:
+\begin{itemize}
+    \item Conexión del modulo a los pines PD0 y PD1 del Arduino.
+    \item Se le carga el código visto en clase al microcontrolador y luego un programa del software Arduino en blanco.
+    \item Se configura el software Arduino a 38400 baudio y comunicación que muestre NL $\&$ CL.
+    \item Se comienza a ingresar los comandos AT para cambiar el nombre, el modo, el CMODE.
+    \item En caso de ser configurado como esclavo, se ingresa AT+MODE=0 y se pide la adress del dispositivo con AT+ADRR?.
+    \item En el caso del maestro, se ingresa el AT+MODE =1 y se vincula los dispositivos con AT+BIND: <adress>.
+    \item Por ultimo, se reinician los dispositivos desconectandolos de la alimentación y volviéndolos a conectar.
+    \item Cuando parpadeen sincronizados ya están conectados.
+\end{itemize}
+
+ Ademas, en este problema, fue necesario saber manejar relés para para accionar los distintos modo de giro y la parada de emergencia del sistema. El circuito diseñado contara con 3 botones, uno de giro horario, otro de giro antihorario y un tercero para la parada de emergencia del sistema.
+
+ Primeramente, se simulara con leds para probar el funcionamiento correcto del sistema sin dañar ningún componente.
+ \subsubsection{Etiquetadora base de pistones}
+ Para el segundo problema, también se realizo la conexión de módulos bluetooth HC-05 siguiendo los mismos pasos del problema anterior. En este caso se controlara mediante botones todo el sistema, contando con 4, uno que realizara la secuencia de Pistón 1, Pistón 2 y sistema de vació en 30 segundos hasta deshabilitarse, y otros 3 que sera para control manual del sistema.
+\subsection{Codigo y simulaciones}
+Para realizar de forma adecuada estos problemas fue necesario diseñar un circuito que se adecuara a los requerimientos del laboratorio de hidráulica y neumática así como los pedidos según las consignas de los problemas.
+Para la comunicación entre módulos es siempre recomendable dejar libre en el montaje físico y en código los pines PD0 y PD1 de comunicación serial así como los pines PB0 y PB1 que serán los nuevos pines de comunicación RX y TX entre módulos. En cuanto a los relés en el caso de la primera parte, se encuentran en los pines PD2, PD3 y PD4, por lo tanto, para nuestra solución se implementaron botones en los pines PB2, PB3, PB4 y PB5, utilizando las interrupciones de estos pines para un funcionamiento optimo del sistema.
+En el caso del segundo problema, se implementaron mas botones, siendo en los pines PC5, PC4 y PC3 los botones para control manual, y en el pin PB2 el funcionamiento automatico del sistema.
+
+A continuacion se adjuntan las simulaciones de la logica seguida para el cableado de ambos circuitos.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.5\textwidth]{Imagenes/logica de cableado.PNG}}
+\caption{Circuito simulado en Proteus del Problema 2, Inversión de giro.}
+\label{fig}
+\end{figure}
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.5\textwidth]{Imagenes/logica del circuito pistones.PNG}}
+\caption{Circuito simulado en Proteus del Problema 2, Sistema de etiquetadora.}
+\label{fig}
+\end{figure}
+
+En cuanto al código, se trabajo con interrupciones en los puertos C y B, del tipo PCINT para poder accionar los botones de parada de emergencia, inversión de giro o activación de pistones de forma que no se superpongan sus funcionamiento entre si en ningún caso. En el caso del segundo problema, se cuenta con un botón de secuencia automática.
+\subsubsection{Montaje físico}
+
+Por ultimo, se procedió a implementar los circuitos de forma física, primero montando un circuito para comprobar la lógica y luego llevándolos al laboratorio para implementar la comunicación Blueetooth mediante el modulo HC-05. Como se observan en las Figuras ~\ref{fig3} y ~\ref{fig4}, se ven los módulos Bluetooth conectados de forma maestro y esclavo, conectados respectivamente a los botones correspondientes para cada caso y para cada relé.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.4\textwidth]{Imagenes/montaje problema bparte a.jpeg}}
+\caption{Circuito físico del Problema 2, Inversión de giro.}
+\label{fig3}
+\end{figure}
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.4\textwidth]{Imagenes/montaje problema b parte b.jpeg}}
+\caption{Circuito físico del Problema 2, Sistema de etiquetadora.}
+\label{fig4}
+\end{figure}
+
+
+\subsection{Problema C}
+Este ejercicio lo que nos plantea es el diseñar , construir y programar un auto del kit fischer, para participar del concurso de autos “Globo Battle” el cual consta de autos de dicho kit con un globo pegado en la parte trasera para cada participante y el objetivo de dicho concurso es explotar el globo del contrario sin que te exploten el tuyo. Para esta competencia construimos el modelo 1 del kit fischer, haciendo algunas mejoras a nivel defensivo ya que este tipo de modelos de autos , no están diseñados para este tipo de competencia. Luego de construido el auto , llega la parte de circuito y código para lo cual utilizamos un módulo bluetooth HC-05 , un arduino uno , cables , 2 motores CC(Incluidos en el kit) , servo motor y un puente H . Para la coneccion bluetooth utilizamos un código que se nos proporcionó en clases de la materia Tecnología de los micro procesamientos , para el control de los motores creamos varias funciones con el nombre del movimiento que hace el auto , como por ejemplo void adelante() lo cual pone en 1 ambos motores en sentido horario para que se desplace hacia adelante. En el main procedemos a llamar a la configuración bluetooth y configuración de pines de los motores, implementamos un sistema de pruebas que llama a cada función de movimiento para saber que no tenemos ningún problema esto es por seguridad , luego entrando en un bucle while en 1 que estará verificando la comunicación bluetooth y un switch con diferentes case , para cada caso una letra que será enviada por la app(Arduino car) del teléfono y llamando a una función del movimiento del auto correspondiente con la acción que se manda desde el teléfono.Para el sistema de ataque implementamos un servo motor con un pincho atado a el , para manejar el movimiento del servo configuramos un pwm y lo llamamos en el main. Después agregándolo al switch con 2 case una para mover el pincho a la izquierda y otro para moverlo a la derecha.
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.5\textwidth]{Imagenes/logica auto.PNG}}
+\caption{Circuito simulado en Proteus del Problema 3, Auto.}
+\label{fig}
+\end{figure}
+\section{Resultados}
+\subsection{Problema A}
+Para abordar la resolución de la problemática A, se llevó a cabo el diseño y simulación del circuito en el software Proteus. Este entorno permitió verificar la funcionalidad del sistema antes de su implementación física. El proceso de resolución se desarrolló en las siguientes etapas:
+
+El circuito completo fue implementado y simulado en Proteus. Durante la simulación, se verificó que el microcontrolador maestro recopilara correctamente los datos de los sensores, los enviara mediante SPI al esclavo y actualizara la pantalla LCD con la accion realizada en cada momento. Por otro lado, el esclavo recibió los datos, controló los actuadores de acuerdo con las especificaciones y transmitió los valores recibidos vía UART.
+
+La simulación en Proteus demostró que el diseño del sistema cumplió con los requerimientos de la problemática A. Tanto la comunicación SPI como la operación de los sensores, actuadores y la interfaz LCD funcionaron correctamente en el entorno virtual. Sin embargo, no se realizó una implementación física del circuito, por lo que no se pudo verificar el comportamiento del sistema en hardware real.  
+
+El principal desafío identificado fue la necesidad de ajustes finos en el código de los microcontroladores para garantizar la sincronización entre el maestro y el esclavo durante la transmisión SPI. A pesar de estas dificultades, el sistema operó de manera satisfactoria en el entorno de simulación.
+
+
+
+\subsection{Problema B}
+\subsubsection{Parte A: Inversión de giro del motor}
+En cuanto a los resultados de esta parte, se identificaron algunas dificultades relacionadas con la conexión entre los módulos HC-05. Estas se debieron a que su configuración requiere métodos que no conocíamos previamente y que fue necesario aprender a utilizar específicamente para este trabajo.
+Para la implementación del sistema se utilizaron dos códigos separados para cada microcontrolador ATmega328P utilizado, uno de maestro y otro de esclavo. El maestro se encarga de recibir la información de que botón ha sido presionado, enviando un numero especifico para que recibe el esclavo, interpretándolo en la acción correspondiente de cambio de giro o de parada del motor.
+El montaje físico implementado para esta parte del laboratorio funcionó correctamente, permitiendo que, al presionar los botones correspondientes, se ejecutaran las tareas previstas de manera adecuada.
+\subsubsection{Parte B: Maquina etiquetadora}
+En cuanto a esta parte del laboratorio realizado, se observaron ciertas dificultados a la hora de la conexión entre los módulos HC-05, ya que llevan una configuración por métodos que no conocíamos y que se debieron aprender a utilizar para este trabajo.
+La implementación de dos códigos, uno maestro que recibiera los datos de los botones presionados, enviando un código especifico para cada tarea que fue recibido por el esclavo, que ejecuta la tarea correspondiente a ese código.
+Los botones dispuestos para la secuencia automática del proceso funciono de forma correcta, así como los botones de control manual. Todo este funcionamiento se realizo usando interrupciones y un contador en el Timer 1 que se encargo de contar hasta 30 segundos, deteniéndola como se pueden ver en los videos adjuntos en la carpeta de Google Drive de este informe.
+\subsection{Problema C}
+Como desarrollo de la solución , nos encontramos con dificultad al momento de la comunicación bluetooth , ya que al momento de implementar el código de clases nos enviaba signos los cuales no eran los caracteres que le enviamos o algunos casos no recibía nada. Como solución llegamos a que eliminar el GPIO era la solución de este problema quedando 2 funciones para el UART , configuración y la de recibir el dato.
+Pero en los demás aspectos logramos el objetivo , teniendo un auto funcional como se podrá apreciar en los videos subidos. Un auto con comunicación bluetooth , un sistema de ataque a través de un servo y pinchos distribuidos por el vehiculo. Un buen control de los motores para un manejo a través de la app como se esperaba.
+\section{Conclusiones}
+
+En este laboratorio se lograron los objetivos planteados, diseñando sistemas de control que integraron diversas tecnologías para resolver problemas prácticos. Durante el proceso, se enfrentaron desafíos como la configuración de comunicación entre dispositivos, los cuales se superaron gracias al aprendizaje y al trabajo en equipo. Los proyectos realizados, como el vehículo controlado a distancia y el sistema automatizado de etiquetado, reflejaron aplicaciones concretas y creativas, permitiendo poner en práctica conceptos teóricos de manera efectiva.
+
+\newpage
+
+\begin{thebibliography}{00}
+\bibitem{b1} Repositorio de GitHub. \url{https://github.com/BelenBoado/Tecnolog-as-de-Microprocesamientos/tree/inicializacion/Laboratorio%202}
+\bibitem{b2} Informacion sobre microcontrolador ATmega328P. \url{https://www.incb.com.mx/index.php/articulos/78-microcontroladores-y-dsps/2546-conociendo-el-microcontrolador-nucleo-core-atmega328p-de-arduino-uno-mic019s}
+\bibitem{b3} Informacion sobre microcontrolador ATmega328P. \url{https://es.wikipedia.org/wiki/Atmega328}
+\bibitem{b4} Informacion sobre el lenguaje de programacion C. \url{https://openwebinars.net/blog/que-es-c/}
+\bibitem{b5} Informacion sobre integrado Puente H. \url{https://laelectronica.com.gt/extras/que-es-y-como-funciona-un-l293d?srsltid=AfmBOoq2ctxZl5rDOHV0MlVaxmWI850rPb-1-R5HcrMKx10at9RnwPZR}
+\bibitem{b6} Informacion sobre Servomotores. \url{https://www.a-m-c.com/es/servomotor/}
+\bibitem{b7} Informacion sobre el modulo HC-05. \url{https://naylampmechatronics.com/inalambrico/43-modulo-bluetooth-hc05.html}
+\bibitem{b8} Informacion sobre . \url{}
+\bibitem{b9} Informacion sobre motores .\url{}
+\bibitem{b10} Informacion sobre la configuracion del modulo HC-05. \url{https://tutowindow.com/como-funciona-hc-05/}
+\bibitem{b11} Pasos utiles para la configuracion del modulo HC-05. \url{https://naylampmechatronics.com/blog/24_configuracion-del-modulo-bluetooth-hc-05-usando-comandos-at.html}
+\bibitem{b12} Informacion sobre motores de induccion. \url{https://demotor.net/motores-electricos/motores-corriente-alterna/motor-asincrono}
+\bibitem{b13} Informacion sobre motores de induccion. \url{https://smartwheels.es/como-funciona-un-motor-de-induccion/}
+\bibitem{b14} Informacion sobre SPI. \url{https://www.makerguides.com/master-slave-spi-communication-arduino/}
+\bibitem{b15} Informacion sobre SPI. \url{https://microcontrollerslab.com/introduction-to-spi-communication-protocol/}
+\bibitem{b16} Carpeta de Videos en Google Drive. \url{https://drive.google.com/drive/folders/12KhNLPPYYEPz5lPZWr1j2ahAXr_NHBvK?usp=sharing}
+
+\end{thebibliography}
+
+
+\end{document}
 
